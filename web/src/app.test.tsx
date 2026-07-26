@@ -15,29 +15,59 @@ describe("campus map app", () => {
     expect(screen.getByText("Google Maps is not configured.")).toBeInTheDocument()
   })
 
-  it("preserves the show-all search behavior and opens amenity details", async () => {
+  it("searches building names case-insensitively and opens restroom details", async () => {
     const user = userEvent.setup()
     render(<App />)
     const drawer = document.querySelector('[data-slot="drawer-popup"]')
 
     expect(drawer).not.toHaveAttribute("data-expanded")
 
-    await user.type(screen.getByRole("searchbox"), "restroom")
+    await user.type(screen.getByRole("searchbox"), "cOrY ReStRoOm")
     await user.click(screen.getByRole("button", { name: "Search" }))
 
     expect(drawer).toHaveAttribute("data-expanded", "")
-    expect(screen.getAllByRole("button", { name: /Floor/ })).toHaveLength(10)
+    expect(screen.getByText("Showing 10 of 10 results.")).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })).toHaveLength(10)
 
-    await user.click(screen.getAllByRole("button", { name: /Restroom.*Soda Hall.*Floor 1/ })[0])
+    await user.click(screen.getByRole("button", { name: /Women's restroom.*Cory Hall 112/i }))
 
-    expect(screen.getByRole("heading", { name: "Restroom" })).toBeInTheDocument()
-    expect(screen.getByText("Last reported 10 minutes ago")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Women's restroom" })).toBeInTheDocument()
+    expect(screen.getByText("Cory Hall")).toBeInTheDocument()
+    expect(screen.getByText("General campus access")).toBeInTheDocument()
+    expect(screen.queryByText("Stall type")).not.toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Back" })).toBeInTheDocument()
 
     await user.click(screen.getByRole("button", { name: "Back" }))
     expect(drawer).toHaveAttribute("data-expanded", "")
-    expect(screen.getByRole("searchbox")).toHaveValue("restroom")
-    expect(screen.getAllByRole("button", { name: /Floor/ })).toHaveLength(10)
+    expect(screen.getByRole("searchbox")).toHaveValue("cOrY ReStRoOm")
+    expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })).toHaveLength(10)
+  })
+
+  it("searches short building names and limits broad generic results", async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const searchbox = screen.getByRole("searchbox")
+
+    await user.type(searchbox, "MLK bathroom")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    expect(screen.getAllByRole("button", { name: /restroom.*Martin Luther King Junior Student Union/i }).length).toBeGreaterThan(0)
+
+    await user.clear(searchbox)
+    await user.type(searchbox, "bathroom")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+
+    expect(screen.getByText("Showing 50 of 1,025 results.")).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(50)
+  })
+
+  it("does not search bathroom locations and reports no building matches", async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.type(screen.getByRole("searchbox"), "N658A")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+
+    expect(screen.getByText("No restrooms found for this building.")).toBeInTheDocument()
   })
 
   it("opens top-level drawer views and keeps the drawer open", async () => {

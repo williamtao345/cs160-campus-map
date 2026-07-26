@@ -4,24 +4,54 @@ import type { FormEvent } from "react"
 import { CampusMap } from "@/components/campus-map"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { amenities, type Amenity } from "@/data/amenities"
+import { buildings, searchRestrooms, type Restroom } from "@/data/restrooms"
 
 type DrawerView = "search" | "details" | "create" | "settings"
 
 const amenityTypes = ["Restroom", "Water refill station", "Vending machine", "Study space", "Food", "Other"]
-const buildings = ["Soda Hall", "Cory Hall", "GSPP", "Sutardja Dai Hall"]
+const buildingOptions = buildings.map((building) => building.name)
 const collapsedSnapPoint = "11rem"
+const resultLimit = 50
 
-function AvailabilityBadge({ availability }: { availability: Amenity["availability"] }) {
-  const variant = availability === "Out of service" ? "destructive" : availability === "Unknown" ? "outline" : "secondary"
-  return <Badge variant={variant}>{availability}</Badge>
+function categoryLabel(category: Restroom["category"]) {
+  if (category === "women") return "Women's"
+  if (category === "men") return "Men's"
+  return "Gender-inclusive"
+}
+
+function AccessibilityBadge({ accessible }: { accessible: boolean }) {
+  return (
+    <Badge
+      variant="outline"
+      className={accessible ? "border-0 bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300" : undefined}
+    >
+      {accessible ? "Accessible" : "Not accessible"}
+    </Badge>
+  )
+}
+
+function RestroomResult({ restroom, onSelect }: { restroom: Restroom; onSelect: () => void }) {
+  return (
+    <button type="button" className="block w-full rounded-xl text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={onSelect}>
+      <div className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10 transition-colors hover:bg-muted/50">
+        <div className="min-w-0 flex-1">
+          <p className="font-heading font-medium leading-snug">{categoryLabel(restroom.category)} restroom</p>
+          <p className="mt-1 text-muted-foreground">{restroom.building.name} {restroom.location}</p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <AccessibilityBadge accessible={restroom.accessible} />
+          {restroom.stallType && <Badge variant="outline">{restroom.stallType === "single" ? "Single-stall" : "Multi-stall"}</Badge>}
+          {restroom.restrictedAccess && <Badge variant="outline">Restricted access</Badge>}
+        </div>
+      </div>
+    </button>
+  )
 }
 
 function SearchView({
@@ -30,16 +60,20 @@ function SearchView({
   onQueryChange,
   onSearch,
   onSelect,
+  results,
+  totalResultCount,
 }: {
   hasSearched: boolean
   query: string
   onQueryChange: (query: string) => void
   onSearch: () => void
-  onSelect: (amenity: Amenity) => void
+  onSelect: (restroom: Restroom) => void
+  results: Restroom[]
+  totalResultCount: number
 }) {
   return (
     <section className="space-y-4" aria-labelledby="search-heading">
-      <h2 id="search-heading" className="sr-only">Search campus amenities</h2>
+      <h2 id="search-heading" className="sr-only">Search campus restrooms</h2>
       <form
         role="search"
         className="flex gap-2"
@@ -51,8 +85,8 @@ function SearchView({
         <Input
           name="query"
           type="search"
-          aria-label="Search by amenity or building"
-          placeholder="Search amenities or buildings"
+          aria-label="Search by restroom or building"
+          placeholder="Search restrooms or buildings"
           className="h-9"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
@@ -63,42 +97,42 @@ function SearchView({
       <Separator />
 
       <section className="space-y-3" aria-labelledby="amenities-heading" aria-live="polite">
-        <h2 id="amenities-heading" className="text-sm font-medium">Campus Amenities</h2>
-        {!hasSearched && <p className="text-sm text-muted-foreground">Nearby amenities will appear here.</p>}
-        {hasSearched && amenities.map((amenity) => (
-          <button key={amenity.id} type="button" className="block w-full rounded-xl text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => onSelect(amenity)}>
-            <Card size="sm" className="transition-colors hover:bg-muted/50">
-              <CardHeader>
-                <CardTitle>{amenity.type}</CardTitle>
-                <CardAction><AvailabilityBadge availability={amenity.availability} /></CardAction>
-                <CardDescription>{amenity.building} · Floor {amenity.floor}</CardDescription>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">Rating: {amenity.rating}/5</CardContent>
-            </Card>
-          </button>
-        ))}
+        <h2 id="amenities-heading" className="text-sm font-medium">Campus Restrooms</h2>
+        {!hasSearched && <p className="text-sm text-muted-foreground">Search by building name to find restrooms.</p>}
+        {hasSearched && totalResultCount === 0 && <p className="text-sm text-muted-foreground">No restrooms found for this building.</p>}
+        {hasSearched && totalResultCount > 0 && (
+          <p className="text-sm text-muted-foreground">
+            Showing {results.length.toLocaleString()} of {totalResultCount.toLocaleString()} results.
+          </p>
+        )}
+        {results.length > 0 && (
+          <div className="flex flex-col gap-3">
+            {results.map((restroom) => (
+              <RestroomResult key={restroom.id} restroom={restroom} onSelect={() => onSelect(restroom)} />
+            ))}
+          </div>
+        )}
       </section>
     </section>
   )
 }
 
-function AmenityDetails({ amenity }: { amenity: Amenity }) {
+function RestroomDetails({ restroom }: { restroom: Restroom }) {
   const details = [
-    ["Rating", amenity.rating ? `${amenity.rating}/5` : "Not rated"],
-    ["Hours", amenity.hours || "Not provided"],
-    ["Accessibility", amenity.accessibility],
-    ["Location details", amenity.locationDetails || "Not provided"],
-    ["Notes", amenity.notes || "Not provided"],
+    ["Location", restroom.location],
+    ["Accessibility", restroom.accessible ? "Accessible" : "Not accessible"],
+    ...(restroom.stallType ? [["Stall type", `${restroom.stallType === "single" ? "Single" : "Multi"}-stall`]] : []),
+    ["Access", restroom.restrictedAccess ? "Restricted" : "General campus access"],
   ]
 
   return (
     <article className="space-y-5">
       <header className="space-y-1">
         <div className="flex items-start justify-between gap-4">
-          <h2 className="font-heading text-xl font-medium">{amenity.type}</h2>
-          <AvailabilityBadge availability={amenity.availability} />
+          <h2 className="font-heading text-xl font-medium">{categoryLabel(restroom.category)} restroom</h2>
+          <AccessibilityBadge accessible={restroom.accessible} />
         </div>
-        <p className="text-sm text-muted-foreground">{amenity.building} · Floor {amenity.floor}</p>
+        <p className="text-sm text-muted-foreground">{restroom.building.name}</p>
       </header>
       <dl className="space-y-3 text-sm">
         {details.map(([term, description]) => (
@@ -108,7 +142,6 @@ function AmenityDetails({ amenity }: { amenity: Amenity }) {
           </div>
         ))}
       </dl>
-      <p className="text-right text-xs text-muted-foreground">Last reported {amenity.lastReported}</p>
     </article>
   )
 }
@@ -166,7 +199,7 @@ function CreateAmenityForm() {
       <p className="mt-1 mb-5 text-sm text-muted-foreground"><span className="text-destructive" aria-hidden="true">*</span> Required fields</p>
       <form className="space-y-4" onSubmit={submitAmenity} onInput={() => setSuccess("")}>
         <FormSelect id="type" label="Amenity type" placeholder="Select a type" options={amenityTypes} value={type} required onValueChange={setType} />
-        <FormSelect id="building" label="Building" placeholder="Select a building" options={buildings} value={building} required onValueChange={setBuilding} />
+        <FormSelect id="building" label="Building" placeholder="Select a building" options={buildingOptions} value={building} required onValueChange={setBuilding} />
         <div className="space-y-2">
           <Label htmlFor="floor">Floor <span className="text-destructive" aria-hidden="true">*</span></Label>
           <Input id="floor" name="floor" type="number" min="0" max="20" required />
@@ -242,15 +275,17 @@ function SettingsView({ email, onSave }: { email: string; onSave: (email: string
 
 export function App() {
   const [view, setView] = useState<DrawerView>("search")
-  const [selectedAmenity, setSelectedAmenity] = useState<Amenity | null>(null)
+  const [selectedRestroom, setSelectedRestroom] = useState<Restroom | null>(null)
   const [snapPoint, setSnapPoint] = useState<string | number>(collapsedSnapPoint)
   const [email, setEmail] = useState("x.tao@berkeley.edu")
   const [searchQuery, setSearchQuery] = useState("")
-  const [hasSearched, setHasSearched] = useState(false)
+  const [submittedQuery, setSubmittedQuery] = useState<string | null>(null)
+  const matchingRestrooms = submittedQuery === null ? [] : searchRestrooms(submittedQuery)
+  const visibleRestrooms = matchingRestrooms.slice(0, resultLimit)
 
   function showView(nextView: DrawerView) {
     setView(nextView)
-    const hasSavedResults = hasSearched && amenities.length > 0
+    const hasSavedResults = submittedQuery !== null
     setSnapPoint(nextView === "search" && !hasSavedResults ? collapsedSnapPoint : 1)
   }
 
@@ -287,17 +322,19 @@ export function App() {
               {view !== "search" && <Button type="button" variant="outline" className="mb-5" onClick={() => showView("search")}>Back</Button>}
               {view === "search" && (
                 <SearchView
-                  hasSearched={hasSearched}
+                  hasSearched={submittedQuery !== null}
                   query={searchQuery}
                   onQueryChange={setSearchQuery}
                   onSearch={() => {
-                    setHasSearched(true)
-                    if (amenities.length > 0) setSnapPoint(1)
+                    setSubmittedQuery(searchQuery)
+                    setSnapPoint(1)
                   }}
-                  onSelect={(amenity) => { setSelectedAmenity(amenity); showView("details") }}
+                  onSelect={(restroom) => { setSelectedRestroom(restroom); showView("details") }}
+                  results={visibleRestrooms}
+                  totalResultCount={matchingRestrooms.length}
                 />
               )}
-              {view === "details" && selectedAmenity && <AmenityDetails amenity={selectedAmenity} />}
+              {view === "details" && selectedRestroom && <RestroomDetails restroom={selectedRestroom} />}
               {view === "create" && <CreateAmenityForm />}
               {view === "settings" && <SettingsView email={email} onSave={setEmail} />}
             </div>

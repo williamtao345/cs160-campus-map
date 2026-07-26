@@ -1,0 +1,1949 @@
+[
+  {
+    "id": 200,
+    "gisId": 238,
+    "caan": "1144",
+    "name": "1893 Le Roy Avenue",
+    "shortName": "1893 Le Roy Ave.",
+    "coordinates": {
+      "latitude": 37.87568816253602,
+      "longitude": -122.25819384743761
+    }
+  },
+  {
+    "id": 247,
+    "gisId": 569,
+    "caan": "1498",
+    "name": "2000 Carleton Street",
+    "shortName": "2000 Carleton Street",
+    "coordinates": {
+      "latitude": 37.86059989588645,
+      "longitude": -122.26857202968068
+    }
+  },
+  {
+    "id": 58,
+    "gisId": 135,
+    "caan": "1902",
+    "name": "2111 Bancroft Way",
+    "shortName": "Banway Building",
+    "coordinates": {
+      "latitude": 37.86790162977945,
+      "longitude": -122.26689435092473
+    }
+  },
+  {
+    "id": 249,
+    "gisId": 564,
+    "caan": "3629",
+    "name": "2121 Allston Street",
+    "shortName": "Magnes Museum",
+    "coordinates": {
+      "latitude": 37.86979766406612,
+      "longitude": -122.26686738045701
+    }
+  },
+  {
+    "id": 50,
+    "gisId": 112,
+    "caan": "1921",
+    "name": "2200 Bancroft Way",
+    "shortName": "2200 Bancroft",
+    "coordinates": {
+      "latitude": 37.86739738950018,
+      "longitude": -122.26561594909967
+    }
+  },
+  {
+    "id": 92,
+    "gisId": 213,
+    "caan": "1257",
+    "name": "2222 Piedmont Avenue",
+    "shortName": "2222 Piedmont Ave.",
+    "coordinates": {
+      "latitude": 37.8711817111959,
+      "longitude": -122.25311897153453
+    }
+  },
+  {
+    "id": 220,
+    "gisId": 214,
+    "caan": "1062",
+    "name": "2224 Piedmont Avenue",
+    "shortName": "2224 Piedmont Ave.",
+    "coordinates": {
+      "latitude": 37.87099287329203,
+      "longitude": -122.2530549783209
+    }
+  },
+  {
+    "id": 245,
+    "gisId": 215,
+    "caan": "1020",
+    "name": "2232 Piedmont Avenue",
+    "shortName": "2232 Piedmont Ave.",
+    "coordinates": {
+      "latitude": 37.87077991543209,
+      "longitude": -122.25304692311377
+    }
+  },
+  {
+    "id": 219,
+    "gisId": 217,
+    "caan": "1224",
+    "name": "2240 Piedmont Avenue",
+    "shortName": "2240 Piedmont Ave.",
+    "coordinates": {
+      "latitude": 37.870317252946926,
+      "longitude": -122.25282436073665
+    }
+  },
+  {
+    "id": 217,
+    "gisId": 222,
+    "caan": "1258",
+    "name": "2251 College Avenue",
+    "shortName": "2251 College Ave.",
+    "coordinates": {
+      "latitude": 37.87020080766416,
+      "longitude": -122.25385710806623
+    }
+  },
+  {
+    "id": 256,
+    "gisId": 734,
+    "caan": "1059",
+    "name": "2295 Shattuck Avenue",
+    "shortName": "2295 Shattuck",
+    "coordinates": {
+      "latitude": 37.86784665734013,
+      "longitude": -122.26735462279082
+    }
+  },
+  {
+    "id": 90,
+    "gisId": 211,
+    "caan": "1063",
+    "name": "2334 Bowditch Street",
+    "shortName": "2334 Bowditch St.",
+    "coordinates": {
+      "latitude": 37.86770656369872,
+      "longitude": -122.25685452536764
+    }
+  },
+  {
+    "id": 89,
+    "gisId": 210,
+    "caan": "1065",
+    "name": "2350 Bowditch Street",
+    "shortName": "Fox Cottage",
+    "coordinates": {
+      "latitude": 37.867598280543504,
+      "longitude": -122.25683773823386
+    }
+  },
+  {
+    "id": 6,
+    "gisId": 129,
+    "caan": "1795",
+    "name": "2401 Bancroft Way",
+    "shortName": "2401 Bancroft Way",
+    "coordinates": {
+      "latitude": 37.868699733685766,
+      "longitude": -122.26118450112405
+    }
+  },
+  {
+    "id": 56,
+    "gisId": 130,
+    "caan": "1924",
+    "name": "2440 Bancroft Way",
+    "shortName": "2440 Bancroft Way",
+    "coordinates": {
+      "latitude": 37.86827211897698,
+      "longitude": -122.26042948237368
+    }
+  },
+  {
+    "id": 210,
+    "gisId": 207,
+    "caan": "1240",
+    "name": "2515 Channing Way",
+    "shortName": "2515 Channing Way",
+    "coordinates": {
+      "latitude": 37.86722846011833,
+      "longitude": -122.25811255614828
+    }
+  },
+  {
+    "id": 239,
+    "gisId": 208,
+    "caan": "1074",
+    "name": "2521 Channing Way",
+    "shortName": "2521 Channing Way",
+    "coordinates": {
+      "latitude": 37.86729588429399,
+      "longitude": -122.25784903872876
+    }
+  },
+  {
+    "id": 78,
+    "gisId": 191,
+    "caan": "1077",
+    "name": "2547 Channing Way",
+    "shortName": "2547 Channing Way",
+    "coordinates": {
+      "latitude": 37.86741667185106,
+      "longitude": -122.25679381130911
+    }
+  },
+  {
+    "id": 199,
+    "gisId": 240,
+    "caan": "1057",
+    "name": "2607 Hearst Avenue",
+    "shortName": "2607 Hearst Ave.",
+    "coordinates": {
+      "latitude": 37.875741072128925,
+      "longitude": -122.25786978221878
+    }
+  },
+  {
+    "id": 251,
+    "gisId": 571,
+    "caan": "1028",
+    "name": "2850 Telegraph Avenue",
+    "shortName": "2850 Telegraph Avenue",
+    "coordinates": {
+      "latitude": 37.85812640982109,
+      "longitude": -122.25983238583886
+    }
+  },
+  {
+    "id": 238,
+    "gisId": 117,
+    "caan": "1215",
+    "name": "Alumni House",
+    "shortName": "Alumni House",
+    "coordinates": {
+      "latitude": 37.869720847545146,
+      "longitude": -122.26129831598584
+    }
+  },
+  {
+    "id": 176,
+    "gisId": 435,
+    "caan": "1064A",
+    "name": "Anna Head Building A",
+    "shortName": "Anna Head Building A",
+    "coordinates": {
+      "latitude": 37.86637062495438,
+      "longitude": -122.25710595588203
+    }
+  },
+  {
+    "id": 69,
+    "gisId": 170,
+    "caan": "1064C",
+    "name": "Anna Head Building E",
+    "shortName": "Anna Head Building E",
+    "coordinates": {
+      "latitude": 37.86643304710512,
+      "longitude": -122.25747706236012
+    }
+  },
+  {
+    "id": 24,
+    "gisId": 184,
+    "caan": "1448",
+    "name": "Anthony Hall",
+    "shortName": "Anthony Hall",
+    "coordinates": {
+      "latitude": 37.87068914343136,
+      "longitude": -122.2582209817982
+    }
+  },
+  {
+    "id": 221,
+    "gisId": 205,
+    "caan": "1486",
+    "name": "Anthropology & Art Practice",
+    "shortName": "Anthropology & Art Practice",
+    "coordinates": {
+      "latitude": 37.869878970193774,
+      "longitude": -122.25533009791428
+    }
+  },
+  {
+    "id": 49,
+    "gisId": 106,
+    "caan": "1430",
+    "name": "Architects & Engineers Building",
+    "shortName": "A & E Building",
+    "coordinates": {
+      "latitude": 37.87016985523905,
+      "longitude": -122.25879632441253
+    }
+  },
+  {
+    "id": 16,
+    "gisId": 152,
+    "caan": "1793",
+    "name": "Barker Hall",
+    "shortName": "Barker Hall",
+    "coordinates": {
+      "latitude": 37.87396169688679,
+      "longitude": -122.26547482578117
+    }
+  },
+  {
+    "id": 222,
+    "gisId": 219,
+    "caan": "1797",
+    "name": "Bauer Wurster Hall",
+    "shortName": "Wurster Hall",
+    "coordinates": {
+      "latitude": 37.87061677229227,
+      "longitude": -122.25477457985198
+    }
+  },
+  {
+    "id": 232,
+    "gisId": 132,
+    "caan": "1017",
+    "name": "Berkeley Art Museum and Pacific Film Archive",
+    "shortName": "BAMPFA",
+    "coordinates": {
+      "latitude": 37.87091369731057,
+      "longitude": -122.26640405733411
+    }
+  },
+  {
+    "id": 38,
+    "gisId": 264,
+    "caan": "1037",
+    "name": "Berkeley Way West",
+    "shortName": "Berkeley Way West",
+    "coordinates": {
+      "latitude": 37.87355012264897,
+      "longitude": -122.2679290522967
+    }
+  },
+  {
+    "id": 21,
+    "gisId": 176,
+    "caan": "1220",
+    "name": "Birge Hall",
+    "shortName": "Birge Hall",
+    "coordinates": {
+      "latitude": 37.87219456582197,
+      "longitude": -122.25726284463794
+    }
+  },
+  {
+    "id": 135,
+    "gisId": 308,
+    "caan": "1744",
+    "name": "Botanical Garden Lower Restrooms",
+    "shortName": "Lower Restrooms",
+    "coordinates": {
+      "latitude": 37.87414136023416,
+      "longitude": -122.2379444727338
+    }
+  },
+  {
+    "id": 131,
+    "gisId": 304,
+    "caan": "1781",
+    "name": "Botanical Garden Plant Conservation Center",
+    "shortName": "Plant Conservation Center",
+    "coordinates": {
+      "latitude": 37.8750726183576,
+      "longitude": -122.23927786095439
+    }
+  },
+  {
+    "id": 139,
+    "gisId": 312,
+    "caan": "1732",
+    "name": "Botanical Garden Prop House Nursery",
+    "shortName": "Prop House Nursery",
+    "coordinates": {
+      "latitude": 37.87329909951087,
+      "longitude": -122.23743888793133
+    }
+  },
+  {
+    "id": 181,
+    "gisId": 452,
+    "caan": "1718",
+    "name": "Botanical Garden Upper Restrooms",
+    "shortName": "Upper Restrooms",
+    "coordinates": {
+      "latitude": 37.87509995345669,
+      "longitude": -122.23813705733555
+    }
+  },
+  {
+    "id": 7,
+    "gisId": 136,
+    "caan": "1150",
+    "name": "C. V. Starr East Asian Library",
+    "shortName": "Starr East Asian Library",
+    "coordinates": {
+      "latitude": 37.87355860434978,
+      "longitude": -122.26038492988876
+    }
+  },
+  {
+    "id": 235,
+    "gisId": 114,
+    "caan": "1270",
+    "name": "California Hall",
+    "shortName": "California Hall",
+    "coordinates": {
+      "latitude": 37.87189097452159,
+      "longitude": -122.26038008693723
+    }
+  },
+  {
+    "id": 191,
+    "gisId": 567,
+    "caan": "1271",
+    "name": "California Memorial Stadium",
+    "shortName": "Memorial Stadium",
+    "coordinates": {
+      "latitude": 37.871009634276334,
+      "longitude": -122.25075850484086
+    }
+  },
+  {
+    "id": 214,
+    "gisId": 177,
+    "caan": "1799",
+    "name": "Calvin Laboratory",
+    "shortName": "Calvin Lab",
+    "coordinates": {
+      "latitude": 37.87101432510157,
+      "longitude": -122.25394839546942
+    }
+  },
+  {
+    "id": 32,
+    "gisId": 235,
+    "caan": "1027",
+    "name": "Campbell Hall",
+    "shortName": "Campbell Hall",
+    "coordinates": {
+      "latitude": 37.87298693113622,
+      "longitude": -122.25709123671822
+    }
+  },
+  {
+    "id": 145,
+    "gisId": 321,
+    "caan": "3618",
+    "name": "Center for Independent Journalism",
+    "shortName": "2481/2483 Hearst Ave. ",
+    "coordinates": {
+      "latitude": 37.87526178591458,
+      "longitude": -122.26058045912134
+    }
+  },
+  {
+    "id": 215,
+    "gisId": 293,
+    "caan": "1233",
+    "name": "Cheit Hall",
+    "shortName": "Cheit Hall",
+    "coordinates": {
+      "latitude": 37.871817349845,
+      "longitude": -122.25427434977266
+    }
+  },
+  {
+    "id": 108,
+    "gisId": 257,
+    "caan": "1815",
+    "name": "Chern Hall",
+    "shortName": "Chern Hall",
+    "coordinates": {
+      "latitude": 37.87983675414015,
+      "longitude": -122.24426002466548
+    }
+  },
+  {
+    "id": 211,
+    "gisId": 197,
+    "caan": "1033",
+    "name": "Chou Hall",
+    "shortName": "Chou Hall",
+    "coordinates": {
+      "latitude": 37.87238150993827,
+      "longitude": -122.2543608341058
+    }
+  },
+  {
+    "id": 168,
+    "gisId": 427,
+    "caan": "1820",
+    "name": "Clark Kerr Campus 1 - Administration",
+    "shortName": "1",
+    "coordinates": {
+      "latitude": 37.864263304237625,
+      "longitude": -122.24887374996037
+    }
+  },
+  {
+    "id": 162,
+    "gisId": 338,
+    "caan": "2037",
+    "name": "Clark Kerr Campus 24 - Recreation Maintenance",
+    "shortName": "24",
+    "coordinates": {
+      "latitude": 37.86504388069276,
+      "longitude": -122.24754380504386
+    }
+  },
+  {
+    "id": 156,
+    "gisId": 332,
+    "caan": "1842",
+    "name": "Clark Kerr Campus 25 - Golden Bear Rec Center",
+    "shortName": "25",
+    "coordinates": {
+      "latitude": 37.86542851296914,
+      "longitude": -122.2472026681417
+    }
+  },
+  {
+    "id": 26,
+    "gisId": 223,
+    "caan": "1325",
+    "name": "Cory Hall",
+    "shortName": "Cory Hall",
+    "coordinates": {
+      "latitude": 37.87507203695804,
+      "longitude": -122.25758489684519
+    }
+  },
+  {
+    "id": 52,
+    "gisId": 116,
+    "caan": "1418",
+    "name": "Creekside Center",
+    "shortName": "Creekside Center",
+    "coordinates": {
+      "latitude": 37.87034130154488,
+      "longitude": -122.26129560921676
+    }
+  },
+  {
+    "id": 146,
+    "gisId": 322,
+    "caan": "1038",
+    "name": "David Blackwell Hall",
+    "shortName": "Blackwell Hall",
+    "coordinates": {
+      "latitude": 37.86792449809592,
+      "longitude": -122.2610798963564
+    }
+  },
+  {
+    "id": 201,
+    "gisId": 275,
+    "caan": "1297",
+    "name": "David Gardner Stacks",
+    "shortName": "Gardner Stacks",
+    "coordinates": {
+      "latitude": 37.87265314610424,
+      "longitude": -122.25928181258857
+    }
+  },
+  {
+    "id": 43,
+    "gisId": 287,
+    "caan": "1323",
+    "name": "Davis Hall",
+    "shortName": "Davis Hall",
+    "coordinates": {
+      "latitude": 37.87450990750159,
+      "longitude": -122.25831724152975
+    }
+  },
+  {
+    "id": 2,
+    "gisId": 111,
+    "caan": "1298",
+    "name": "Doe Annex",
+    "shortName": "Bancroft Library",
+    "coordinates": {
+      "latitude": 37.872270931766046,
+      "longitude": -122.25885678006219
+    }
+  },
+  {
+    "id": 229,
+    "gisId": 131,
+    "caan": "1301",
+    "name": "Doe Memorial Library",
+    "shortName": "Doe Library",
+    "coordinates": {
+      "latitude": 37.87219374742519,
+      "longitude": -122.2595003492415
+    }
+  },
+  {
+    "id": 37,
+    "gisId": 244,
+    "caan": "1419",
+    "name": "Donner Lab",
+    "shortName": "Donner Lab",
+    "coordinates": {
+      "latitude": 37.874548936524114,
+      "longitude": -122.25644733570807
+    }
+  },
+  {
+    "id": 234,
+    "gisId": 121,
+    "caan": "1227",
+    "name": "Durant Hall",
+    "shortName": "Durant Hall",
+    "coordinates": {
+      "latitude": 37.87125925209633,
+      "longitude": -122.26014366634845
+    }
+  },
+  {
+    "id": 3,
+    "gisId": 120,
+    "caan": "1295",
+    "name": "Dwinelle Hall",
+    "shortName": "Dwinelle Hall",
+    "coordinates": {
+      "latitude": 37.87069519401878,
+      "longitude": -122.26061857050661
+    }
+  },
+  {
+    "id": 231,
+    "gisId": 140,
+    "caan": "1095",
+    "name": "Earl Warren Hall",
+    "shortName": "Warren Hall",
+    "coordinates": {
+      "latitude": 37.8743949145449,
+      "longitude": -122.26697607641204
+    }
+  },
+  {
+    "id": 259,
+    "gisId": 732,
+    "caan": "1442",
+    "name": "Emeryville Intersection Apartments",
+    "shortName": "Intersection Apartments",
+    "coordinates": {
+      "latitude": 37.82911973131442,
+      "longitude": -122.27837798842197
+    }
+  },
+  {
+    "id": 226,
+    "gisId": 109,
+    "caan": "1154",
+    "name": "Eshleman Hall",
+    "shortName": "Eshleman Hall",
+    "coordinates": {
+      "latitude": 37.868766285229285,
+      "longitude": -122.26038516645099
+    }
+  },
+  {
+    "id": 198,
+    "gisId": 157,
+    "caan": "1783",
+    "name": "Etcheverry Hall",
+    "shortName": "Etcheverry Hall",
+    "coordinates": {
+      "latitude": 37.87568843582934,
+      "longitude": -122.259274649585
+    }
+  },
+  {
+    "id": 243,
+    "gisId": 291,
+    "caan": "1318",
+    "name": "Evans Field Dugout",
+    "shortName": "Evans Dugout",
+    "coordinates": {
+      "latitude": 37.86970714453606,
+      "longitude": -122.26275298561028
+    }
+  },
+  {
+    "id": 30,
+    "gisId": 233,
+    "caan": "1790",
+    "name": "Evans Hall",
+    "shortName": "Evans Hall",
+    "coordinates": {
+      "latitude": 37.873625465655415,
+      "longitude": -122.25785209441422
+    }
+  },
+  {
+    "id": 246,
+    "gisId": 204,
+    "caan": "1340",
+    "name": "Faculty Club",
+    "shortName": "Faculty Club",
+    "coordinates": {
+      "latitude": 37.87179146686376,
+      "longitude": -122.25583717211829
+    }
+  },
+  {
+    "id": 267,
+    "gisId": 516,
+    "caan": "2423",
+    "name": "Family Student Housing 123",
+    "shortName": "UVA 123",
+    "coordinates": {
+      "latitude": 37.88473181062686,
+      "longitude": -122.30108515875531
+    }
+  },
+  {
+    "id": 268,
+    "gisId": 486,
+    "caan": "2436",
+    "name": "Family Student Housing 136",
+    "shortName": "UVA 136",
+    "coordinates": {
+      "latitude": 37.88289470133077,
+      "longitude": -122.30138479125478
+    }
+  },
+  {
+    "id": 266,
+    "gisId": 493,
+    "caan": "2463",
+    "name": "Family Student Housing 142",
+    "shortName": "UVA 142",
+    "coordinates": {
+      "latitude": 37.88373392826495,
+      "longitude": -122.30186647893116
+    }
+  },
+  {
+    "id": 269,
+    "gisId": 469,
+    "caan": "2479",
+    "name": "Family Student Housing 160",
+    "shortName": "UVA 160",
+    "coordinates": {
+      "latitude": 37.88437087457259,
+      "longitude": -122.30395498477992
+    }
+  },
+  {
+    "id": 255,
+    "gisId": 543,
+    "caan": "9497",
+    "name": "Family Student Housing Community Cener",
+    "shortName": "Community Center",
+    "coordinates": {
+      "latitude": 37.88378257905114,
+      "longitude": -122.29931414426058
+    }
+  },
+  {
+    "id": 270,
+    "gisId": 540,
+    "caan": "9339",
+    "name": "Family Student Housing Grounds Shop",
+    "shortName": "Grounds Shop",
+    "coordinates": {
+      "latitude": 37.884380670628005,
+      "longitude": -122.30565895760594
+    }
+  },
+  {
+    "id": 271,
+    "gisId": 544,
+    "caan": "9392",
+    "name": "Family Student Housing Study Center Trailer",
+    "shortName": "Study Center Trailer",
+    "coordinates": {
+      "latitude": 37.88405893159128,
+      "longitude": -122.29921968766958
+    }
+  },
+  {
+    "id": 264,
+    "gisId": 542,
+    "caan": "9496",
+    "name": "Family Student Housing Village Office",
+    "shortName": "Main Office",
+    "coordinates": {
+      "latitude": 37.88341466479483,
+      "longitude": -122.29958724736616
+    }
+  },
+  {
+    "id": 123,
+    "gisId": 296,
+    "caan": "1081",
+    "name": "Foothill Housing Building 1",
+    "shortName": "Foothill Housing 1",
+    "coordinates": {
+      "latitude": 37.87588850281916,
+      "longitude": -122.25652350173807
+    }
+  },
+  {
+    "id": 119,
+    "gisId": 286,
+    "caan": "1087",
+    "name": "Foothill Housing Building 7",
+    "shortName": "Foothill 7",
+    "coordinates": {
+      "latitude": 37.87515890610449,
+      "longitude": -122.25466601743507
+    }
+  },
+  {
+    "id": 18,
+    "gisId": 154,
+    "caan": "1789",
+    "name": "Genetics & Plant Biology Building",
+    "shortName": "Genetics & Plant Biology",
+    "coordinates": {
+      "latitude": 37.87343502794388,
+      "longitude": -122.26475510388266
+    }
+  },
+  {
+    "id": 113,
+    "gisId": 267,
+    "caan": "1236",
+    "name": "Gerson Bakar Faculty Building",
+    "shortName": "Bakar Faculty Building",
+    "coordinates": {
+      "latitude": 37.87192906402076,
+      "longitude": -122.25365004173898
+    }
+  },
+  {
+    "id": 11,
+    "gisId": 147,
+    "caan": "1355",
+    "name": "Giannini Hall",
+    "shortName": "Giannini Hall",
+    "coordinates": {
+      "latitude": 37.87354152872135,
+      "longitude": -122.26237729121439
+    }
+  },
+  {
+    "id": 44,
+    "gisId": 577,
+    "caan": "1356",
+    "name": "Gilman Hall",
+    "shortName": "Gilman Hall",
+    "coordinates": {
+      "latitude": 37.872633883961356,
+      "longitude": -122.25631127241564
+    }
+  },
+  {
+    "id": 42,
+    "gisId": 272,
+    "caan": "1788",
+    "name": "Grimes Engineering Center",
+    "shortName": "Grimes Engineering Center",
+    "coordinates": {
+      "latitude": 37.87422459477289,
+      "longitude": -122.25823513062957
+    }
+  },
+  {
+    "id": 104,
+    "gisId": 247,
+    "caan": "1773",
+    "name": "Haas Clubhouse",
+    "shortName": "Haas Clubhouse",
+    "coordinates": {
+      "latitude": 37.872445663702585,
+      "longitude": -122.24605379191848
+    }
+  },
+  {
+    "id": 224,
+    "gisId": 183,
+    "caan": "1424",
+    "name": "Hargrove Music Library",
+    "shortName": "Hargrove Music Library",
+    "coordinates": {
+      "latitude": 37.87046219568757,
+      "longitude": -122.25614068558647
+    }
+  },
+  {
+    "id": 13,
+    "gisId": 149,
+    "caan": "1371",
+    "name": "Haviland Hall",
+    "shortName": "Haviland Hall",
+    "coordinates": {
+      "latitude": 37.87373311290924,
+      "longitude": -122.26106997259264
+    }
+  },
+  {
+    "id": 54,
+    "gisId": 126,
+    "caan": "1267",
+    "name": "Hazardous Materials Facility",
+    "shortName": "Haz Mat Facility",
+    "coordinates": {
+      "latitude": 37.870216398198444,
+      "longitude": -122.26398256022055
+    }
+  },
+  {
+    "id": 120,
+    "gisId": 290,
+    "caan": "1097",
+    "name": "Hearst Field Annex A",
+    "shortName": "Hearst Annex A",
+    "coordinates": {
+      "latitude": 37.869130623249944,
+      "longitude": -122.25773852046565
+    }
+  },
+  {
+    "id": 244,
+    "gisId": 187,
+    "caan": "1097",
+    "name": "Hearst Field Annex B",
+    "shortName": "Hearst Annex B",
+    "coordinates": {
+      "latitude": 37.869430450169695,
+      "longitude": -122.25774137506318
+    }
+  },
+  {
+    "id": 76,
+    "gisId": 188,
+    "caan": "1097",
+    "name": "Hearst Field Annex C",
+    "shortName": "Hearst Annex C",
+    "coordinates": {
+      "latitude": 37.86972730202611,
+      "longitude": -122.25794281230631
+    }
+  },
+  {
+    "id": 25,
+    "gisId": 189,
+    "caan": "1097",
+    "name": "Hearst Field Annex D",
+    "shortName": "Hearst Annex D",
+    "coordinates": {
+      "latitude": 37.86944061029393,
+      "longitude": -122.25818134848669
+    }
+  },
+  {
+    "id": 164,
+    "gisId": 421,
+    "caan": "1359",
+    "name": "Hearst Greek Theatre",
+    "shortName": "Greek Theatre",
+    "coordinates": {
+      "latitude": 37.87371771688124,
+      "longitude": -122.25425455063312
+    }
+  },
+  {
+    "id": 225,
+    "gisId": 181,
+    "caan": "1372",
+    "name": "Hearst Memorial Gymnasium",
+    "shortName": "Hearst Gym",
+    "coordinates": {
+      "latitude": 37.86958702469322,
+      "longitude": -122.256906446403
+    }
+  },
+  {
+    "id": 33,
+    "gisId": 236,
+    "caan": "1373",
+    "name": "Hearst Memorial Mining Building",
+    "shortName": "Hearst Mining Building",
+    "coordinates": {
+      "latitude": 37.87445475182685,
+      "longitude": -122.25727687475619
+    }
+  },
+  {
+    "id": 252,
+    "gisId": 741,
+    "caan": "1075",
+    "name": "Helen Diller Anchor House",
+    "shortName": "Anchor House",
+    "coordinates": {
+      "latitude": 37.87289333503105,
+      "longitude": -122.26659483276434
+    }
+  },
+  {
+    "id": 253,
+    "gisId": 259,
+    "caan": "1609",
+    "name": "Hellman Tennis Center",
+    "shortName": "Hellman Tennis Center",
+    "coordinates": {
+      "latitude": 37.870065291586684,
+      "longitude": -122.26475187024684
+    }
+  },
+  {
+    "id": 212,
+    "gisId": 182,
+    "caan": "1423",
+    "name": "Hertz Memorial Concert Hall",
+    "shortName": "Hertz Hall",
+    "coordinates": {
+      "latitude": 37.87110339961157,
+      "longitude": -122.25573648398583
+    }
+  },
+  {
+    "id": 40,
+    "gisId": 270,
+    "caan": "1375",
+    "name": "Hesse Hall",
+    "shortName": "Hesse Hall",
+    "coordinates": {
+      "latitude": 37.8741704193455,
+      "longitude": -122.25931234479675
+    }
+  },
+  {
+    "id": 34,
+    "gisId": 241,
+    "caan": "1809",
+    "name": "Hildebrand Hall",
+    "shortName": "Hildebrand Hall",
+    "coordinates": {
+      "latitude": 37.87259327347626,
+      "longitude": -122.25571895797621
+    }
+  },
+  {
+    "id": 15,
+    "gisId": 151,
+    "caan": "1376",
+    "name": "Hilgard Hall",
+    "shortName": "Hilgard Hall",
+    "coordinates": {
+      "latitude": 37.87330039534317,
+      "longitude": -122.26340207987235
+    }
+  },
+  {
+    "id": 265,
+    "gisId": 552,
+    "caan": "1072",
+    "name": "Hiram Edward Manville Hall",
+    "shortName": "Manville Hall",
+    "coordinates": {
+      "latitude": 37.8656189355075,
+      "longitude": -122.26702196740536
+    }
+  },
+  {
+    "id": 85,
+    "gisId": 200,
+    "caan": "1142",
+    "name": "Ida Louise Jackson Graduate House",
+    "shortName": "Jackson Graduate House",
+    "coordinates": {
+      "latitude": 37.868060505820374,
+      "longitude": -122.25404334102878
+    }
+  },
+  {
+    "id": 62,
+    "gisId": 160,
+    "caan": "1022",
+    "name": "Innovative Genomics Institute Building",
+    "shortName": "IGIB",
+    "coordinates": {
+      "latitude": 37.87383843359548,
+      "longitude": -122.26694178396654
+    }
+  },
+  {
+    "id": 87,
+    "gisId": 203,
+    "caan": "1390",
+    "name": "International House",
+    "shortName": "I-House",
+    "coordinates": {
+      "latitude": 37.86967135152471,
+      "longitude": -122.25159032856678
+    }
+  },
+  {
+    "id": 240,
+    "gisId": 137,
+    "caan": "1032",
+    "name": "Jacobs Hall",
+    "shortName": "Jacobs Hall",
+    "coordinates": {
+      "latitude": 37.87603666457783,
+      "longitude": -122.25880383682849
+    }
+  },
+  {
+    "id": 130,
+    "gisId": 303,
+    "caan": "1143",
+    "name": "Jane Grey Research Greenhouse",
+    "shortName": "Jane Grey Greenhouse",
+    "coordinates": {
+      "latitude": 37.87526941746462,
+      "longitude": -122.239202970217
+    }
+  },
+  {
+    "id": 17,
+    "gisId": 153,
+    "caan": "1796",
+    "name": "Koshland Hall",
+    "shortName": "Koshland Hall",
+    "coordinates": {
+      "latitude": 37.87393390096377,
+      "longitude": -122.26488271794472
+    }
+  },
+  {
+    "id": 36,
+    "gisId": 243,
+    "caan": "1782",
+    "name": "Latimer Hall",
+    "shortName": "Latimer Hall",
+    "coordinates": {
+      "latitude": 37.87313506629271,
+      "longitude": -122.2559220267415
+    }
+  },
+  {
+    "id": 218,
+    "gisId": 198,
+    "caan": "1231",
+    "name": "Law Building",
+    "shortName": "Law Building",
+    "coordinates": {
+      "latitude": 37.869924461351715,
+      "longitude": -122.25341027910484
+    }
+  },
+  {
+    "id": 106,
+    "gisId": 254,
+    "caan": "1800",
+    "name": "Lawrence Hall of Science",
+    "shortName": "Lawrence Hall of Science",
+    "coordinates": {
+      "latitude": 37.8792251888355,
+      "longitude": -122.24668367227487
+    }
+  },
+  {
+    "id": 28,
+    "gisId": 231,
+    "caan": "1292",
+    "name": "Lewis Hall",
+    "shortName": "Lewis Hall",
+    "coordinates": {
+      "latitude": 37.873005648776115,
+      "longitude": -122.25516852688479
+    }
+  },
+  {
+    "id": 9,
+    "gisId": 139,
+    "caan": "1444",
+    "name": "Li Ka Shing Center",
+    "shortName": "Li Ka Shing Center",
+    "coordinates": {
+      "latitude": 37.872987856490475,
+      "longitude": -122.2653360407109
+    }
+  },
+  {
+    "id": 1,
+    "gisId": 108,
+    "caan": "1791",
+    "name": "Martin Luther King Junior Student Union",
+    "shortName": "MLK Student Union",
+    "coordinates": {
+      "latitude": 37.86915201130271,
+      "longitude": -122.25970051970336
+    }
+  },
+  {
+    "id": 70,
+    "gisId": 171,
+    "caan": "1073",
+    "name": "Maximino Martinez Commons ",
+    "shortName": "Martinez Commons",
+    "coordinates": {
+      "latitude": 37.86668796167021,
+      "longitude": -122.25779005418715
+    }
+  },
+  {
+    "id": 10,
+    "gisId": 143,
+    "caan": "1762",
+    "name": "McCone Hall",
+    "shortName": "McCone Hall",
+    "coordinates": {
+      "latitude": 37.87413081697176,
+      "longitude": -122.25968413417964
+    }
+  },
+  {
+    "id": 250,
+    "gisId": 449,
+    "caan": "1021",
+    "name": "McEnerney Hall",
+    "shortName": "McEnerney Hall",
+    "coordinates": {
+      "latitude": 37.87667262260737,
+      "longitude": -122.26449542833905
+    }
+  },
+  {
+    "id": 8,
+    "gisId": 138,
+    "caan": "1321",
+    "name": "McLaughlin Hall",
+    "shortName": "McLaughlin Hall",
+    "coordinates": {
+      "latitude": 37.87383332288945,
+      "longitude": -122.2590450755355
+    }
+  },
+  {
+    "id": 237,
+    "gisId": 218,
+    "caan": "1302F",
+    "name": "Minor Hall",
+    "shortName": "Minor Hall",
+    "coordinates": {
+      "latitude": 37.871479833059986,
+      "longitude": -122.25473895060989
+    }
+  },
+  {
+    "id": 236,
+    "gisId": 283,
+    "caan": "1302",
+    "name": "Minor Hall Addition",
+    "shortName": "Minor Hall Addition",
+    "coordinates": {
+      "latitude": 37.87140308928787,
+      "longitude": -122.2551345278058
+    }
+  },
+  {
+    "id": 196,
+    "gisId": 141,
+    "caan": "1299",
+    "name": "Moffitt Undergraduate Library",
+    "shortName": "Moffitt Library",
+    "coordinates": {
+      "latitude": 37.87258280116292,
+      "longitude": -122.26079690902682
+    }
+  },
+  {
+    "id": 14,
+    "gisId": 150,
+    "caan": "1382",
+    "name": "Morgan Hall",
+    "shortName": "Morgan Hall",
+    "coordinates": {
+      "latitude": 37.87333222905298,
+      "longitude": -122.26422968142799
+    }
+  },
+  {
+    "id": 213,
+    "gisId": 282,
+    "caan": "1422",
+    "name": "Morrison Hall",
+    "shortName": "Morrison Hall",
+    "coordinates": {
+      "latitude": 37.870876124380636,
+      "longitude": -122.2564841636122
+    }
+  },
+  {
+    "id": 19,
+    "gisId": 155,
+    "caan": "1346",
+    "name": "Mulford Hall",
+    "shortName": "Mulford Hall",
+    "coordinates": {
+      "latitude": 37.87265438429355,
+      "longitude": -122.26449384204761
+    }
+  },
+  {
+    "id": 20,
+    "gisId": 156,
+    "caan": "1206",
+    "name": "North Gate Hall",
+    "shortName": "North Gate Hall",
+    "coordinates": {
+      "latitude": 37.87491777877774,
+      "longitude": -122.25962335504292
+    }
+  },
+  {
+    "id": 115,
+    "gisId": 274,
+    "caan": "1229",
+    "name": "Northwest Animal Facility",
+    "shortName": "Northwest Animal Facility",
+    "coordinates": {
+      "latitude": 37.8736715595779,
+      "longitude": -122.26556125698566
+    }
+  },
+  {
+    "id": 41,
+    "gisId": 271,
+    "caan": "1377",
+    "name": "O'Brien Hall",
+    "shortName": "O'Brien Hall",
+    "coordinates": {
+      "latitude": 37.87430752681679,
+      "longitude": -122.2590791109815
+    }
+  },
+  {
+    "id": 112,
+    "gisId": 266,
+    "caan": "1366",
+    "name": "Oxford Research Unit and Greenhouses",
+    "shortName": "Oxford Tract Research Greenhouse",
+    "coordinates": {
+      "latitude": 37.875245523774936,
+      "longitude": -122.26708471134457
+    }
+  },
+  {
+    "id": 64,
+    "gisId": 165,
+    "caan": "1785",
+    "name": "Oxford Tract - Genetics & Plant Biology Greenhouse",
+    "shortName": "Oxford Tract Greenhouse",
+    "coordinates": {
+      "latitude": 37.87576963910582,
+      "longitude": -122.26708650236925
+    }
+  },
+  {
+    "id": 63,
+    "gisId": 163,
+    "caan": "1723",
+    "name": "Oxford Tract Insectary Building",
+    "shortName": "Oxford Insectary Building",
+    "coordinates": {
+      "latitude": 37.87466723661784,
+      "longitude": -122.26724000999616
+    }
+  },
+  {
+    "id": 61,
+    "gisId": 159,
+    "caan": "1435",
+    "name": "Oxford Tract Natural Resources Laboratory",
+    "shortName": "Natural Resources Lab",
+    "coordinates": {
+      "latitude": 37.87482144245713,
+      "longitude": -122.26685779446514
+    }
+  },
+  {
+    "id": 22,
+    "gisId": 179,
+    "caan": "1324",
+    "name": "Philosophy Hall",
+    "shortName": "Philosophy Hall",
+    "coordinates": {
+      "latitude": 37.87095991869968,
+      "longitude": -122.25811749705035
+    }
+  },
+  {
+    "id": 31,
+    "gisId": 234,
+    "caan": "1405",
+    "name": "Physics Building",
+    "shortName": "Physics Building",
+    "coordinates": {
+      "latitude": 37.87258595620622,
+      "longitude": -122.25715090114633
+    }
+  },
+  {
+    "id": 29,
+    "gisId": 232,
+    "caan": "1801",
+    "name": "Pimentel Hall",
+    "shortName": "Pimentel Hall",
+    "coordinates": {
+      "latitude": 37.87342131877563,
+      "longitude": -122.2560299299705
+    }
+  },
+  {
+    "id": 204,
+    "gisId": 279,
+    "caan": "1365",
+    "name": "Recreational Sports Facility",
+    "shortName": "RSF",
+    "coordinates": {
+      "latitude": 37.868668086412754,
+      "longitude": -122.26304895649845
+    }
+  },
+  {
+    "id": 241,
+    "gisId": 142,
+    "caan": "1322",
+    "name": "Richard C. Blum Hall",
+    "shortName": "Blum Hall",
+    "coordinates": {
+      "latitude": 37.87497714658272,
+      "longitude": -122.25895272247963
+    }
+  },
+  {
+    "id": 254,
+    "gisId": 448,
+    "caan": "1016",
+    "name": "Rogers Rowing Center",
+    "shortName": "Rogers Rowing Center",
+    "coordinates": {
+      "latitude": 37.77130397727713,
+      "longitude": -122.23275445267596
+    }
+  },
+  {
+    "id": 86,
+    "gisId": 201,
+    "caan": "1480",
+    "name": "Sather Tower",
+    "shortName": "Campanile",
+    "coordinates": {
+      "latitude": 37.87206349233636,
+      "longitude": -122.25782694945003
+    }
+  },
+  {
+    "id": 107,
+    "gisId": 256,
+    "caan": "1810A",
+    "name": "Silver Space Sciences Laboratory",
+    "shortName": "Silver Space Sciences Lab",
+    "coordinates": {
+      "latitude": 37.880600242476795,
+      "longitude": -122.24461402198702
+    }
+  },
+  {
+    "id": 105,
+    "gisId": 249,
+    "caan": "1813",
+    "name": "Silver Space Sciences Laboratory Addition",
+    "shortName": "Silver Lab Addition",
+    "coordinates": {
+      "latitude": 37.880747218564714,
+      "longitude": -122.24392539259733
+    }
+  },
+  {
+    "id": 190,
+    "gisId": 566,
+    "caan": "1811",
+    "name": "Silver Space Sciences Laboratory Annex",
+    "shortName": "Silver Lab Annex",
+    "coordinates": {
+      "latitude": 37.88061181436971,
+      "longitude": -122.24479657113697
+    }
+  },
+  {
+    "id": 216,
+    "gisId": 341,
+    "caan": "1391",
+    "name": "Simon Hall",
+    "shortName": "Simon Hall",
+    "coordinates": {
+      "latitude": 37.86994361691036,
+      "longitude": -122.25267231170119
+    }
+  },
+  {
+    "id": 195,
+    "gisId": 583,
+    "caan": "1277",
+    "name": "Simpson Student-Athlete High Performance Center",
+    "shortName": "Simpson Center",
+    "coordinates": {
+      "latitude": 37.87078847391275,
+      "longitude": -122.2518533361626
+    }
+  },
+  {
+    "id": 223,
+    "gisId": 186,
+    "caan": "1761",
+    "name": "Social Sciences Building",
+    "shortName": "Social Sciences Building",
+    "coordinates": {
+      "latitude": 37.87010173505086,
+      "longitude": -122.2579872465133
+    }
+  },
+  {
+    "id": 197,
+    "gisId": 239,
+    "caan": "1237",
+    "name": "Soda Hall",
+    "shortName": "Soda Hall",
+    "coordinates": {
+      "latitude": 37.87564567934229,
+      "longitude": -122.25872258719399
+    }
+  },
+  {
+    "id": 23,
+    "gisId": 180,
+    "caan": "1484",
+    "name": "South Hall",
+    "shortName": "South Hall",
+    "coordinates": {
+      "latitude": 37.87134384528419,
+      "longitude": -122.25853701705637
+    }
+  },
+  {
+    "id": 227,
+    "gisId": 123,
+    "caan": "1210",
+    "name": "Sproul Hall",
+    "shortName": "Sproul Hall",
+    "coordinates": {
+      "latitude": 37.869599782249374,
+      "longitude": -122.25878675438778
+    }
+  },
+  {
+    "id": 35,
+    "gisId": 242,
+    "caan": "1149",
+    "name": "Stanley Hall",
+    "shortName": "Stanley Hall",
+    "coordinates": {
+      "latitude": 37.87399916411517,
+      "longitude": -122.25612167681352
+    }
+  },
+  {
+    "id": 202,
+    "gisId": 178,
+    "caan": "1488",
+    "name": "Stephens Hall",
+    "shortName": "Stephens Hall",
+    "coordinates": {
+      "latitude": 37.8713359122477,
+      "longitude": -122.25756312931739
+    }
+  },
+  {
+    "id": 98,
+    "gisId": 227,
+    "caan": "1495",
+    "name": "Stern Hall",
+    "shortName": "Stern Hall",
+    "coordinates": {
+      "latitude": 37.8748634505069,
+      "longitude": -122.25519157882786
+    }
+  },
+  {
+    "id": 178,
+    "gisId": 437,
+    "caan": "1038",
+    "name": "Stiles Hall",
+    "shortName": "Stiles Hall",
+    "coordinates": {
+      "latitude": 37.86824852232861,
+      "longitude": -122.26102483411965
+    }
+  },
+  {
+    "id": 248,
+    "gisId": 318,
+    "caan": "1437",
+    "name": "Strawberry Canyon Center",
+    "shortName": "Strawberry Canyon Center",
+    "coordinates": {
+      "latitude": 37.8730388092109,
+      "longitude": -122.24429081771233
+    }
+  },
+  {
+    "id": 228,
+    "gisId": 119,
+    "caan": "1784",
+    "name": "Student Center",
+    "shortName": "Student Center",
+    "coordinates": {
+      "latitude": 37.86975212705326,
+      "longitude": -122.26022817973168
+    }
+  },
+  {
+    "id": 27,
+    "gisId": 229,
+    "caan": "1152",
+    "name": "Sutardja Dai Hall",
+    "shortName": "Sutardja Dai Hall",
+    "coordinates": {
+      "latitude": 37.87484792257131,
+      "longitude": -122.25839843650806
+    }
+  },
+  {
+    "id": 39,
+    "gisId": 268,
+    "caan": "1808",
+    "name": "Tan Kah Kee Hall",
+    "shortName": "Tan Hall",
+    "coordinates": {
+      "latitude": 37.87311198698541,
+      "longitude": -122.25644972915684
+    }
+  },
+  {
+    "id": 242,
+    "gisId": 110,
+    "caan": "1286",
+    "name": "Tang Center",
+    "shortName": "Tang Center",
+    "coordinates": {
+      "latitude": 37.86762552922416,
+      "longitude": -122.26433462061091
+    }
+  },
+  {
+    "id": 194,
+    "gisId": 575,
+    "caan": "1767",
+    "name": "Unit 1 Residence Hall - Central Building",
+    "shortName": "Unit 1 Central Building",
+    "coordinates": {
+      "latitude": 37.867845790814584,
+      "longitude": -122.25524072531556
+    }
+  },
+  {
+    "id": 82,
+    "gisId": 195,
+    "caan": "1145",
+    "name": "Unit 1 Residence Hall - Christian Hall",
+    "shortName": "Unit 1 Christian Hall",
+    "coordinates": {
+      "latitude": 37.86811758355621,
+      "longitude": -122.25503978893745
+    }
+  },
+  {
+    "id": 79,
+    "gisId": 192,
+    "caan": "1146",
+    "name": "Unit 1 Residence Hall - Slottman Hall",
+    "shortName": "Unit 1 Slottman Hall",
+    "coordinates": {
+      "latitude": 37.867562693616804,
+      "longitude": -122.25526177871036
+    }
+  },
+  {
+    "id": 193,
+    "gisId": 574,
+    "caan": "1772",
+    "name": "Unit 2 Residence Hall - Central Building",
+    "shortName": "Unit 2 Central Building",
+    "coordinates": {
+      "latitude": 37.86606991505416,
+      "longitude": -122.25487525903917
+    }
+  },
+  {
+    "id": 67,
+    "gisId": 168,
+    "caan": "1768",
+    "name": "Unit 2 Residence Hall - Cunningham Hall",
+    "shortName": "Unit 2 Cunningham Hall",
+    "coordinates": {
+      "latitude": 37.86629386838398,
+      "longitude": -122.25527360532313
+    }
+  },
+  {
+    "id": 65,
+    "gisId": 166,
+    "caan": "1769",
+    "name": "Unit 2 Residence Hall - Davidson Hall",
+    "shortName": "Unit 2 Davidson Hall",
+    "coordinates": {
+      "latitude": 37.86627863277848,
+      "longitude": -122.25422701371984
+    }
+  },
+  {
+    "id": 74,
+    "gisId": 175,
+    "caan": "1771",
+    "name": "Unit 2 Residence Hall - Ehrman Hall",
+    "shortName": "Unit 2 Ehrman Hall",
+    "coordinates": {
+      "latitude": 37.865850661229885,
+      "longitude": -122.255355095299
+    }
+  },
+  {
+    "id": 73,
+    "gisId": 174,
+    "caan": "1770",
+    "name": "Unit 2 Residence Hall - Griffiths Hall",
+    "shortName": "Unit 2 Griffiths Hall ",
+    "coordinates": {
+      "latitude": 37.8658343861693,
+      "longitude": -122.25430751323395
+    }
+  },
+  {
+    "id": 66,
+    "gisId": 167,
+    "caan": "1147",
+    "name": "Unit 2 Residence Hall - Towle Hall",
+    "shortName": "Unit 2 Towle Hall",
+    "coordinates": {
+      "latitude": 37.86634127743861,
+      "longitude": -122.25467439563748
+    }
+  },
+  {
+    "id": 72,
+    "gisId": 173,
+    "caan": "1148",
+    "name": "Unit 2 Residence Hall - Wada Apartments",
+    "shortName": "Unit 2 Wada Apartments",
+    "coordinates": {
+      "latitude": 37.86578840577293,
+      "longitude": -122.2549046705537
+    }
+  },
+  {
+    "id": 209,
+    "gisId": 113,
+    "caan": "1803",
+    "name": "Unit 3 Residence Hall - Dining Center",
+    "shortName": "Unit 3 Dining Center",
+    "coordinates": {
+      "latitude": 37.86716670360268,
+      "longitude": -122.26037607985036
+    }
+  },
+  {
+    "id": 208,
+    "gisId": 440,
+    "caan": "1804",
+    "name": "Unit 3 Residence Hall - Ida Sproul Hall",
+    "shortName": "Unit 3 Ida Sproul Hall",
+    "coordinates": {
+      "latitude": 37.86695448541786,
+      "longitude": -122.26094514270187
+    }
+  },
+  {
+    "id": 206,
+    "gisId": 443,
+    "caan": "1805",
+    "name": "Unit 3 Residence Hall - Norton Hall",
+    "shortName": "Unit 3 Norton Hall",
+    "coordinates": {
+      "latitude": 37.86739155693581,
+      "longitude": -122.26085908443
+    }
+  },
+  {
+    "id": 205,
+    "gisId": 441,
+    "caan": "1807",
+    "name": "Unit 3 Residence Hall - Priestley Hall",
+    "shortName": "Unit 3 Priestley Hall",
+    "coordinates": {
+      "latitude": 37.8669404250908,
+      "longitude": -122.25990538000991
+    }
+  },
+  {
+    "id": 207,
+    "gisId": 442,
+    "caan": "1806",
+    "name": "Unit 3 Residence Hall - Spens-Black Hall",
+    "shortName": "Unit 3 Spens-Black Hall",
+    "coordinates": {
+      "latitude": 37.8674929512284,
+      "longitude": -122.26002793338846
+    }
+  },
+  {
+    "id": 5,
+    "gisId": 124,
+    "caan": "1406",
+    "name": "Valley Life Sciences Building",
+    "shortName": "VLSB",
+    "coordinates": {
+      "latitude": 37.8714811164686,
+      "longitude": -122.26215469728126
+    }
+  },
+  {
+    "id": 84,
+    "gisId": 199,
+    "caan": "1234",
+    "name": "Walter A. Haas Student Services Building",
+    "shortName": "Student Services Building",
+    "coordinates": {
+      "latitude": 37.87145172644639,
+      "longitude": -122.2535671561383
+    }
+  },
+  {
+    "id": 203,
+    "gisId": 107,
+    "caan": "1360",
+    "name": "Walter A. Haas, Jr. Pavilion",
+    "shortName": "Haas Pavilion",
+    "coordinates": {
+      "latitude": 37.86940090107634,
+      "longitude": -122.2622193668781
+    }
+  },
+  {
+    "id": 233,
+    "gisId": 125,
+    "caan": "1225",
+    "name": "Weill Hall",
+    "shortName": "Weill Hall",
+    "coordinates": {
+      "latitude": 37.871411241920484,
+      "longitude": -122.26326234132009
+    }
+  },
+  {
+    "id": 12,
+    "gisId": 148,
+    "caan": "1202",
+    "name": "Wellman Hall",
+    "shortName": "Wellman Hall",
+    "coordinates": {
+      "latitude": 37.87312211432443,
+      "longitude": -122.2627748483161
+    }
+  },
+  {
+    "id": 4,
+    "gisId": 122,
+    "caan": "1552",
+    "name": "Wheeler Hall",
+    "shortName": "Wheeler Hall",
+    "coordinates": {
+      "latitude": 37.87131096476402,
+      "longitude": -122.25916960017807
+    }
+  },
+  {
+    "id": 257,
+    "gisId": 248,
+    "caan": "1252",
+    "name": "Witter Rugby Field Restroom",
+    "shortName": "Witter Rugby Field Restroom",
+    "coordinates": {
+      "latitude": 37.871497540922896,
+      "longitude": -122.24791139769161
+    }
+  },
+  {
+    "id": 230,
+    "gisId": null,
+    "caan": null,
+    "name": "Women's Faculty Club",
+    "shortName": "Women's Faculty Club",
+    "coordinates": {
+      "latitude": 37.87204969374749,
+      "longitude": -122.25492783546014
+    }
+  },
+  {
+    "id": 77,
+    "gisId": 190,
+    "caan": "1520",
+    "name": "Woo Hon Fai Hall",
+    "shortName": "Woo Hon Fai Hall",
+    "coordinates": {
+      "latitude": 37.86876388063989,
+      "longitude": -122.25584146632475
+    }
+  },
+  {
+    "id": 261,
+    "gisId": 736,
+    "caan": "1076",
+    "name": "xučyun ruwway",
+    "shortName": "xučyun ruwway",
+    "coordinates": {
+      "latitude": 37.88480832373512,
+      "longitude": -122.29938653623532
+    }
+  },
+  {
+    "id": 53,
+    "gisId": 118,
+    "caan": "1802",
+    "name": "Zellerbach Hall",
+    "shortName": "Zellerbach Hall",
+    "coordinates": {
+      "latitude": 37.869103258793544,
+      "longitude": -122.26097633903478
+    }
+  }
+]
