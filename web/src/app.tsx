@@ -25,6 +25,13 @@ function categoryLabel(category: Restroom["category"]) {
   return "Gender-inclusive"
 }
 
+function preferredRestroomCategory(gender: string): Restroom["category"] | null {
+  if (gender === "Woman") return "women"
+  if (gender === "Man") return "men"
+  if (gender === "Non-binary") return "genderInclusive"
+  return null
+}
+
 function AccessibilityBadge({ accessible }: { accessible: boolean }) {
   return (
     <Badge
@@ -226,17 +233,19 @@ function CreateAmenityForm() {
   )
 }
 
-function SettingsView({ email, onSave }: { email: string; onSave: (email: string) => void }) {
+function SettingsView({ email, gender, onSave }: { email: string; gender: string; onSave: (email: string, gender: string) => void }) {
   const [draftEmail, setDraftEmail] = useState(email)
+  const [draftGender, setDraftGender] = useState(gender)
   const [success, setSuccess] = useState(false)
   const statusRef = useRef<HTMLParagraphElement>(null)
   const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draftEmail)
+  const hasChanges = draftEmail !== email || draftGender !== gender
 
-  function saveEmail(event: FormEvent<HTMLFormElement>) {
+  function saveSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!isValid || draftEmail === email) return
+    if (!isValid || !hasChanges) return
 
-    onSave(draftEmail)
+    onSave(draftEmail, draftGender)
     setSuccess(true)
     requestAnimationFrame(() => statusRef.current?.focus())
   }
@@ -244,7 +253,7 @@ function SettingsView({ email, onSave }: { email: string; onSave: (email: string
   return (
     <section aria-labelledby="settings-heading">
       <h2 id="settings-heading" className="font-heading text-xl font-medium">Settings</h2>
-      <form className="mt-5 space-y-4" onSubmit={saveEmail}>
+      <form className="mt-5 space-y-4" onSubmit={saveSettings}>
         <div className="space-y-2">
           <Label htmlFor="settings-email">Email</Label>
           <Input
@@ -260,13 +269,23 @@ function SettingsView({ email, onSave }: { email: string; onSave: (email: string
               setSuccess(false)
             }}
           />
-          <p className="text-sm text-muted-foreground">This email is stored for this session only.</p>
         </div>
-        <Button type="submit" disabled={!isValid || draftEmail === email}>Save</Button>
+        <FormSelect
+          id="settings-gender"
+          label="Gender"
+          placeholder="Select gender"
+          options={["Woman", "Man", "Non-binary", "Prefer not to say"]}
+          value={draftGender}
+          onValueChange={(value) => {
+            setDraftGender(value)
+            setSuccess(false)
+          }}
+        />
+        <Button type="submit" disabled={!isValid || !hasChanges}>Save</Button>
       </form>
       {success && (
         <p ref={statusRef} role="status" tabIndex={-1} className="mt-4 rounded-lg bg-secondary p-3 text-sm font-medium">
-          Email saved for this session.
+          Settings saved for this session.
         </p>
       )}
     </section>
@@ -278,9 +297,13 @@ export function App() {
   const [selectedRestroom, setSelectedRestroom] = useState<Restroom | null>(null)
   const [snapPoint, setSnapPoint] = useState<string | number>(collapsedSnapPoint)
   const [email, setEmail] = useState("x.tao@berkeley.edu")
+  const [gender, setGender] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [submittedQuery, setSubmittedQuery] = useState<string | null>(null)
-  const matchingRestrooms = submittedQuery === null ? [] : searchRestrooms(submittedQuery)
+  const preferredCategory = preferredRestroomCategory(gender)
+  const matchingRestrooms = submittedQuery === null ? [] : [...searchRestrooms(submittedQuery)].sort((first, second) => (
+    Number(second.category === preferredCategory) - Number(first.category === preferredCategory)
+  ))
   const visibleRestrooms = matchingRestrooms.slice(0, resultLimit)
 
   function showView(nextView: DrawerView) {
@@ -336,7 +359,16 @@ export function App() {
               )}
               {view === "details" && selectedRestroom && <RestroomDetails restroom={selectedRestroom} />}
               {view === "create" && <CreateAmenityForm />}
-              {view === "settings" && <SettingsView email={email} onSave={setEmail} />}
+              {view === "settings" && (
+                <SettingsView
+                  email={email}
+                  gender={gender}
+                  onSave={(nextEmail, nextGender) => {
+                    setEmail(nextEmail)
+                    setGender(nextGender)
+                  }}
+                />
+              )}
             </div>
           </div>
         </DrawerContent>

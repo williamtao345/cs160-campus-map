@@ -85,6 +85,8 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: "Settings" }))
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument()
     expect(screen.getByRole("textbox", { name: "Email" })).toHaveValue("x.tao@berkeley.edu")
+    expect(screen.getByRole("combobox", { name: "Gender" })).toBeInTheDocument()
+    expect(screen.queryByText("This email is stored for this session only.")).not.toBeInTheDocument()
 
     await user.keyboard("{Escape}")
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument()
@@ -110,11 +112,31 @@ describe("campus map app", () => {
     expect(saveButton).toBeEnabled()
     await user.click(saveButton)
 
-    expect(screen.getByRole("status")).toHaveTextContent("Email saved for this session.")
+    expect(screen.getByRole("status")).toHaveTextContent("Settings saved for this session.")
 
     await user.click(screen.getByRole("button", { name: "Back" }))
     await user.click(screen.getByRole("button", { name: "Settings" }))
     expect(screen.getByRole("textbox", { name: "Email" })).toHaveValue("new.user@berkeley.edu")
+  })
+
+  it("saves the selected gender for the current session", async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole("button", { name: "Settings" }))
+    await user.click(screen.getByRole("combobox", { name: "Gender" }))
+    await user.click(screen.getByRole("option", { name: "Non-binary" }))
+    await user.click(screen.getByRole("button", { name: "Save" }))
+
+    await user.click(screen.getByRole("button", { name: "Back" }))
+    await user.click(screen.getByRole("button", { name: "Settings" }))
+    expect(screen.getByRole("combobox", { name: "Gender" })).toHaveTextContent("Non-binary")
+    await user.click(screen.getByRole("button", { name: "Back" }))
+
+    await user.type(screen.getByRole("searchbox"), "Cory Hall")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+
+    expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })[0]).toHaveAccessibleName(/^Gender-inclusive restroom/)
   })
 
   it("shows a useful message when Google Maps rejects the key", () => {
