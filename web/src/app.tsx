@@ -279,7 +279,7 @@ export function App() {
           if (nextSnapPoint !== null) setSnapPoint(nextSnapPoint)
         }}
       >
-        <DrawerContent>
+        <DrawerContent className="mx-auto max-w-xl">
           <DrawerTitle className="sr-only">Campus information</DrawerTitle>
           <DrawerDescription className="sr-only">Search, view, and add campus amenities.</DrawerDescription>
           <div className="drawer-main-content flex-1 overflow-y-auto overscroll-contain p-4">
