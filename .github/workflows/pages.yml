@@ -30,20 +30,33 @@ jobs:
         with:
           enablement: true
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: web
+
+      - name: Run tests
+        run: npm test
+        working-directory: web
+
       - name: Build static artifact
         env:
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
         run: |
-          test -n "$GOOGLE_MAPS_API_KEY"
-          mkdir _site
-          cp -R web/. _site/
-          rm _site/config.example.js
-          printf 'window.APP_CONFIG = { googleMapsApiKey: "%s" };\n' "$GOOGLE_MAPS_API_KEY" > _site/config.js
+          test -n "${VITE_GOOGLE_MAPS_API_KEY:-}"
+          npm run build
+        working-directory: web
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: web/dist
 
       - name: Deploy to GitHub Pages
         id: deployment
