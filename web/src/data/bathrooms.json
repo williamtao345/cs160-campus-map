@@ -2184,18 +2184,6 @@
     "sourceText": "141*, 256*, 262*, 3rd Floor Concourse Level*, II-K*, EE-FF*, HH-I*, CC-E*, W-XX*, 741*, Koret Visitor Center, South & North Side Plaza (Field Club)*, "
   },
   {
-    "id": "191-women-a-u-11",
-    "buildingId": 191,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "women",
-    "accessible": true,
-    "stallType": null,
-    "restrictedAccess": false,
-    "sourceText": "141*, 256*, 262*, 3rd Floor Concourse Level*, II-K*, EE-FF*, HH-I*, CC-E*, W-XX*, 741*, Koret Visitor Center, South & North Side Plaza (Field Club)*, "
-  },
-  {
     "id": "191-women-a-u-12",
     "buildingId": 191,
     "floorNumber": "Plaza",
@@ -2313,18 +2301,6 @@
     "accessible": true,
     "stallType": null,
     "restrictedAccess": true,
-    "sourceText": "DD E*, 141*, 256*, 262*, 3rd Floor Concourse Level*, II-K*, EE-FF*, CC-E*, 769*, Koret Visitor Center, South & North Side Plaza (Field Club)*, "
-  },
-  {
-    "id": "191-men-a-u-10",
-    "buildingId": 191,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "men",
-    "accessible": true,
-    "stallType": null,
-    "restrictedAccess": false,
     "sourceText": "DD E*, 141*, 256*, 262*, 3rd Floor Concourse Level*, II-K*, EE-FF*, CC-E*, 769*, Koret Visitor Center, South & North Side Plaza (Field Club)*, "
   },
   {
@@ -4356,30 +4332,6 @@
     "sourceText": "1116"
   },
   {
-    "id": "243-genderInclusive-a-single-1",
-    "buildingId": 243,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "genderInclusive",
-    "accessible": true,
-    "stallType": "single",
-    "restrictedAccess": true,
-    "sourceText": "Under bleachers*"
-  },
-  {
-    "id": "243-genderInclusive-n-single-1",
-    "buildingId": 243,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "genderInclusive",
-    "accessible": false,
-    "stallType": "single",
-    "restrictedAccess": true,
-    "sourceText": "Under bleachers*"
-  },
-  {
     "id": "30-women-a-u-1",
     "buildingId": 30,
     "floorNumber": null,
@@ -4678,54 +4630,6 @@
     "stallType": null,
     "restrictedAccess": false,
     "sourceText": "24"
-  },
-  {
-    "id": "267-genderInclusive-a-single-1",
-    "buildingId": 267,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "genderInclusive",
-    "accessible": true,
-    "stallType": "single",
-    "restrictedAccess": true,
-    "sourceText": "Family Resource Center*"
-  },
-  {
-    "id": "268-genderInclusive-a-single-1",
-    "buildingId": 268,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "genderInclusive",
-    "accessible": true,
-    "stallType": "single",
-    "restrictedAccess": true,
-    "sourceText": "Graduate Study Center*"
-  },
-  {
-    "id": "266-genderInclusive-a-single-1",
-    "buildingId": 266,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "genderInclusive",
-    "accessible": true,
-    "stallType": "single",
-    "restrictedAccess": true,
-    "sourceText": "Public/Staff Restroom*"
-  },
-  {
-    "id": "269-genderInclusive-a-single-1",
-    "buildingId": 269,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "genderInclusive",
-    "accessible": true,
-    "stallType": "single",
-    "restrictedAccess": true,
-    "sourceText": "Study Center*"
   },
   {
     "id": "255-women-a-u-1",
@@ -6060,18 +5964,6 @@
     "sourceText": "Oxford Lobby, Sequoia Courtyard, 2nd Floor Fitness*, 3rd Floor Fitness*, 13th Floor Venue*"
   },
   {
-    "id": "252-genderInclusive-a-multi-2",
-    "buildingId": 252,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "genderInclusive",
-    "accessible": true,
-    "stallType": "multi",
-    "restrictedAccess": false,
-    "sourceText": "Oxford Lobby, Sequoia Courtyard, 2nd Floor Fitness*, 3rd Floor Fitness*, 13th Floor Venue*"
-  },
-  {
     "id": "252-genderInclusive-a-multi-3",
     "buildingId": 252,
     "floorNumber": "2",
@@ -6106,30 +5998,6 @@
     "stallType": "multi",
     "restrictedAccess": true,
     "sourceText": "Oxford Lobby, Sequoia Courtyard, 2nd Floor Fitness*, 3rd Floor Fitness*, 13th Floor Venue*"
-  },
-  {
-    "id": "253-women-a-u-1",
-    "buildingId": 253,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "women",
-    "accessible": true,
-    "stallType": null,
-    "restrictedAccess": false,
-    "sourceText": "Bleachers"
-  },
-  {
-    "id": "253-men-a-u-1",
-    "buildingId": 253,
-    "floorNumber": null,
-    "roomNumber": null,
-    "isAvailable": null,
-    "category": "men",
-    "accessible": true,
-    "stallType": null,
-    "restrictedAccess": false,
-    "sourceText": "Bleachers"
   },
   {
     "id": "253-genderInclusive-a-single-1",
@@ -8884,18 +8752,6 @@
     "buildingId": 204,
     "floorNumber": null,
     "roomNumber": "55B",
-    "isAvailable": null,
-    "category": "genderInclusive",
-    "accessible": true,
-    "stallType": "multi",
-    "restrictedAccess": true,
-    "sourceText": "55A*, 55B*, Universal Locker Room*"
-  },
-  {
-    "id": "204-genderInclusive-a-multi-3",
-    "buildingId": 204,
-    "floorNumber": null,
-    "roomNumber": null,
     "isAvailable": null,
     "category": "genderInclusive",
     "accessible": true,

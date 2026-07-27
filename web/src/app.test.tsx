@@ -114,7 +114,7 @@ describe("campus map app", () => {
     await user.type(searchbox, "bathroom")
     await user.click(screen.getByRole("button", { name: "Search" }))
 
-    expect(screen.getByText("Showing 50 of 1,025 results.")).toBeInTheDocument()
+    expect(screen.getByText("Showing 50 of 1,013 results.")).toBeInTheDocument()
     expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(50)
   })
 
