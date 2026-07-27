@@ -62,7 +62,7 @@ function RestroomResult({ restroom, onSelect }: { restroom: Restroom; onSelect: 
         <div className="min-w-0 flex-1">
           <p className="font-heading font-medium leading-snug">{categoryLabel(restroom.category)} restroom</p>
           <p className="mt-1 text-muted-foreground">
-            {restroom.building.name}{locationLabel && ` · ${locationLabel}`}
+            {restroom.building.shortName ?? restroom.building.name}{locationLabel && ` · ${locationLabel}`}
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">

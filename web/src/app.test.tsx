@@ -108,7 +108,7 @@ describe("campus map app", () => {
 
     await user.type(searchbox, "MLK bathroom")
     await user.click(screen.getByRole("button", { name: "Search" }))
-    expect(screen.getAllByRole("button", { name: /restroom.*Martin Luther King Junior Student Union/i }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole("button", { name: /restroom.*MLK Student Union/i }).length).toBeGreaterThan(0)
 
     await user.clear(searchbox)
     await user.type(searchbox, "bathroom")
@@ -116,6 +116,26 @@ describe("campus map app", () => {
 
     expect(screen.getByText("Showing 50 of 1,025 results.")).toBeInTheDocument()
     expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(50)
+  })
+
+  it("falls back to the full building name when a short name is unavailable", async () => {
+    const user = userEvent.setup()
+    const coryBuilding = buildings.find((building) => building.name === "Cory Hall")
+    const originalShortName = coryBuilding?.shortName
+
+    expect(coryBuilding).toBeDefined()
+
+    try {
+      coryBuilding!.shortName = null
+      render(<App />)
+
+      await user.type(screen.getByRole("searchbox"), "Cory Hall")
+      await user.click(screen.getByRole("button", { name: "Search" }))
+
+      expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })).toHaveLength(10)
+    } finally {
+      coryBuilding!.shortName = originalShortName ?? null
+    }
   })
 
   it("shows availability status instead of accessibility on search results", async () => {
