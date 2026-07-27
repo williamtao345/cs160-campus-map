@@ -1,9 +1,9 @@
-import { act, render, screen, waitFor } from "@testing-library/react"
+import { act, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { App } from "@/app"
-import { buildings, restrooms } from "@/data/restrooms"
+import { buildings, restrooms, searchBuildings } from "@/data/amenities"
 
 function installGoogleMapsMock() {
   const maps: Array<{
@@ -68,7 +68,36 @@ describe("campus map app", () => {
     expect(screen.getByText("Google Maps is not configured.")).toBeInTheDocument()
   })
 
-  it("searches building names case-insensitively and opens restroom details", async () => {
+  it("returns individual amenity counts with each building search result", () => {
+    const [result] = searchBuildings("Cory Hall")
+
+    expect(result).toMatchObject({
+      building: { name: "Cory Hall" },
+      amenityCounts: {
+        total: 10,
+        restrooms: 10,
+        waterRefillStations: 0,
+        vendingMachines: 0,
+        studySpaces: 0,
+      },
+    })
+  })
+
+  it("shows icons for the amenity types available in a building", async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.type(screen.getByRole("searchbox"), "Cory Hall")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+
+    const coryResult = screen.getByRole("button", { name: /Cory Hall.*10 amenities/i })
+    expect(within(coryResult).getByLabelText("Restrooms available")).toBeInTheDocument()
+    expect(within(coryResult).queryByLabelText("Water refill stations available")).not.toBeInTheDocument()
+    expect(within(coryResult).queryByLabelText("Vending machines available")).not.toBeInTheDocument()
+    expect(within(coryResult).queryByLabelText("Study spaces available")).not.toBeInTheDocument()
+  })
+
+  it("searches buildings case-insensitively and navigates through their amenities", async () => {
     const user = userEvent.setup()
     render(<App />)
     const drawer = document.querySelector('[data-slot="drawer-popup"]')
@@ -79,10 +108,16 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: "Search" }))
 
     expect(drawer).toHaveAttribute("data-expanded", "")
-    expect(screen.getByText("Showing 10 of 10 results.")).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })).toHaveLength(10)
+    expect(screen.getByText("Showing 1 of 1 results.")).toBeInTheDocument()
 
-    await user.click(screen.getByRole("button", { name: /Women's restroom.*Cory Hall.*Floor 1.*Room 112/i }))
+    await user.click(screen.getByRole("button", { name: /Cory Hall.*10 amenities/i }))
+
+    expect(screen.getByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
+    expect(screen.getByText("10 total amenities")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "10 Restrooms" })).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(10)
+
+    await user.click(screen.getByRole("button", { name: /Women's restroom.*Floor 1.*Room 112/i }))
 
     expect(screen.getByRole("heading", { name: "Women's restroom" })).toBeInTheDocument()
     expect(screen.getByText("Cory Hall")).toBeInTheDocument()
@@ -96,26 +131,32 @@ describe("campus map app", () => {
     expect(screen.getByRole("button", { name: "Back" })).toBeInTheDocument()
 
     await user.click(screen.getByRole("button", { name: "Back" }))
+    expect(screen.getByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(10)
+
+    await user.click(screen.getByRole("button", { name: "Back" }))
     expect(drawer).toHaveAttribute("data-expanded", "")
     expect(screen.getByRole("searchbox")).toHaveValue("cOrY ReStRoOm")
-    expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })).toHaveLength(10)
+    expect(screen.getByRole("button", { name: /Cory Hall.*10 amenities/i })).toBeInTheDocument()
   })
 
-  it("searches short building names and limits broad generic results", async () => {
+  it("searches short building names and returns each eligible building once", async () => {
     const user = userEvent.setup()
     render(<App />)
     const searchbox = screen.getByRole("searchbox")
+    const eligibleBuildingCount = new Set(restrooms.map((restroom) => restroom.buildingId)).size
 
     await user.type(searchbox, "MLK bathroom")
     await user.click(screen.getByRole("button", { name: "Search" }))
-    expect(screen.getAllByRole("button", { name: /restroom.*MLK Student Union/i }).length).toBeGreaterThan(0)
+    expect(screen.getByRole("button", { name: /Martin Luther King Junior Student Union.*MLK Student Union/i })).toBeInTheDocument()
 
     await user.clear(searchbox)
     await user.type(searchbox, "bathroom")
     await user.click(screen.getByRole("button", { name: "Search" }))
 
-    expect(screen.getByText("Showing 50 of 1,013 results.")).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(50)
+    expect(screen.getByText(`Showing ${Math.min(50, eligibleBuildingCount)} of ${eligibleBuildingCount} results.`)).toBeInTheDocument()
+    const buildingResults = screen.getByRole("region", { name: "Campus Buildings" })
+    expect(within(buildingResults).getAllByRole("button", { name: /amenit(?:y|ies)/i })).toHaveLength(Math.min(50, eligibleBuildingCount))
   })
 
   it("falls back to the full building name when a short name is unavailable", async () => {
@@ -132,7 +173,7 @@ describe("campus map app", () => {
       await user.type(screen.getByRole("searchbox"), "Cory Hall")
       await user.click(screen.getByRole("button", { name: "Search" }))
 
-      expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })).toHaveLength(10)
+      expect(screen.getByRole("button", { name: /Cory Hall.*10 amenities/i })).toBeInTheDocument()
     } finally {
       coryBuilding!.shortName = originalShortName ?? null
     }
@@ -149,8 +190,9 @@ describe("campus map app", () => {
       sampleRestrooms[2].isAvailable = null
 
       render(<App />)
-      await user.type(screen.getByRole("searchbox"), "bathroom")
+      await user.type(screen.getByRole("searchbox"), sampleRestrooms[0].building.name)
       await user.click(screen.getByRole("button", { name: "Search" }))
+      await user.click(screen.getByRole("button", { name: new RegExp(sampleRestrooms[0].building.name, "i") }))
 
       expect(screen.getByText("Available")).toHaveClass("text-green-800")
       expect(screen.getByText("Out of service")).toHaveClass("text-destructive")
@@ -164,14 +206,14 @@ describe("campus map app", () => {
     }
   })
 
-  it("does not search bathroom locations and reports no building matches", async () => {
+  it("does not search restroom locations", async () => {
     const user = userEvent.setup()
     render(<App />)
 
     await user.type(screen.getByRole("searchbox"), "N658A")
     await user.click(screen.getByRole("button", { name: "Search" }))
 
-    expect(screen.getByText("No restrooms found for this building.")).toBeInTheDocument()
+    expect(screen.getByText("No matching buildings found.")).toBeInTheDocument()
   })
 
   it("opens top-level drawer views and keeps the drawer open", async () => {
@@ -239,11 +281,12 @@ describe("campus map app", () => {
 
     await user.type(screen.getByRole("searchbox"), "Cory Hall")
     await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /Cory Hall.*10 amenities/i }))
 
-    expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })[0]).toHaveAccessibleName(/^Gender-inclusive restroom/)
+    expect(screen.getAllByRole("button", { name: /restroom/i })[0]).toHaveAccessibleName(/^Gender-inclusive restroom/)
   })
 
-  it("shows every building on the map and searches its name when selected", async () => {
+  it("shows every building on the map and opens it when selected", async () => {
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
     const { maps, markers } = installGoogleMapsMock()
     const { unmount } = render(<App />)
@@ -268,9 +311,10 @@ describe("campus map app", () => {
     act(() => coryMarker?.click())
 
     expect(maps[0].panTo).toHaveBeenCalledWith(coryMarker?.options.position)
-    expect(screen.getByRole("searchbox")).toHaveValue("Cory Hall")
-    expect(screen.getByText("Showing 10 of 10 results.")).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })).toHaveLength(10)
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
+    expect(screen.getByText("10 total amenities")).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(10)
 
     unmount()
     expect(markers.every((marker) => marker.removeListener.mock.calls.length === 1)).toBe(true)

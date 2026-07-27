@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 
-import type { Building } from "@/data/restrooms"
+import type { Building } from "@/data/amenities"
 
 let googleMapsPromise: Promise<void> | undefined
 

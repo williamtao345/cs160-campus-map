@@ -1,6 +1,14 @@
 import { useRef, useState } from "react"
 import type { FormEvent } from "react"
-import { ArrowLeftIcon, PlusIcon, SettingsIcon } from "lucide-react"
+import {
+  ArrowLeftIcon,
+  BookOpenIcon,
+  DropletsIcon,
+  PlusIcon,
+  PopcornIcon,
+  SettingsIcon,
+  ToiletIcon,
+} from "lucide-react"
 
 import { CampusMap } from "@/components/campus-map"
 import { Badge } from "@/components/ui/badge"
@@ -11,14 +19,39 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { buildings, searchRestrooms, type Restroom } from "@/data/restrooms"
+import {
+  buildings,
+  getAmenitiesForBuilding,
+  searchBuildings,
+  type Amenity,
+  type AmenityType,
+  type Building,
+  type BuildingSearchResult,
+  type GeneralAmenity,
+  type Restroom,
+} from "@/data/amenities"
 
-type DrawerView = "search" | "details" | "create" | "settings"
+type DrawerView = "search" | "building" | "restroom" | "create" | "settings"
 
-const amenityTypes = ["Restroom", "Water refill station", "Vending machine", "Study space", "Food", "Other"]
+const amenityTypes = ["Restroom", "Water refill station", "Vending machine", "Study space"]
 const buildingOptions = buildings.map((building) => building.name)
 const collapsedSnapPoint = "11rem"
 const resultLimit = 50
+const amenityTypeOrder: AmenityType[] = ["restroom", "waterRefillStation", "vendingMachine", "studySpace"]
+
+const amenityTypeLabels: Record<AmenityType, { singular: string; plural: string }> = {
+  restroom: { singular: "Restroom", plural: "Restrooms" },
+  waterRefillStation: { singular: "Water refill station", plural: "Water refill stations" },
+  vendingMachine: { singular: "Vending machine", plural: "Vending machines" },
+  studySpace: { singular: "Study space", plural: "Study spaces" },
+}
+
+const buildingAmenityIcons = [
+  { countKey: "restrooms", label: "Restrooms available", Icon: ToiletIcon },
+  { countKey: "waterRefillStations", label: "Water refill stations available", Icon: DropletsIcon },
+  { countKey: "vendingMachines", label: "Vending machines available", Icon: PopcornIcon },
+  { countKey: "studySpaces", label: "Study spaces available", Icon: BookOpenIcon },
+] as const
 
 function categoryLabel(category: Restroom["category"]) {
   if (category === "women") return "Women's"
@@ -61,9 +94,7 @@ function RestroomResult({ restroom, onSelect }: { restroom: Restroom; onSelect: 
       <div className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10 transition-colors hover:bg-muted/50">
         <div className="min-w-0 flex-1">
           <p className="font-heading font-medium leading-snug">{categoryLabel(restroom.category)} restroom</p>
-          <p className="mt-1 text-muted-foreground">
-            {restroom.building.shortName ?? restroom.building.name}{locationLabel && ` · ${locationLabel}`}
-          </p>
+          {locationLabel && <p className="mt-1 text-muted-foreground">{locationLabel}</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
           <AvailabilityBadge isAvailable={restroom.isAvailable} />
@@ -75,12 +106,61 @@ function RestroomResult({ restroom, onSelect }: { restroom: Restroom; onSelect: 
   )
 }
 
+function GeneralAmenityResult({ amenity }: { amenity: GeneralAmenity }) {
+  const locationLabel = [
+    amenity.floorNumber ? `Floor ${amenity.floorNumber}` : null,
+    amenity.locationDetails,
+  ].filter(Boolean).join(" · ")
+
+  return (
+    <article className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10">
+      <div className="min-w-0 flex-1">
+        <h4 className="font-heading font-medium leading-snug">{amenityTypeLabels[amenity.amenityType].singular}</h4>
+        {locationLabel && <p className="mt-1 text-muted-foreground">{locationLabel}</p>}
+      </div>
+      <div className="flex shrink-0 flex-col items-end gap-2">
+        <AvailabilityBadge isAvailable={amenity.isAvailable} />
+        {amenity.accessible !== null && <Badge variant="outline">{amenity.accessible ? "Accessible" : "Not accessible"}</Badge>}
+      </div>
+    </article>
+  )
+}
+
+function BuildingResult({ result, onSelect }: { result: BuildingSearchResult; onSelect: () => void }) {
+  const { building, amenityCounts } = result
+
+  return (
+    <button type="button" className="block w-full rounded-xl text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={onSelect}>
+      <div className="flex w-full items-center justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10 transition-colors hover:bg-muted/50">
+        <div className="min-w-0 flex-1">
+          <p className="font-heading font-medium leading-snug">{building.name}</p>
+          {building.shortName && building.shortName !== building.name && <p className="mt-1 text-muted-foreground">{building.shortName}</p>}
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <Badge variant="secondary">
+            {amenityCounts.total.toLocaleString()} {amenityCounts.total === 1 ? "amenity" : "amenities"}
+          </Badge>
+          {amenityCounts.total > 0 && (
+            <div className="flex items-center gap-1" aria-label="Available amenity types">
+              {buildingAmenityIcons.map(({ countKey, label, Icon }) => amenityCounts[countKey] > 0 && (
+                <span key={countKey} className="grid size-6 place-items-center text-foreground" aria-label={label} title={label}>
+                  <Icon className="size-4" aria-hidden="true" />
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </button>
+  )
+}
+
 function SearchView({
   hasSearched,
   query,
   onQueryChange,
   onSearch,
-  onSelect,
+  onSelectBuilding,
   results,
   totalResultCount,
 }: {
@@ -88,13 +168,13 @@ function SearchView({
   query: string
   onQueryChange: (query: string) => void
   onSearch: () => void
-  onSelect: (restroom: Restroom) => void
-  results: Restroom[]
+  onSelectBuilding: (building: Building) => void
+  results: BuildingSearchResult[]
   totalResultCount: number
 }) {
   return (
     <section className="space-y-4" aria-labelledby="search-heading">
-      <h2 id="search-heading" className="sr-only">Search campus restrooms</h2>
+      <h2 id="search-heading" className="sr-only">Search campus buildings and amenities</h2>
       <form
         role="search"
         className="flex gap-2"
@@ -106,8 +186,8 @@ function SearchView({
         <Input
           name="query"
           type="search"
-          aria-label="Search by restroom or building"
-          placeholder="Search restrooms or buildings"
+          aria-label="Search buildings and amenities"
+          placeholder="Search buildings or amenities"
           className="h-9"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
@@ -117,24 +197,83 @@ function SearchView({
 
       <Separator />
 
-      <section className="space-y-3" aria-labelledby="amenities-heading" aria-live="polite">
-        <h2 id="amenities-heading" className="text-sm font-medium">Campus Restrooms</h2>
-        {!hasSearched && <p className="text-sm text-muted-foreground">Search by building name to find restrooms.</p>}
-        {hasSearched && totalResultCount === 0 && <p className="text-sm text-muted-foreground">No restrooms found for this building.</p>}
-        {hasSearched && totalResultCount > 0 && (
-          <p className="text-sm text-muted-foreground">
-            Showing {results.length.toLocaleString()} of {totalResultCount.toLocaleString()} results.
-          </p>
-        )}
+      <section className="space-y-3" aria-labelledby="buildings-heading" aria-live="polite">
+        <div className="flex items-center justify-between gap-3">
+          <h2 id="buildings-heading" className="text-sm font-medium">Campus Buildings</h2>
+          {hasSearched && totalResultCount > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Showing {results.length.toLocaleString()} of {totalResultCount.toLocaleString()} results.
+            </p>
+          )}
+        </div>
+        {!hasSearched && <p className="text-sm text-muted-foreground">Search by building or amenity type.</p>}
+        {hasSearched && totalResultCount === 0 && <p className="text-sm text-muted-foreground">No matching buildings found.</p>}
         {results.length > 0 && (
           <div className="flex flex-col gap-3">
-            {results.map((restroom) => (
-              <RestroomResult key={restroom.id} restroom={restroom} onSelect={() => onSelect(restroom)} />
+            {results.map((result) => (
+              <BuildingResult key={result.building.id} result={result} onSelect={() => onSelectBuilding(result.building)} />
             ))}
           </div>
         )}
       </section>
     </section>
+  )
+}
+
+function BuildingDetails({
+  building,
+  amenities,
+  preferredCategory,
+  onSelectRestroom,
+}: {
+  building: Building
+  amenities: Amenity[]
+  preferredCategory: Restroom["category"] | null
+  onSelectRestroom: (restroom: Restroom) => void
+}) {
+  const amenitiesByType = new Map<AmenityType, Amenity[]>()
+  amenities.forEach((amenity) => {
+    const groupedAmenities = amenitiesByType.get(amenity.amenityType) ?? []
+    groupedAmenities.push(amenity)
+    amenitiesByType.set(amenity.amenityType, groupedAmenities)
+  })
+
+  const restrooms = amenitiesByType.get("restroom") as Restroom[] | undefined
+  restrooms?.sort((first, second) => (
+    Number(second.category === preferredCategory) - Number(first.category === preferredCategory)
+  ))
+
+  return (
+    <article className="flex flex-col gap-5">
+      <header className="flex flex-col gap-1">
+        <h2 className="font-heading text-xl font-medium">{building.name}</h2>
+        <p className="text-sm text-muted-foreground">
+          {amenities.length.toLocaleString()} total {amenities.length === 1 ? "amenity" : "amenities"}
+        </p>
+      </header>
+
+      {amenities.length === 0 && <p className="text-sm text-muted-foreground">No amenities have been recorded for this building.</p>}
+
+      {amenityTypeOrder.map((amenityType) => {
+        const groupedAmenities = amenitiesByType.get(amenityType)
+        if (!groupedAmenities?.length) return null
+
+        return (
+          <section key={amenityType} className="flex flex-col gap-3" aria-labelledby={`${amenityType}-heading`}>
+            <h3 id={`${amenityType}-heading`} className="text-sm font-medium">
+              {groupedAmenities.length.toLocaleString()} {amenityTypeLabels[amenityType][groupedAmenities.length === 1 ? "singular" : "plural"]}
+            </h3>
+            <div className="flex flex-col gap-3">
+              {groupedAmenities.map((amenity) => amenity.amenityType === "restroom" ? (
+                <RestroomResult key={amenity.id} restroom={amenity} onSelect={() => onSelectRestroom(amenity)} />
+              ) : (
+                <GeneralAmenityResult key={amenity.id} amenity={amenity} />
+              ))}
+            </div>
+          </section>
+        )
+      })}
+    </article>
   )
 }
 
@@ -306,6 +445,7 @@ function SettingsView({ email, gender, onSave }: { email: string; gender: string
 
 export function App() {
   const [view, setView] = useState<DrawerView>("search")
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null)
   const [selectedRestroom, setSelectedRestroom] = useState<Restroom | null>(null)
   const [snapPoint, setSnapPoint] = useState<string | number>(collapsedSnapPoint)
   const [email, setEmail] = useState("x.tao@berkeley.edu")
@@ -313,10 +453,8 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState("")
   const [submittedQuery, setSubmittedQuery] = useState<string | null>(null)
   const preferredCategory = preferredRestroomCategory(gender)
-  const matchingRestrooms = submittedQuery === null ? [] : [...searchRestrooms(submittedQuery)].sort((first, second) => (
-    Number(second.category === preferredCategory) - Number(first.category === preferredCategory)
-  ))
-  const visibleRestrooms = matchingRestrooms.slice(0, resultLimit)
+  const matchingBuildings = submittedQuery === null ? [] : searchBuildings(submittedQuery)
+  const visibleBuildings = matchingBuildings.slice(0, resultLimit)
 
   function showView(nextView: DrawerView) {
     setView(nextView)
@@ -327,15 +465,30 @@ export function App() {
   function submitSearch(query: string) {
     setSearchQuery(query)
     setSubmittedQuery(query)
+    setSelectedBuilding(null)
     setSelectedRestroom(null)
     setView("search")
     setSnapPoint(1)
   }
 
+  function openBuilding(building: Building) {
+    setSelectedBuilding(building)
+    setSelectedRestroom(null)
+    showView("building")
+  }
+
+  function goBack() {
+    if (view === "restroom") {
+      showView("building")
+      return
+    }
+    showView("search")
+  }
+
   return (
     <main className="app-shell">
       <h1 className="sr-only">UC Berkeley Campus Amenities</h1>
-      <CampusMap buildings={buildings} onBuildingSelect={(building) => submitSearch(building.name)} />
+      <CampusMap buildings={buildings} onBuildingSelect={openBuilding} />
 
       <nav className="top-actions" aria-label="App actions">
         <Button type="button" className="bg-accent text-[var(--berkeley-blue-dark)] hover:bg-accent/80" onClick={() => showView("create")}>
@@ -369,7 +522,7 @@ export function App() {
           <div className="drawer-main-content flex-1 overflow-y-auto overscroll-contain p-4">
             <div className="mx-auto max-w-lg">
               {view !== "search" && (
-                <Button type="button" variant="outline" className="mb-5" onClick={() => showView("search")}>
+                <Button type="button" variant="outline" className="mb-5" onClick={goBack}>
                   <ArrowLeftIcon aria-hidden="true" />
                   Back
                 </Button>
@@ -380,12 +533,23 @@ export function App() {
                   query={searchQuery}
                   onQueryChange={setSearchQuery}
                   onSearch={() => submitSearch(searchQuery)}
-                  onSelect={(restroom) => { setSelectedRestroom(restroom); showView("details") }}
-                  results={visibleRestrooms}
-                  totalResultCount={matchingRestrooms.length}
+                  onSelectBuilding={openBuilding}
+                  results={visibleBuildings}
+                  totalResultCount={matchingBuildings.length}
                 />
               )}
-              {view === "details" && selectedRestroom && <RestroomDetails restroom={selectedRestroom} />}
+              {view === "building" && selectedBuilding && (
+                <BuildingDetails
+                  building={selectedBuilding}
+                  amenities={[...getAmenitiesForBuilding(selectedBuilding.id)]}
+                  preferredCategory={preferredCategory}
+                  onSelectRestroom={(restroom) => {
+                    setSelectedRestroom(restroom)
+                    showView("restroom")
+                  }}
+                />
+              )}
+              {view === "restroom" && selectedRestroom && <RestroomDetails restroom={selectedRestroom} />}
               {view === "create" && <CreateAmenityForm />}
               {view === "settings" && (
                 <SettingsView
