@@ -33,27 +33,40 @@ function preferredRestroomCategory(gender: string): Restroom["category"] | null 
   return null
 }
 
-function AccessibilityBadge({ accessible }: { accessible: boolean }) {
+function restroomLocationLabel(restroom: Restroom) {
+  return [
+    restroom.floorNumber ? `Floor ${restroom.floorNumber}` : null,
+    restroom.roomNumber ? `Room ${restroom.roomNumber}` : null,
+  ].filter(Boolean).join(" · ")
+}
+
+function AvailabilityBadge({ isAvailable }: { isAvailable: boolean | null }) {
+  if (isAvailable === null) return null
+
   return (
     <Badge
-      variant="outline"
-      className={accessible ? "border-0 bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300" : undefined}
+      variant={isAvailable ? "outline" : "destructive"}
+      className={isAvailable ? "border-0 bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300" : undefined}
     >
-      {accessible ? "Accessible" : "Not accessible"}
+      {isAvailable ? "Available" : "Out of service"}
     </Badge>
   )
 }
 
 function RestroomResult({ restroom, onSelect }: { restroom: Restroom; onSelect: () => void }) {
+  const locationLabel = restroomLocationLabel(restroom)
+
   return (
     <button type="button" className="block w-full rounded-xl text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={onSelect}>
       <div className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10 transition-colors hover:bg-muted/50">
         <div className="min-w-0 flex-1">
           <p className="font-heading font-medium leading-snug">{categoryLabel(restroom.category)} restroom</p>
-          <p className="mt-1 text-muted-foreground">{restroom.building.name} {restroom.location}</p>
+          <p className="mt-1 text-muted-foreground">
+            {restroom.building.name}{locationLabel && ` · ${locationLabel}`}
+          </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
-          <AccessibilityBadge accessible={restroom.accessible} />
+          <AvailabilityBadge isAvailable={restroom.isAvailable} />
           {restroom.stallType && <Badge variant="outline">{restroom.stallType === "single" ? "Single-stall" : "Multi-stall"}</Badge>}
           {restroom.restrictedAccess && <Badge variant="outline">Restricted access</Badge>}
         </div>
@@ -127,7 +140,8 @@ function SearchView({
 
 function RestroomDetails({ restroom }: { restroom: Restroom }) {
   const details = [
-    ["Location", restroom.location],
+    ...(restroom.floorNumber ? [["Floor", restroom.floorNumber]] : []),
+    ...(restroom.roomNumber ? [["Room number", restroom.roomNumber]] : []),
     ["Accessibility", restroom.accessible ? "Accessible" : "Not accessible"],
     ...(restroom.stallType ? [["Stall type", `${restroom.stallType === "single" ? "Single" : "Multi"}-stall`]] : []),
     ["Access", restroom.restrictedAccess ? "Restricted" : "General campus access"],
@@ -136,10 +150,7 @@ function RestroomDetails({ restroom }: { restroom: Restroom }) {
   return (
     <article className="space-y-5">
       <header className="space-y-1">
-        <div className="flex items-start justify-between gap-4">
-          <h2 className="font-heading text-xl font-medium">{categoryLabel(restroom.category)} restroom</h2>
-          <AccessibilityBadge accessible={restroom.accessible} />
-        </div>
+        <h2 className="font-heading text-xl font-medium">{categoryLabel(restroom.category)} restroom</h2>
         <p className="text-sm text-muted-foreground">{restroom.building.name}</p>
       </header>
       <dl className="space-y-3 text-sm">

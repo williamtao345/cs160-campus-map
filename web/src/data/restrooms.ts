@@ -16,7 +16,9 @@ export type Building = {
 export type Restroom = {
   id: string
   buildingId: number
-  location: string
+  floorNumber: string | null
+  roomNumber: string | null
+  isAvailable: boolean | null
   category: "women" | "men" | "genderInclusive"
   accessible: boolean
   stallType: "single" | "multi" | null
