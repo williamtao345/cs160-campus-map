@@ -78,7 +78,7 @@ describe("campus map app", () => {
     expect(drawer).toHaveAttribute("data-snap-points", "")
     expect(drawer).not.toHaveAttribute("data-expanded")
 
-    await user.click(screen.getByRole("button", { name: "Create" }))
+    await user.click(screen.getByRole("button", { name: "Add Amenity" }))
     expect(drawer).toHaveAttribute("data-expanded", "")
     expect(screen.getByRole("heading", { name: "Add an amenity" })).toBeInTheDocument()
 

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react"
 import type { FormEvent } from "react"
+import { ArrowLeftIcon, PlusIcon, SettingsIcon } from "lucide-react"
 
 import { CampusMap } from "@/components/campus-map"
 import { Badge } from "@/components/ui/badge"
@@ -318,8 +319,14 @@ export function App() {
       <CampusMap />
 
       <nav className="top-actions" aria-label="App actions">
-        <Button type="button" className="bg-accent text-[var(--berkeley-blue-dark)] hover:bg-accent/80" onClick={() => showView("create")}>Create</Button>
-        <Button type="button" onClick={() => showView("settings")}>Settings</Button>
+        <Button type="button" className="bg-accent text-[var(--berkeley-blue-dark)] hover:bg-accent/80" onClick={() => showView("create")}>
+          <PlusIcon aria-hidden="true" />
+          Add Amenity
+        </Button>
+        <Button type="button" onClick={() => showView("settings")}>
+          <SettingsIcon aria-hidden="true" />
+          Settings
+        </Button>
       </nav>
 
       <Drawer
@@ -342,7 +349,12 @@ export function App() {
           <DrawerDescription className="sr-only">Search, view, and add campus amenities.</DrawerDescription>
           <div className="drawer-main-content flex-1 overflow-y-auto overscroll-contain p-4">
             <div className="mx-auto max-w-lg">
-              {view !== "search" && <Button type="button" variant="outline" className="mb-5" onClick={() => showView("search")}>Back</Button>}
+              {view !== "search" && (
+                <Button type="button" variant="outline" className="mb-5" onClick={() => showView("search")}>
+                  <ArrowLeftIcon aria-hidden="true" />
+                  Back
+                </Button>
+              )}
               {view === "search" && (
                 <SearchView
                   hasSearched={submittedQuery !== null}
