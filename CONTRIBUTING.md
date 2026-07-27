@@ -7,10 +7,8 @@
 - Run relevant formatting, linting, and tests before opening a pull request.
 - Update documentation when behavior, setup, or usage changes.
 
-## Branches and Pull Requests
+## Pull Requests
 
-- Keep `main` stable and demoable; do not commit directly to it.
-- Create short-lived branches from `main` named `type/scope-summary`, such as `feat/web-login`.
 - Keep pull requests focused, describe what changed, and include screenshots for visible UI changes.
 - Get at least one teammate review before merging, then delete the branch.
 
