@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "30-vending-machine-1",
+    "buildingId": 30,
+    "floorNumber": "1",
+    "locationDetails": null,
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": null
+  }
+]

@@ -54,7 +54,7 @@ export function CampusMap({
     let markers: google.maps.Marker[] = []
     let markerListeners: google.maps.MapsEventListener[] = []
 
-    if (!apiKey) return
+    if (!apiKey || buildings.length === 0) return
 
     const handleAuthFailure = () => {
       if (!cancelled) setError("Google Maps could not be authorized.")

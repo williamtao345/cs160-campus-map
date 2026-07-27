@@ -3,7 +3,41 @@ import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { App } from "@/app"
-import { buildings, restrooms, searchBuildings } from "@/data/amenities"
+import { loadAmenitiesForBuilding, loadBuildings, searchBuildings } from "@/data/amenities"
+import {
+  authenticationErrorMessage,
+  observeAuthState,
+  signInWithGoogle,
+  signOutCurrentUser,
+  type AuthUser,
+} from "@/lib/auth"
+import { amenities, buildings, restrooms } from "@/test/amenity-fixtures"
+
+vi.mock("@/data/amenities", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@/data/amenities")>(),
+  loadBuildings: vi.fn(),
+  loadAmenitiesForBuilding: vi.fn(),
+}))
+
+vi.mock("@/lib/auth", () => ({
+  authenticationErrorMessage: vi.fn(() => "Google sign-in could not be completed. Please try again."),
+  observeAuthState: vi.fn(),
+  signInWithGoogle: vi.fn(),
+  signOutCurrentUser: vi.fn(),
+}))
+
+const signedInUser: AuthUser = {
+  uid: "google-user-1",
+  displayName: "Test User",
+  email: "test.user@example.com",
+  photoURL: "https://example.com/avatar.jpg",
+}
+
+async function renderApp() {
+  const result = render(<App />)
+  await screen.findByRole("searchbox")
+  return result
+}
 
 function installGoogleMapsMock() {
   const maps: Array<{
@@ -55,21 +89,44 @@ function installGoogleMapsMock() {
 describe("campus map app", () => {
   beforeEach(() => {
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "")
+    vi.mocked(loadBuildings).mockResolvedValue(buildings)
+    vi.mocked(loadAmenitiesForBuilding).mockImplementation(async (building) => (
+      amenities.filter((amenity) => amenity.buildingId === building.id)
+    ))
+    vi.mocked(observeAuthState).mockImplementation((onChange) => {
+      onChange(null)
+      return vi.fn()
+    })
+    vi.mocked(signInWithGoogle).mockResolvedValue(signedInUser)
+    vi.mocked(signOutCurrentUser).mockResolvedValue()
   })
 
   afterEach(() => {
+    vi.clearAllMocks()
     vi.unstubAllGlobals()
     vi.unstubAllEnvs()
   })
 
-  it("shows the map fallback when an API key is not configured", () => {
-    render(<App />)
+  it("shows the map fallback when an API key is not configured", async () => {
+    await renderApp()
 
     expect(screen.getByText("Google Maps is not configured.")).toBeInTheDocument()
   })
 
+  it("shows a database error and retries the initial load", async () => {
+    const user = userEvent.setup()
+    vi.mocked(loadBuildings).mockRejectedValueOnce(new Error("Database unavailable"))
+    render(<App />)
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Campus data could not be loaded. Database unavailable")
+    await user.click(screen.getByRole("button", { name: "Try again" }))
+
+    expect(await screen.findByRole("searchbox")).toBeInTheDocument()
+    expect(loadBuildings).toHaveBeenCalledTimes(2)
+  })
+
   it("returns individual amenity counts with each building search result", () => {
-    const [result] = searchBuildings("Cory Hall")
+    const [result] = searchBuildings(buildings, "Cory Hall")
 
     expect(result).toMatchObject({
       building: { name: "Cory Hall" },
@@ -85,7 +142,7 @@ describe("campus map app", () => {
 
   it("shows icons for the amenity types available in a building", async () => {
     const user = userEvent.setup()
-    render(<App />)
+    await renderApp()
 
     await user.type(screen.getByRole("searchbox"), "Cory Hall")
     await user.click(screen.getByRole("button", { name: "Search" }))
@@ -99,7 +156,7 @@ describe("campus map app", () => {
 
   it("searches buildings case-insensitively and navigates through their amenities", async () => {
     const user = userEvent.setup()
-    render(<App />)
+    await renderApp()
     const drawer = document.querySelector('[data-slot="drawer-popup"]')
 
     expect(drawer).not.toHaveAttribute("data-expanded")
@@ -142,7 +199,7 @@ describe("campus map app", () => {
 
   it("searches short building names and returns each eligible building once", async () => {
     const user = userEvent.setup()
-    render(<App />)
+    await renderApp()
     const searchbox = screen.getByRole("searchbox")
     const eligibleBuildingCount = new Set(restrooms.map((restroom) => restroom.buildingId)).size
 
@@ -168,7 +225,7 @@ describe("campus map app", () => {
 
     try {
       coryBuilding!.shortName = null
-      render(<App />)
+      await renderApp()
 
       await user.type(screen.getByRole("searchbox"), "Cory Hall")
       await user.click(screen.getByRole("button", { name: "Search" }))
@@ -189,7 +246,7 @@ describe("campus map app", () => {
       sampleRestrooms[1].isAvailable = false
       sampleRestrooms[2].isAvailable = null
 
-      render(<App />)
+      await renderApp()
       await user.type(screen.getByRole("searchbox"), sampleRestrooms[0].building.name)
       await user.click(screen.getByRole("button", { name: "Search" }))
       await user.click(screen.getByRole("button", { name: new RegExp(sampleRestrooms[0].building.name, "i") }))
@@ -206,9 +263,34 @@ describe("campus map app", () => {
     }
   })
 
+  it("shows available GSPP restrooms, its water station, and Evans vending machines", async () => {
+    const user = userEvent.setup()
+    await renderApp()
+    const searchbox = screen.getByRole("searchbox")
+
+    await user.type(searchbox, "2607 Hearst water refill")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /2607 Hearst Avenue.*4 amenities/i }))
+
+    expect(screen.getByRole("heading", { name: "3 Restrooms" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "1 Water refill station" })).toBeInTheDocument()
+    expect(screen.getByText("Floor 1 · Near Room GSPP 150")).toBeInTheDocument()
+    expect(screen.getAllByText("Available")).toHaveLength(3)
+
+    await user.click(screen.getByRole("button", { name: "Back" }))
+    const returnedSearchbox = screen.getByRole("searchbox")
+    await user.clear(returnedSearchbox)
+    await user.type(returnedSearchbox, "Evans vending machine")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /Evans Hall.*amenities/i }))
+
+    expect(screen.getByRole("heading", { name: "1 Vending machine" })).toBeInTheDocument()
+    expect(screen.getByText("Available")).toBeInTheDocument()
+  })
+
   it("does not search restroom locations", async () => {
     const user = userEvent.setup()
-    render(<App />)
+    await renderApp()
 
     await user.type(screen.getByRole("searchbox"), "N658A")
     await user.click(screen.getByRole("button", { name: "Search" }))
@@ -218,7 +300,7 @@ describe("campus map app", () => {
 
   it("opens top-level drawer views and keeps the drawer open", async () => {
     const user = userEvent.setup()
-    render(<App />)
+    await renderApp()
     const drawer = document.querySelector('[data-slot="drawer-popup"]')
 
     expect(drawer).toHaveAttribute("data-snap-points", "")
@@ -227,52 +309,103 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: "Add Amenity" }))
     expect(drawer).toHaveAttribute("data-expanded", "")
     expect(screen.getByRole("heading", { name: "Add an amenity" })).toBeInTheDocument()
+    expect(screen.getByText("Amenity submissions are not enabled yet.")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Submissions unavailable" })).toBeDisabled()
 
     await user.click(screen.getByRole("button", { name: "Settings" }))
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument()
-    expect(screen.getByRole("textbox", { name: "Email" })).toHaveValue("x.tao@berkeley.edu")
+    expect(screen.getByText("Sign in securely through Google.")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Sign in with Google" })).toBeInTheDocument()
     expect(screen.getByRole("combobox", { name: "Gender" })).toBeInTheDocument()
-    expect(screen.queryByText("This email is stored for this session only.")).not.toBeInTheDocument()
 
     await user.keyboard("{Escape}")
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument()
   })
 
-  it("validates and saves the email for the current session", async () => {
+  it("signs in with Google and shows the authenticated identity", async () => {
     const user = userEvent.setup()
-    render(<App />)
+    await renderApp()
+
+    expect(screen.queryByRole("button", { name: "Sign in with Google" })).not.toBeInTheDocument()
+    await user.click(screen.getByRole("button", { name: "Settings" }))
+    await user.click(screen.getByRole("button", { name: "Sign in with Google" }))
+
+    expect(signInWithGoogle).toHaveBeenCalledOnce()
+    expect(screen.getByText("Test User")).toBeInTheDocument()
+    expect(screen.getByText("test.user@example.com")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument()
+  })
+
+  it("shows an authentication loading state until Firebase restores the session", async () => {
+    vi.mocked(observeAuthState).mockImplementation(() => vi.fn())
+    await renderApp()
+
+    expect(screen.queryByRole("button", { name: "Sign in with Google" })).not.toBeInTheDocument()
+    await userEvent.setup().click(screen.getByRole("button", { name: "Settings" }))
+    expect(screen.getByRole("status")).toHaveTextContent("Checking sign-in...")
+  })
+
+  it("keeps settings usable when authentication initialization fails", async () => {
+    vi.mocked(observeAuthState).mockImplementation((_onChange, onError) => {
+      onError(new Error("Firebase is not configured"))
+      return vi.fn()
+    })
+    await renderApp()
+
+    await userEvent.setup().click(screen.getByRole("button", { name: "Settings" }))
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Authentication could not be initialized")
+    expect(screen.getByRole("button", { name: "Sign in with Google" })).toBeInTheDocument()
+  })
+
+  it("signs out the current Google user", async () => {
+    const user = userEvent.setup()
+    vi.mocked(observeAuthState).mockImplementation((onChange) => {
+      onChange(signedInUser)
+      return vi.fn()
+    })
+    await renderApp()
 
     await user.click(screen.getByRole("button", { name: "Settings" }))
-    const emailInput = screen.getByRole("textbox", { name: "Email" })
-    const saveButton = screen.getByRole("button", { name: "Save" })
+    await user.click(screen.getByRole("button", { name: "Sign out" }))
 
-    expect(saveButton).toBeDisabled()
+    expect(signOutCurrentUser).toHaveBeenCalledOnce()
+    expect(screen.getByRole("button", { name: "Sign in with Google" })).toBeInTheDocument()
+  })
 
-    await user.clear(emailInput)
-    await user.type(emailInput, "not-an-email")
-    expect(emailInput).toHaveAttribute("aria-invalid", "true")
-    expect(saveButton).toBeDisabled()
+  it("shows Google authentication errors in settings", async () => {
+    const user = userEvent.setup()
+    vi.mocked(signInWithGoogle).mockRejectedValueOnce(new Error("popup blocked"))
+    await renderApp()
 
-    await user.clear(emailInput)
-    await user.type(emailInput, "new.user@berkeley.edu")
-    expect(saveButton).toBeEnabled()
-    await user.click(saveButton)
-
-    expect(screen.getByRole("status")).toHaveTextContent("Settings saved for this session.")
-
-    await user.click(screen.getByRole("button", { name: "Back" }))
     await user.click(screen.getByRole("button", { name: "Settings" }))
-    expect(screen.getByRole("textbox", { name: "Email" })).toHaveValue("new.user@berkeley.edu")
+    await user.click(screen.getByRole("button", { name: "Sign in with Google" }))
+
+    expect(authenticationErrorMessage).toHaveBeenCalledOnce()
+    expect(await screen.findByRole("alert")).toHaveTextContent("Google sign-in could not be completed")
+  })
+
+  it("silently handles a cancelled Google popup", async () => {
+    const user = userEvent.setup()
+    vi.mocked(signInWithGoogle).mockRejectedValueOnce(new Error("popup closed"))
+    vi.mocked(authenticationErrorMessage).mockReturnValueOnce(null)
+    await renderApp()
+
+    await user.click(screen.getByRole("button", { name: "Settings" }))
+    await user.click(screen.getByRole("button", { name: "Sign in with Google" }))
+
+    expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument()
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument()
   })
 
   it("saves the selected gender for the current session", async () => {
     const user = userEvent.setup()
-    render(<App />)
+    await renderApp()
 
     await user.click(screen.getByRole("button", { name: "Settings" }))
     await user.click(screen.getByRole("combobox", { name: "Gender" }))
     await user.click(await screen.findByRole("option", { name: "Non-binary" }))
-    await user.click(screen.getByRole("button", { name: "Save" }))
+    await user.click(screen.getByRole("button", { name: "Save preferences" }))
 
     await user.click(screen.getByRole("button", { name: "Back" }))
     await user.click(screen.getByRole("button", { name: "Settings" }))
@@ -289,7 +422,7 @@ describe("campus map app", () => {
   it("shows every building on the map and opens it when selected", async () => {
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
     const { maps, markers } = installGoogleMapsMock()
-    const { unmount } = render(<App />)
+    const { unmount } = await renderApp()
 
     await waitFor(() => expect(markers).toHaveLength(buildings.length))
 
@@ -312,7 +445,7 @@ describe("campus map app", () => {
 
     expect(maps[0].panTo).toHaveBeenCalledWith(coryMarker?.options.position)
     expect(screen.queryByRole("searchbox")).not.toBeInTheDocument()
-    expect(screen.getByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
+    expect(await screen.findByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
     expect(screen.getByText("10 total amenities")).toBeInTheDocument()
     expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(10)
 
@@ -321,9 +454,9 @@ describe("campus map app", () => {
     expect(markers.every((marker) => marker.setMap.mock.calls[0]?.[0] === null)).toBe(true)
   })
 
-  it("shows a useful message when Google Maps rejects the key", () => {
+  it("shows a useful message when Google Maps rejects the key", async () => {
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
-    render(<App />)
+    await renderApp()
 
     expect(window.gm_authFailure).toBeTypeOf("function")
     act(() => window.gm_authFailure?.())

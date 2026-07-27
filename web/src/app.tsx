@@ -1,9 +1,11 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { FormEvent } from "react"
 import {
   ArrowLeftIcon,
   BookOpenIcon,
   DropletsIcon,
+  LogInIcon,
+  LogOutIcon,
   PlusIcon,
   PopcornIcon,
   SettingsIcon,
@@ -11,6 +13,7 @@ import {
 } from "lucide-react"
 
 import { CampusMap } from "@/components/campus-map"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer"
@@ -20,8 +23,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import {
-  buildings,
-  getAmenitiesForBuilding,
+  loadAmenitiesForBuilding,
+  loadBuildings,
   searchBuildings,
   type Amenity,
   type AmenityType,
@@ -30,11 +33,17 @@ import {
   type GeneralAmenity,
   type Restroom,
 } from "@/data/amenities"
+import {
+  authenticationErrorMessage,
+  observeAuthState,
+  signInWithGoogle,
+  signOutCurrentUser,
+  type AuthUser,
+} from "@/lib/auth"
 
 type DrawerView = "search" | "building" | "restroom" | "create" | "settings"
 
 const amenityTypes = ["Restroom", "Water refill station", "Vending machine", "Study space"]
-const buildingOptions = buildings.map((building) => building.name)
 const collapsedSnapPoint = "11rem"
 const resultLimit = 50
 const amenityTypeOrder: AmenityType[] = ["restroom", "waterRefillStation", "vendingMachine", "studySpace"]
@@ -330,32 +339,26 @@ function FormSelect({ id, label, placeholder, options, value, required, onValueC
   )
 }
 
-function CreateAmenityForm() {
+function CreateAmenityForm({ buildings }: { buildings: Building[] }) {
   const [type, setType] = useState("")
   const [building, setBuilding] = useState("")
   const [availability, setAvailability] = useState("")
   const [accessibility, setAccessibility] = useState("")
   const [rating, setRating] = useState("Not rated")
-  const [success, setSuccess] = useState("")
-  const statusRef = useRef<HTMLParagraphElement>(null)
+  const buildingOptions = buildings.map((buildingOption) => buildingOption.name)
 
   function submitAmenity(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setSuccess(`${type} at ${building} was submitted for review.`)
-    event.currentTarget.reset()
-    setType("")
-    setBuilding("")
-    setAvailability("")
-    setAccessibility("")
-    setRating("Not rated")
-    requestAnimationFrame(() => statusRef.current?.focus())
   }
 
   return (
     <section aria-labelledby="create-heading">
       <h2 id="create-heading" className="font-heading text-xl font-medium">Add an amenity</h2>
+      <p className="mt-2 rounded-lg bg-secondary p-3 text-sm text-secondary-foreground">
+        Amenity submissions are not enabled yet.
+      </p>
       <p className="mt-1 mb-5 text-sm text-muted-foreground"><span className="text-destructive" aria-hidden="true">*</span> Required fields</p>
-      <form className="space-y-4" onSubmit={submitAmenity} onInput={() => setSuccess("")}>
+      <form className="space-y-4" onSubmit={submitAmenity}>
         <FormSelect id="type" label="Amenity type" placeholder="Select a type" options={amenityTypes} value={type} required onValueChange={setType} />
         <FormSelect id="building" label="Building" placeholder="Select a building" options={buildingOptions} value={building} required onValueChange={setBuilding} />
         <div className="space-y-2">
@@ -377,26 +380,46 @@ function CreateAmenityForm() {
           <Label htmlFor="notes">Notes</Label>
           <Textarea id="notes" name="notes" rows={4} />
         </div>
-        <Button type="submit" size="lg" className="w-full">Submit amenity</Button>
+        <Button type="submit" size="lg" className="w-full" disabled>Submissions unavailable</Button>
       </form>
-      {success && <p ref={statusRef} role="status" tabIndex={-1} className="mt-4 rounded-lg bg-secondary p-3 text-sm font-medium">{success}</p>}
     </section>
   )
 }
 
-function SettingsView({ email, gender, onSave }: { email: string; gender: string; onSave: (email: string, gender: string) => void }) {
-  const [draftEmail, setDraftEmail] = useState(email)
+function userInitials(user: AuthUser) {
+  const nameInitials = user.displayName?.split(/\s+/).filter(Boolean).map((part) => part[0]).join("").slice(0, 2)
+  return nameInitials?.toLocaleUpperCase() || user.email?.[0]?.toLocaleUpperCase() || "U"
+}
+
+function SettingsView({
+  authError,
+  authUser,
+  gender,
+  isAuthLoading,
+  isAuthPending,
+  onSave,
+  onSignIn,
+  onSignOut,
+}: {
+  authError: string
+  authUser: AuthUser | null
+  gender: string
+  isAuthLoading: boolean
+  isAuthPending: boolean
+  onSave: (gender: string) => void
+  onSignIn: () => void
+  onSignOut: () => void
+}) {
   const [draftGender, setDraftGender] = useState(gender)
   const [success, setSuccess] = useState(false)
   const statusRef = useRef<HTMLParagraphElement>(null)
-  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draftEmail)
-  const hasChanges = draftEmail !== email || draftGender !== gender
+  const hasChanges = draftGender !== gender
 
   function saveSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!isValid || !hasChanges) return
+    if (!hasChanges) return
 
-    onSave(draftEmail, draftGender)
+    onSave(draftGender)
     setSuccess(true)
     requestAnimationFrame(() => statusRef.current?.focus())
   }
@@ -404,23 +427,40 @@ function SettingsView({ email, gender, onSave }: { email: string; gender: string
   return (
     <section aria-labelledby="settings-heading">
       <h2 id="settings-heading" className="font-heading text-xl font-medium">Settings</h2>
+
+      <div className="mt-5 flex flex-col gap-3">
+        {isAuthLoading ? (
+          <p role="status" className="text-sm text-muted-foreground">Checking sign-in...</p>
+        ) : authUser ? (
+          <div className="flex items-center gap-3">
+            <Avatar>
+              {authUser.photoURL && <AvatarImage src={authUser.photoURL} alt="" referrerPolicy="no-referrer" />}
+              <AvatarFallback>{userInitials(authUser)}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">{authUser.displayName ?? "Google user"}</p>
+              {authUser.email && <p className="truncate text-xs text-muted-foreground">{authUser.email}</p>}
+            </div>
+            <Button type="button" variant="outline" disabled={isAuthPending} onClick={onSignOut}>
+              <LogOutIcon data-icon="inline-start" aria-hidden="true" />
+              Sign out
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-start gap-3">
+            <p className="text-sm text-muted-foreground">Sign in securely through Google.</p>
+            <Button type="button" disabled={isAuthPending} onClick={onSignIn}>
+              <LogInIcon data-icon="inline-start" aria-hidden="true" />
+              {isAuthPending ? "Signing in..." : "Sign in with Google"}
+            </Button>
+          </div>
+        )}
+        {authError && <p role="alert" className="text-sm text-destructive">{authError}</p>}
+      </div>
+
+      <Separator className="mt-5" />
+
       <form className="mt-5 space-y-4" onSubmit={saveSettings}>
-        <div className="space-y-2">
-          <Label htmlFor="settings-email">Email</Label>
-          <Input
-            id="settings-email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            value={draftEmail}
-            required
-            aria-invalid={draftEmail.length > 0 && !isValid}
-            onChange={(event) => {
-              setDraftEmail(event.target.value)
-              setSuccess(false)
-            }}
-          />
-        </div>
         <FormSelect
           id="settings-gender"
           label="Gender"
@@ -432,7 +472,7 @@ function SettingsView({ email, gender, onSave }: { email: string; gender: string
             setSuccess(false)
           }}
         />
-        <Button type="submit" disabled={!isValid || !hasChanges}>Save</Button>
+        <Button type="submit" disabled={!hasChanges}>Save preferences</Button>
       </form>
       {success && (
         <p ref={statusRef} role="status" tabIndex={-1} className="mt-4 rounded-lg bg-secondary p-3 text-sm font-medium">
@@ -444,17 +484,90 @@ function SettingsView({ email, gender, onSave }: { email: string; gender: string
 }
 
 export function App() {
+  const [buildings, setBuildings] = useState<Building[]>([])
+  const [buildingLoadError, setBuildingLoadError] = useState("")
+  const [isLoadingBuildings, setIsLoadingBuildings] = useState(true)
+  const [loadAttempt, setLoadAttempt] = useState(0)
   const [view, setView] = useState<DrawerView>("search")
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null)
   const [selectedRestroom, setSelectedRestroom] = useState<Restroom | null>(null)
+  const [selectedAmenities, setSelectedAmenities] = useState<Amenity[]>([])
+  const [amenityLoadError, setAmenityLoadError] = useState("")
+  const [isLoadingAmenities, setIsLoadingAmenities] = useState(false)
   const [snapPoint, setSnapPoint] = useState<string | number>(collapsedSnapPoint)
-  const [email, setEmail] = useState("x.tao@berkeley.edu")
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null)
+  const [authError, setAuthError] = useState("")
+  const [isAuthLoading, setIsAuthLoading] = useState(true)
+  const [isAuthPending, setIsAuthPending] = useState(false)
   const [gender, setGender] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [submittedQuery, setSubmittedQuery] = useState<string | null>(null)
+  const amenityCache = useRef(new Map<number, Amenity[]>())
+  const amenityRequest = useRef(0)
   const preferredCategory = preferredRestroomCategory(gender)
-  const matchingBuildings = submittedQuery === null ? [] : searchBuildings(submittedQuery)
+  const matchingBuildings = submittedQuery === null ? [] : searchBuildings(buildings, submittedQuery)
   const visibleBuildings = matchingBuildings.slice(0, resultLimit)
+
+  useEffect(() => {
+    let cancelled = false
+    setIsLoadingBuildings(true)
+    setBuildingLoadError("")
+
+    loadBuildings()
+      .then((loadedBuildings) => {
+        if (!cancelled) setBuildings(loadedBuildings)
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setBuildingLoadError(error instanceof Error ? error.message : "Unable to load campus data.")
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingBuildings(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [loadAttempt])
+
+  useEffect(() => observeAuthState(
+    (user) => {
+      setAuthUser(user)
+      setIsAuthLoading(false)
+    },
+    () => {
+      setAuthError("Authentication could not be initialized. Check the Firebase configuration and try again.")
+      setIsAuthLoading(false)
+    },
+  ), [])
+
+  async function signIn() {
+    setAuthError("")
+    setIsAuthPending(true)
+    try {
+      setAuthUser(await signInWithGoogle())
+    } catch (error) {
+      const message = authenticationErrorMessage(error)
+      if (message) {
+        setAuthError(message)
+        showView("settings")
+      }
+    } finally {
+      setIsAuthPending(false)
+    }
+  }
+
+  async function signOutUser() {
+    setAuthError("")
+    setIsAuthPending(true)
+    try {
+      await signOutCurrentUser()
+      setAuthUser(null)
+    } catch {
+      setAuthError("Sign out could not be completed. Please try again.")
+    } finally {
+      setIsAuthPending(false)
+    }
+  }
 
   function showView(nextView: DrawerView) {
     setView(nextView)
@@ -471,10 +584,34 @@ export function App() {
     setSnapPoint(1)
   }
 
-  function openBuilding(building: Building) {
+  async function openBuilding(building: Building) {
+    const request = ++amenityRequest.current
     setSelectedBuilding(building)
     setSelectedRestroom(null)
+    setAmenityLoadError("")
     showView("building")
+
+    const cachedAmenities = amenityCache.current.get(building.id)
+    if (cachedAmenities) {
+      setSelectedAmenities(cachedAmenities)
+      setIsLoadingAmenities(false)
+      return
+    }
+
+    setSelectedAmenities([])
+    setIsLoadingAmenities(true)
+
+    try {
+      const loadedAmenities = await loadAmenitiesForBuilding(building)
+      amenityCache.current.set(building.id, loadedAmenities)
+      if (request === amenityRequest.current) setSelectedAmenities(loadedAmenities)
+    } catch (error) {
+      if (request === amenityRequest.current) {
+        setAmenityLoadError(error instanceof Error ? error.message : "Unable to load amenities.")
+      }
+    } finally {
+      if (request === amenityRequest.current) setIsLoadingAmenities(false)
+    }
   }
 
   function goBack() {
@@ -492,11 +629,11 @@ export function App() {
 
       <nav className="top-actions" aria-label="App actions">
         <Button type="button" className="bg-accent text-[var(--berkeley-blue-dark)] hover:bg-accent/80" onClick={() => showView("create")}>
-          <PlusIcon aria-hidden="true" />
+          <PlusIcon data-icon="inline-start" aria-hidden="true" />
           Add Amenity
         </Button>
         <Button type="button" onClick={() => showView("settings")}>
-          <SettingsIcon aria-hidden="true" />
+          <SettingsIcon data-icon="inline-start" aria-hidden="true" />
           Settings
         </Button>
       </nav>
@@ -528,37 +665,57 @@ export function App() {
                 </Button>
               )}
               {view === "search" && (
-                <SearchView
-                  hasSearched={submittedQuery !== null}
-                  query={searchQuery}
-                  onQueryChange={setSearchQuery}
-                  onSearch={() => submitSearch(searchQuery)}
-                  onSelectBuilding={openBuilding}
-                  results={visibleBuildings}
-                  totalResultCount={matchingBuildings.length}
-                />
+                isLoadingBuildings ? (
+                  <p role="status" className="text-sm text-muted-foreground">Loading campus data...</p>
+                ) : buildingLoadError ? (
+                  <div role="alert" className="space-y-3 rounded-xl bg-destructive/10 p-4 text-sm text-destructive">
+                    <p>Campus data could not be loaded. {buildingLoadError}</p>
+                    <Button type="button" variant="outline" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>Try again</Button>
+                  </div>
+                ) : (
+                  <SearchView
+                    hasSearched={submittedQuery !== null}
+                    query={searchQuery}
+                    onQueryChange={setSearchQuery}
+                    onSearch={() => submitSearch(searchQuery)}
+                    onSelectBuilding={openBuilding}
+                    results={visibleBuildings}
+                    totalResultCount={matchingBuildings.length}
+                  />
+                )
               )}
               {view === "building" && selectedBuilding && (
-                <BuildingDetails
-                  building={selectedBuilding}
-                  amenities={[...getAmenitiesForBuilding(selectedBuilding.id)]}
-                  preferredCategory={preferredCategory}
-                  onSelectRestroom={(restroom) => {
-                    setSelectedRestroom(restroom)
-                    showView("restroom")
-                  }}
-                />
+                isLoadingAmenities ? (
+                  <p role="status" className="text-sm text-muted-foreground">Loading amenities for {selectedBuilding.name}...</p>
+                ) : amenityLoadError ? (
+                  <div role="alert" className="space-y-3 rounded-xl bg-destructive/10 p-4 text-sm text-destructive">
+                    <p>Amenities could not be loaded. {amenityLoadError}</p>
+                    <Button type="button" variant="outline" onClick={() => void openBuilding(selectedBuilding)}>Try again</Button>
+                  </div>
+                ) : (
+                  <BuildingDetails
+                    building={selectedBuilding}
+                    amenities={[...selectedAmenities]}
+                    preferredCategory={preferredCategory}
+                    onSelectRestroom={(restroom) => {
+                      setSelectedRestroom(restroom)
+                      showView("restroom")
+                    }}
+                  />
+                )
               )}
               {view === "restroom" && selectedRestroom && <RestroomDetails restroom={selectedRestroom} />}
-              {view === "create" && <CreateAmenityForm />}
+              {view === "create" && <CreateAmenityForm buildings={buildings} />}
               {view === "settings" && (
                 <SettingsView
-                  email={email}
+                  authError={authError}
+                  authUser={authUser}
                   gender={gender}
-                  onSave={(nextEmail, nextGender) => {
-                    setEmail(nextEmail)
-                    setGender(nextGender)
-                  }}
+                  isAuthLoading={isAuthLoading}
+                  isAuthPending={isAuthPending}
+                  onSave={setGender}
+                  onSignIn={() => void signIn()}
+                  onSignOut={() => void signOutUser()}
                 />
               )}
             </div>

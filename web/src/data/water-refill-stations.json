@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "199-water-refill-station-1",
+    "buildingId": 199,
+    "floorNumber": "1",
+    "locationDetails": "Near Room GSPP 150",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": null
+  }
+]
