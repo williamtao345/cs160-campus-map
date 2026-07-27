@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 
+import type { Building } from "@/data/restrooms"
+
 let googleMapsPromise: Promise<void> | undefined
 
 function loadGoogleMaps(apiKey: string) {
@@ -31,15 +33,26 @@ function loadGoogleMaps(apiKey: string) {
   return googleMapsPromise
 }
 
-export function CampusMap() {
+export function CampusMap({
+  buildings,
+  onBuildingSelect,
+}: {
+  buildings: Building[]
+  onBuildingSelect: (building: Building) => void
+}) {
   const mapRef = useRef<HTMLDivElement>(null)
+  const onBuildingSelectRef = useRef(onBuildingSelect)
   const [error, setError] = useState<string | null>(
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? null : "Google Maps is not configured.",
   )
 
+  onBuildingSelectRef.current = onBuildingSelect
+
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
     let cancelled = false
+    let markers: google.maps.Marker[] = []
+    let markerListeners: google.maps.MapsEventListener[] = []
 
     if (!apiKey) return
 
@@ -53,12 +66,39 @@ export function CampusMap() {
       .then(() => {
         if (cancelled || !mapRef.current) return
 
-        new google.maps.Map(mapRef.current, {
+        const map = new google.maps.Map(mapRef.current, {
           center: { lat: 37.8719, lng: -122.2585 },
           zoom: 16,
           mapTypeId: "roadmap",
           disableDefaultUI: true,
           clickableIcons: false,
+        })
+
+        markers = buildings.map((building) => {
+          const position = {
+            lat: building.coordinates.latitude,
+            lng: building.coordinates.longitude,
+          }
+          const marker = new google.maps.Marker({
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 5,
+              fillColor: "#003262",
+              fillOpacity: 0.9,
+              strokeColor: "#ffffff",
+              strokeWeight: 2,
+            },
+            map,
+            position,
+            title: building.name,
+          })
+
+          markerListeners.push(marker.addListener("click", () => {
+            map.panTo(position)
+            onBuildingSelectRef.current(building)
+          }))
+
+          return marker
         })
       })
       .catch(() => {
@@ -67,9 +107,11 @@ export function CampusMap() {
 
     return () => {
       cancelled = true
+      markerListeners.forEach((listener) => listener.remove())
+      markers.forEach((marker) => marker.setMap(null))
       if (window.gm_authFailure === handleAuthFailure) window.gm_authFailure = undefined
     }
-  }, [])
+  }, [buildings])
 
   return (
     <section className="campus-map" aria-label="UC Berkeley campus map">

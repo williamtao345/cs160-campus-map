@@ -324,10 +324,18 @@ export function App() {
     setSnapPoint(nextView === "search" && !hasSavedResults ? collapsedSnapPoint : 1)
   }
 
+  function submitSearch(query: string) {
+    setSearchQuery(query)
+    setSubmittedQuery(query)
+    setSelectedRestroom(null)
+    setView("search")
+    setSnapPoint(1)
+  }
+
   return (
     <main className="app-shell">
       <h1 className="sr-only">UC Berkeley Campus Amenities</h1>
-      <CampusMap />
+      <CampusMap buildings={buildings} onBuildingSelect={(building) => submitSearch(building.name)} />
 
       <nav className="top-actions" aria-label="App actions">
         <Button type="button" className="bg-accent text-[var(--berkeley-blue-dark)] hover:bg-accent/80" onClick={() => showView("create")}>
@@ -371,10 +379,7 @@ export function App() {
                   hasSearched={submittedQuery !== null}
                   query={searchQuery}
                   onQueryChange={setSearchQuery}
-                  onSearch={() => {
-                    setSubmittedQuery(searchQuery)
-                    setSnapPoint(1)
-                  }}
+                  onSearch={() => submitSearch(searchQuery)}
                   onSelect={(restroom) => { setSelectedRestroom(restroom); showView("details") }}
                   results={visibleRestrooms}
                   totalResultCount={matchingRestrooms.length}

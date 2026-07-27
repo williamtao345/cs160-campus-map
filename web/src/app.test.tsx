@@ -1,13 +1,65 @@
-import { act, render, screen } from "@testing-library/react"
+import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { App } from "@/app"
-import { restrooms } from "@/data/restrooms"
+import { buildings, restrooms } from "@/data/restrooms"
+
+function installGoogleMapsMock() {
+  const maps: Array<{
+    panTo: ReturnType<typeof vi.fn>
+  }> = []
+  const markers: Array<{
+    options: google.maps.MarkerOptions
+    click: () => void
+    removeListener: ReturnType<typeof vi.fn>
+    setMap: ReturnType<typeof vi.fn>
+  }> = []
+
+  class MockMap {
+    panTo = vi.fn()
+
+    constructor() {
+      maps.push(this)
+    }
+  }
+
+  class MockMarker {
+    options: google.maps.MarkerOptions
+    click = () => {}
+    removeListener = vi.fn()
+    setMap = vi.fn()
+
+    constructor(options: google.maps.MarkerOptions) {
+      this.options = options
+      markers.push(this)
+    }
+
+    addListener(_eventName: string, handler: () => void) {
+      this.click = handler
+      return { remove: this.removeListener }
+    }
+  }
+
+  vi.stubGlobal("google", {
+    maps: {
+      Map: MockMap,
+      Marker: MockMarker,
+      SymbolPath: { CIRCLE: "CIRCLE" },
+    },
+  })
+
+  return { maps, markers }
+}
 
 describe("campus map app", () => {
   beforeEach(() => {
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "")
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
   })
 
   it("shows the map fallback when an API key is not configured", () => {
@@ -157,7 +209,7 @@ describe("campus map app", () => {
 
     await user.click(screen.getByRole("button", { name: "Settings" }))
     await user.click(screen.getByRole("combobox", { name: "Gender" }))
-    await user.click(screen.getByRole("option", { name: "Non-binary" }))
+    await user.click(await screen.findByRole("option", { name: "Non-binary" }))
     await user.click(screen.getByRole("button", { name: "Save" }))
 
     await user.click(screen.getByRole("button", { name: "Back" }))
@@ -169,6 +221,40 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: "Search" }))
 
     expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })[0]).toHaveAccessibleName(/^Gender-inclusive restroom/)
+  })
+
+  it("shows every building on the map and searches its name when selected", async () => {
+    vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
+    const { maps, markers } = installGoogleMapsMock()
+    const { unmount } = render(<App />)
+
+    await waitFor(() => expect(markers).toHaveLength(buildings.length))
+
+    const coryBuilding = buildings.find((building) => building.name === "Cory Hall")
+    const coryMarker = markers.find((marker) => marker.options.title === "Cory Hall")
+
+    expect(coryMarker?.options.position).toEqual({
+      lat: coryBuilding?.coordinates.latitude,
+      lng: coryBuilding?.coordinates.longitude,
+    })
+    expect(coryMarker?.options.icon).toMatchObject({
+      path: "CIRCLE",
+      scale: 5,
+      fillColor: "#003262",
+      strokeColor: "#ffffff",
+      strokeWeight: 2,
+    })
+
+    act(() => coryMarker?.click())
+
+    expect(maps[0].panTo).toHaveBeenCalledWith(coryMarker?.options.position)
+    expect(screen.getByRole("searchbox")).toHaveValue("Cory Hall")
+    expect(screen.getByText("Showing 10 of 10 results.")).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: /restroom.*Cory Hall/i })).toHaveLength(10)
+
+    unmount()
+    expect(markers.every((marker) => marker.removeListener.mock.calls.length === 1)).toBe(true)
+    expect(markers.every((marker) => marker.setMap.mock.calls[0]?.[0] === null)).toBe(true)
   })
 
   it("shows a useful message when Google Maps rejects the key", () => {
