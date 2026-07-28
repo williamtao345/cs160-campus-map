@@ -517,6 +517,65 @@ describe("campus map app", () => {
     expect(screen.getAllByRole("button", { name: /restroom/i })[0]).toHaveAccessibleName(/^Gender-inclusive restroom/)
   })
 
+  it("shows the three nearest buildings until a search is submitted", async () => {
+    const user = userEvent.setup()
+    vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
+    const locationBuildings = [
+      { ...buildings[0], name: "Far Building", shortName: null, coordinates: { latitude: 37.03, longitude: -122.25 } },
+      { ...buildings[1], name: "Second Building", shortName: null, coordinates: { latitude: 37.01, longitude: -122.25 } },
+      { ...buildings[2], name: "Nearest Building", shortName: null, coordinates: { latitude: 37.001, longitude: -122.25 } },
+      { ...buildings[3], name: "Third Building", shortName: null, coordinates: { latitude: 37.02, longitude: -122.25 } },
+    ]
+    vi.mocked(loadBuildings).mockResolvedValue(locationBuildings)
+    let updatePosition: PositionCallback = () => {}
+    vi.stubGlobal("navigator", {
+      geolocation: {
+        clearWatch: vi.fn(),
+        watchPosition: vi.fn((onSuccess: PositionCallback) => {
+          updatePosition = onSuccess
+          return 42
+        }),
+      },
+    })
+    installGoogleMapsMock()
+    const { unmount } = await renderApp()
+
+    const emptyNearestRegion = screen.getByRole("region", { name: "Nearest Buildings" })
+    expect(within(emptyNearestRegion).queryAllByRole("button")).toHaveLength(0)
+
+    act(() => updatePosition({
+      coords: {
+        accuracy: 10,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        latitude: 37,
+        longitude: -122.25,
+        speed: null,
+        toJSON: () => ({}),
+      },
+      timestamp: 1,
+      toJSON: () => ({}),
+    }))
+
+    const nearestRegion = screen.getByRole("region", { name: "Nearest Buildings" })
+    expect(within(nearestRegion).getAllByRole("button").map((button) => button.textContent)).toEqual([
+      expect.stringContaining("Nearest Building"),
+      expect.stringContaining("Second Building"),
+      expect.stringContaining("Third Building"),
+    ])
+    expect(within(nearestRegion).queryByText("Far Building")).not.toBeInTheDocument()
+
+    await user.type(screen.getByRole("searchbox"), "Far Building")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+
+    const searchRegion = screen.getByRole("region", { name: "Campus Buildings" })
+    expect(within(searchRegion).getAllByRole("button")).toHaveLength(1)
+    expect(within(searchRegion).getByText("Far Building")).toBeInTheDocument()
+    expect(within(searchRegion).queryByText("Nearest Building")).not.toBeInTheDocument()
+    unmount()
+  })
+
   it("shows every building on the map and opens it when selected", async () => {
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
     const { maps, markers } = installGoogleMapsMock()
@@ -693,6 +752,7 @@ describe("campus map app", () => {
 
     await waitFor(() => expect(markers).toHaveLength(buildings.length))
     expect(circles).toHaveLength(0)
+    expect(within(screen.getByRole("region", { name: "Nearest Buildings" })).queryAllByRole("button")).toHaveLength(0)
     expect(screen.queryByText("Google Maps failed to load.")).not.toBeInTheDocument()
 
     unmount()

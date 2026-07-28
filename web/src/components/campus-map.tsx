@@ -36,12 +36,15 @@ function loadGoogleMaps(apiKey: string) {
 export function CampusMap({
   buildings,
   onBuildingSelect,
+  onLocationChange,
 }: {
   buildings: Building[]
   onBuildingSelect: (building: Building) => void
+  onLocationChange: (position: { latitude: number; longitude: number }) => void
 }) {
   const mapRef = useRef<HTMLDivElement>(null)
   const onBuildingSelectRef = useRef(onBuildingSelect)
+  const onLocationChangeRef = useRef(onLocationChange)
   const [error, setError] = useState<string | null>(
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY && import.meta.env.VITE_GOOGLE_MAPS_MAP_ID
       ? null
@@ -49,6 +52,7 @@ export function CampusMap({
   )
 
   onBuildingSelectRef.current = onBuildingSelect
+  onLocationChangeRef.current = onLocationChange
 
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
@@ -96,6 +100,7 @@ export function CampusMap({
               if (cancelled) return
 
               const position = { lat: coords.latitude, lng: coords.longitude }
+              onLocationChangeRef.current({ latitude: coords.latitude, longitude: coords.longitude })
 
               if (!hasCenteredOnLocation) {
                 hasCenteredOnLocation = true

@@ -44,9 +44,15 @@ import {
 type DrawerView = "search" | "building" | "restroom" | "create" | "settings"
 
 const amenityTypes = ["Restroom", "Water refill station", "Vending machine", "Study space"]
-const collapsedSnapPoint = "11rem"
+const collapsedSnapPoint = "16rem"
 const resultLimit = 50
+const nearestBuildingLimit = 3
 const amenityTypeOrder: AmenityType[] = ["restroom", "waterRefillStation", "vendingMachine", "studySpace"]
+
+type Coordinates = {
+  latitude: number
+  longitude: number
+}
 
 const amenityTypeLabels: Record<AmenityType, { singular: string; plural: string }> = {
   restroom: { singular: "Restroom", plural: "Restrooms" },
@@ -61,6 +67,30 @@ const buildingAmenityIcons = [
   { countKey: "vendingMachines", label: "Vending machines available", Icon: PopcornIcon },
   { countKey: "studySpaces", label: "Study spaces available", Icon: BookOpenIcon },
 ] as const
+
+function distanceBetween(first: Coordinates, second: Coordinates) {
+  const radians = Math.PI / 180
+  const latitudeDelta = (second.latitude - first.latitude) * radians
+  const longitudeDelta = (second.longitude - first.longitude) * radians
+  const firstLatitude = first.latitude * radians
+  const secondLatitude = second.latitude * radians
+  const haversine = Math.sin(latitudeDelta / 2) ** 2
+    + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2
+
+  return 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
+}
+
+function nearestBuildings(buildings: Building[], position: Coordinates): BuildingSearchResult[] {
+  return buildings
+    .map((building) => ({ building, distance: distanceBetween(position, building.coordinates) }))
+    .sort((first, second) => (
+      first.distance - second.distance
+      || first.building.name.localeCompare(second.building.name)
+      || first.building.id - second.building.id
+    ))
+    .slice(0, nearestBuildingLimit)
+    .map(({ building }) => ({ building, amenityCounts: building.amenityCounts }))
+}
 
 function categoryLabel(category: Restroom["category"]) {
   if (category === "women") return "Women's"
@@ -211,14 +241,15 @@ function SearchView({
 
       <section className="space-y-3" aria-labelledby="buildings-heading" aria-live="polite">
         <div className="flex items-center justify-between gap-3">
-          <h2 id="buildings-heading" className="text-sm font-medium">Campus Buildings</h2>
+          <h2 id="buildings-heading" className="text-sm font-medium">
+            {hasSearched ? "Campus Buildings" : "Nearest Buildings"}
+          </h2>
           {hasSearched && totalResultCount > 0 && (
             <p className="text-xs text-muted-foreground">
               Showing {results.length.toLocaleString()} of {totalResultCount.toLocaleString()} results.
             </p>
           )}
         </div>
-        {!hasSearched && <p className="text-sm text-muted-foreground">Search by building or amenity type.</p>}
         {hasSearched && totalResultCount === 0 && <p className="text-sm text-muted-foreground">No matching buildings found.</p>}
         {results.length > 0 && (
           <div className="flex flex-col gap-3">
@@ -505,11 +536,14 @@ export function App() {
   const [gender, setGender] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [submittedQuery, setSubmittedQuery] = useState<string | null>(null)
+  const [userPosition, setUserPosition] = useState<Coordinates | null>(null)
   const amenityCache = useRef(new Map<number, Amenity[]>())
   const amenityRequest = useRef(0)
   const preferredCategory = preferredRestroomCategory(gender)
-  const matchingBuildings = submittedQuery === null ? [] : searchBuildings(buildings, submittedQuery)
-  const visibleBuildings = matchingBuildings.slice(0, resultLimit)
+  const matchingBuildings = submittedQuery === null
+    ? userPosition === null ? [] : nearestBuildings(buildings, userPosition)
+    : searchBuildings(buildings, submittedQuery)
+  const visibleBuildings = submittedQuery === null ? matchingBuildings : matchingBuildings.slice(0, resultLimit)
 
   useEffect(() => {
     let cancelled = false
@@ -628,7 +662,7 @@ export function App() {
   return (
     <main className="app-shell">
       <h1 className="sr-only">UC Berkeley Campus Amenities</h1>
-      <CampusMap buildings={buildings} onBuildingSelect={openBuilding} />
+      <CampusMap buildings={buildings} onBuildingSelect={openBuilding} onLocationChange={setUserPosition} />
 
       <nav className="top-actions" aria-label="App actions">
         <Button type="button" className="bg-accent text-[var(--berkeley-blue-dark)] hover:bg-accent/80" onClick={() => showView("create")}>

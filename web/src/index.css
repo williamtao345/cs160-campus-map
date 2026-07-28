@@ -151,6 +151,13 @@ body,
   overflow: hidden;
 }
 
+*,
+*::before,
+*::after {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 body {
   min-width: 320px;
   position: relative;
