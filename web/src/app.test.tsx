@@ -220,6 +220,24 @@ describe("campus map app", () => {
     })
   })
 
+  it("disables search until the query contains text", async () => {
+    const user = userEvent.setup()
+    await renderApp()
+    const searchbox = screen.getByRole("searchbox")
+    const searchButton = screen.getByRole("button", { name: "Search" })
+
+    expect(searchButton).toBeDisabled()
+
+    await user.type(searchbox, "   ")
+    expect(searchButton).toBeDisabled()
+
+    await user.type(searchbox, "Cory Hall")
+    expect(searchButton).toBeEnabled()
+
+    await user.clear(searchbox)
+    expect(searchButton).toBeDisabled()
+  })
+
   it("shows icons for the amenity types available in a building", async () => {
     const user = userEvent.setup()
     await renderApp()

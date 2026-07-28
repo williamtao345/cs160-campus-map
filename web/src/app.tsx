@@ -181,6 +181,8 @@ function SearchView({
   results: BuildingSearchResult[]
   totalResultCount: number
 }) {
+  const isSearchDisabled = query.trim().length === 0
+
   return (
     <section className="space-y-4" aria-labelledby="search-heading">
       <h2 id="search-heading" className="sr-only">Search campus buildings and amenities</h2>
@@ -189,6 +191,7 @@ function SearchView({
         className="flex gap-2"
         onSubmit={(event) => {
           event.preventDefault()
+          if (isSearchDisabled) return
           onSearch()
         }}
       >
@@ -201,7 +204,7 @@ function SearchView({
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
         />
-        <Button type="submit">Search</Button>
+        <Button type="submit" disabled={isSearchDisabled}>Search</Button>
       </form>
 
       <Separator />
