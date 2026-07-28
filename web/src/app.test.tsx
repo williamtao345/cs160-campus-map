@@ -42,6 +42,11 @@ async function renderApp() {
 function installGoogleMapsMock() {
   const maps: Array<{
     options: google.maps.MapOptions
+    data: {
+      addGeoJson: ReturnType<typeof vi.fn>
+      remove: ReturnType<typeof vi.fn>
+      setStyle: ReturnType<typeof vi.fn>
+    }
     panTo: ReturnType<typeof vi.fn>
     setZoom: (zoom: number) => void
     startDrag: () => void
@@ -60,9 +65,15 @@ function installGoogleMapsMock() {
     map: google.maps.Map | null | undefined
     setMap: ReturnType<typeof vi.fn>
   }> = []
+  const polygonFeatures = [{ id: "campus-buildings" }]
 
   class MockMap {
     options: google.maps.MapOptions
+    data = {
+      addGeoJson: vi.fn(() => polygonFeatures),
+      remove: vi.fn(),
+      setStyle: vi.fn(),
+    }
     panTo = vi.fn()
     zoom = 16
     zoomChanged = () => {}
@@ -154,7 +165,7 @@ function installGoogleMapsMock() {
     },
   })
 
-  return { circles, maps, markers }
+  return { circles, maps, markers, polygonFeatures }
 }
 
 describe("campus map app", () => {
@@ -578,7 +589,7 @@ describe("campus map app", () => {
 
   it("shows every building on the map and opens it when selected", async () => {
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
-    const { maps, markers } = installGoogleMapsMock()
+    const { maps, markers, polygonFeatures } = installGoogleMapsMock()
     const { unmount } = await renderApp()
 
     await waitFor(() => expect(markers).toHaveLength(buildings.length))
@@ -588,6 +599,16 @@ describe("campus map app", () => {
     const offCampusMarker = markers.find((marker) => marker.options.title === "1893 Le Roy Avenue")
 
     expect(maps[0].options.mapId).toBe("test-map-id")
+    expect(maps[0].data.addGeoJson).toHaveBeenCalledWith(expect.objectContaining({
+      type: "FeatureCollection",
+    }))
+    expect(maps[0].data.setStyle).toHaveBeenCalledWith({
+      clickable: false,
+      fillColor: "#FDB515",
+      fillOpacity: 0.2,
+      strokeOpacity: 0,
+      strokeWeight: 0,
+    })
     expect(coryMarker?.options.position).toEqual({
       lat: coryBuilding?.coordinates.latitude,
       lng: coryBuilding?.coordinates.longitude,
@@ -617,6 +638,7 @@ describe("campus map app", () => {
     unmount()
     expect(markers.every((marker) => marker.removeEventListener.mock.calls.length === 1)).toBe(true)
     expect(markers.every((marker) => marker.map === null)).toBe(true)
+    expect(maps[0].data.remove).toHaveBeenCalledWith(polygonFeatures[0])
   })
 
   it("tracks the user's current position with a Google-style marker and accuracy halo", async () => {

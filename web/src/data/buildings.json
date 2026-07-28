@@ -488,7 +488,7 @@
     "gisId": 427,
     "caan": "1820",
     "name": "Clark Kerr Campus 1 - Administration",
-    "shortName": "1",
+    "shortName": "Clark Kerr Admin",
     "coordinates": {
       "latitude": 37.864263304237625,
       "longitude": -122.24887374996037
@@ -499,7 +499,7 @@
     "gisId": 338,
     "caan": "2037",
     "name": "Clark Kerr Campus 24 - Recreation Maintenance",
-    "shortName": "24",
+    "shortName": "Clark Kerr Rec Maintenance",
     "coordinates": {
       "latitude": 37.86504388069276,
       "longitude": -122.24754380504386
@@ -510,7 +510,7 @@
     "gisId": 332,
     "caan": "1842",
     "name": "Clark Kerr Campus 25 - Golden Bear Rec Center",
-    "shortName": "25",
+    "shortName": "Golden Bear Rec Center",
     "coordinates": {
       "latitude": 37.86542851296914,
       "longitude": -122.2472026681417

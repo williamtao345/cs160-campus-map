@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 
 import type { Building } from "@/data/amenities"
+import campusBuildingPolygons from "@/data/campus-building-polygons.json"
 
 let googleMapsPromise: Promise<void> | undefined
 
@@ -60,6 +61,8 @@ export function CampusMap({
     let cancelled = false
     let markers: google.maps.marker.AdvancedMarkerElement[] = []
     let listenerCleanups: (() => void)[] = []
+    let polygonFeatures: google.maps.Data.Feature[] = []
+    let polygonLayer: google.maps.Data | undefined
     let locationMarker: google.maps.marker.AdvancedMarkerElement | undefined
     let accuracyCircle: google.maps.Circle | undefined
     let locationWatchId: number | undefined
@@ -88,6 +91,15 @@ export function CampusMap({
           mapTypeId: "roadmap",
           disableDefaultUI: true,
           clickableIcons: false,
+        })
+        polygonLayer = map.data
+        polygonFeatures = polygonLayer.addGeoJson(campusBuildingPolygons)
+        polygonLayer.setStyle({
+          clickable: false,
+          fillColor: "#FDB515",
+          fillOpacity: 0.2,
+          strokeOpacity: 0,
+          strokeWeight: 0,
         })
         const dragListener = map.addListener("dragstart", () => {
           hasUserPanned = true
@@ -188,6 +200,7 @@ export function CampusMap({
       markers.forEach((marker) => {
         marker.map = null
       })
+      polygonFeatures.forEach((feature) => polygonLayer?.remove(feature))
       if (locationMarker) locationMarker.map = null
       accuracyCircle?.setMap(null)
       if (locationWatchId !== undefined) navigator.geolocation.clearWatch(locationWatchId)
