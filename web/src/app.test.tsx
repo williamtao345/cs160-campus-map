@@ -44,12 +44,21 @@ function installGoogleMapsMock() {
     options: google.maps.MapOptions
     panTo: ReturnType<typeof vi.fn>
     setZoom: (zoom: number) => void
+    startDrag: () => void
   }> = []
   const markers: Array<{
     map: unknown
     options: google.maps.marker.AdvancedMarkerElementOptions
+    position: google.maps.marker.AdvancedMarkerElement["position"]
     click: () => void
     removeEventListener: ReturnType<typeof vi.fn>
+  }> = []
+  const circles: Array<{
+    options: google.maps.CircleOptions
+    center: google.maps.LatLng | google.maps.LatLngLiteral | null | undefined
+    radius: number
+    map: google.maps.Map | null | undefined
+    setMap: ReturnType<typeof vi.fn>
   }> = []
 
   class MockMap {
@@ -57,6 +66,7 @@ function installGoogleMapsMock() {
     panTo = vi.fn()
     zoom = 16
     zoomChanged = () => {}
+    dragStarted = () => {}
 
     constructor(_element: HTMLElement, options: google.maps.MapOptions) {
       this.options = options
@@ -65,6 +75,7 @@ function installGoogleMapsMock() {
 
     addListener(eventName: string, handler: () => void) {
       if (eventName === "zoom_changed") this.zoomChanged = handler
+      if (eventName === "dragstart") this.dragStarted = handler
       return { remove: vi.fn() }
     }
 
@@ -76,17 +87,23 @@ function installGoogleMapsMock() {
       this.zoom = zoom
       this.zoomChanged()
     }
+
+    startDrag() {
+      this.dragStarted()
+    }
   }
 
   class MockAdvancedMarkerElement {
     map: unknown
     options: google.maps.marker.AdvancedMarkerElementOptions
+    position: google.maps.marker.AdvancedMarkerElement["position"]
     click = () => {}
     removeEventListener = vi.fn()
 
     constructor(options: google.maps.marker.AdvancedMarkerElementOptions) {
       this.options = options
       this.map = options.map ?? null
+      this.position = options.position ?? null
       markers.push(this)
     }
 
@@ -95,13 +112,41 @@ function installGoogleMapsMock() {
     }
   }
 
+  class MockCircle {
+    options: google.maps.CircleOptions
+    center: google.maps.LatLng | google.maps.LatLngLiteral | null | undefined
+    radius: number
+    map: google.maps.Map | null | undefined
+    setMap = vi.fn((map: google.maps.Map | null) => {
+      this.map = map
+    })
+
+    constructor(options: google.maps.CircleOptions) {
+      this.options = options
+      this.center = options.center
+      this.radius = options.radius ?? 0
+      this.map = options.map
+      circles.push(this)
+    }
+
+    setCenter(center: google.maps.LatLng | google.maps.LatLngLiteral | null) {
+      this.center = center
+    }
+
+    setRadius(radius: number) {
+      this.radius = radius
+    }
+  }
+
   const CollisionBehavior = {
     OPTIONAL_AND_HIDES_LOWER_PRIORITY: "OPTIONAL_AND_HIDES_LOWER_PRIORITY",
+    REQUIRED: "REQUIRED",
   }
 
   vi.stubGlobal("google", {
     maps: {
       Map: MockMap,
+      Circle: MockCircle,
       importLibrary: vi.fn(async () => ({
         AdvancedMarkerElement: MockAdvancedMarkerElement,
         CollisionBehavior,
@@ -109,7 +154,7 @@ function installGoogleMapsMock() {
     },
   })
 
-  return { maps, markers }
+  return { circles, maps, markers }
 }
 
 describe("campus map app", () => {
@@ -495,6 +540,145 @@ describe("campus map app", () => {
     unmount()
     expect(markers.every((marker) => marker.removeEventListener.mock.calls.length === 1)).toBe(true)
     expect(markers.every((marker) => marker.map === null)).toBe(true)
+  })
+
+  it("tracks the user's current position with a Google-style marker and accuracy halo", async () => {
+    vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
+    let updatePosition: PositionCallback = () => {}
+    const geolocation = {
+      clearWatch: vi.fn(),
+      watchPosition: vi.fn((onSuccess: PositionCallback) => {
+        updatePosition = onSuccess
+        return 42
+      }),
+    }
+    vi.stubGlobal("navigator", { geolocation })
+    const { circles, maps, markers } = installGoogleMapsMock()
+    const { unmount } = await renderApp()
+
+    await waitFor(() => expect(geolocation.watchPosition).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      { enableHighAccuracy: true, maximumAge: 10_000, timeout: 20_000 },
+    ))
+
+    act(() => updatePosition({
+      coords: {
+        accuracy: 14,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        latitude: 37.8721,
+        longitude: -122.2579,
+        speed: null,
+        toJSON: () => ({}),
+      },
+      timestamp: 1,
+      toJSON: () => ({}),
+    }))
+
+    const locationMarker = markers.find((marker) => marker.options.title === "Your location")
+    expect(locationMarker?.options).toMatchObject({
+      anchorLeft: "-50%",
+      anchorTop: "-50%",
+      collisionBehavior: "REQUIRED",
+      position: { lat: 37.8721, lng: -122.2579 },
+      zIndex: 2_147_483_647,
+    })
+    expect(locationMarker?.options.content).toHaveClass("current-location-dot")
+    expect(locationMarker?.map).toBe(maps[0])
+    expect(maps[0].panTo).toHaveBeenCalledOnce()
+    expect(maps[0].panTo).toHaveBeenCalledWith({ lat: 37.8721, lng: -122.2579 })
+    expect(circles[0].options).toMatchObject({
+      center: { lat: 37.8721, lng: -122.2579 },
+      clickable: false,
+      fillColor: "#4285f4",
+      fillOpacity: 0.15,
+      radius: 14,
+      strokeColor: "#4285f4",
+    })
+
+    act(() => updatePosition({
+      coords: {
+        accuracy: 8,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        latitude: 37.873,
+        longitude: -122.259,
+        speed: null,
+        toJSON: () => ({}),
+      },
+      timestamp: 2,
+      toJSON: () => ({}),
+    }))
+
+    expect(locationMarker?.position).toEqual({ lat: 37.873, lng: -122.259 })
+    expect(circles[0].center).toEqual({ lat: 37.873, lng: -122.259 })
+    expect(circles[0].radius).toBe(8)
+    expect(maps[0].panTo).toHaveBeenCalledOnce()
+
+    unmount()
+    expect(geolocation.clearWatch).toHaveBeenCalledWith(42)
+    expect(locationMarker?.map).toBeNull()
+    expect(circles[0].setMap).toHaveBeenCalledWith(null)
+  })
+
+  it("does not override a manual pan while waiting for the user's location", async () => {
+    vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
+    let updatePosition: PositionCallback = () => {}
+    vi.stubGlobal("navigator", {
+      geolocation: {
+        clearWatch: vi.fn(),
+        watchPosition: vi.fn((onSuccess: PositionCallback) => {
+          updatePosition = onSuccess
+          return 42
+        }),
+      },
+    })
+    const { maps } = installGoogleMapsMock()
+    const { unmount } = await renderApp()
+
+    await waitFor(() => expect(maps).toHaveLength(1))
+    act(() => maps[0].startDrag())
+    act(() => updatePosition({
+      coords: {
+        accuracy: 10,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        latitude: 37.8721,
+        longitude: -122.2579,
+        speed: null,
+        toJSON: () => ({}),
+      },
+      timestamp: 1,
+      toJSON: () => ({}),
+    }))
+
+    expect(maps[0].panTo).not.toHaveBeenCalled()
+    unmount()
+  })
+
+  it("keeps the map usable when location access is denied", async () => {
+    vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
+    const geolocation = {
+      clearWatch: vi.fn(),
+      watchPosition: vi.fn((_onSuccess: PositionCallback, onError: PositionErrorCallback) => {
+        onError({ code: 1, message: "Permission denied", PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3 })
+        return 7
+      }),
+    }
+    vi.stubGlobal("navigator", { geolocation })
+    const { circles, markers } = installGoogleMapsMock()
+    const { unmount } = await renderApp()
+
+    await waitFor(() => expect(markers).toHaveLength(buildings.length))
+    expect(circles).toHaveLength(0)
+    expect(screen.queryByText("Google Maps failed to load.")).not.toBeInTheDocument()
+
+    unmount()
+    expect(geolocation.clearWatch).toHaveBeenCalledWith(7)
   })
 
   it("shows a useful message when Google Maps rejects the key", async () => {

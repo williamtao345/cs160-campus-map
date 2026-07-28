@@ -56,6 +56,11 @@ export function CampusMap({
     let cancelled = false
     let markers: google.maps.marker.AdvancedMarkerElement[] = []
     let listenerCleanups: (() => void)[] = []
+    let locationMarker: google.maps.marker.AdvancedMarkerElement | undefined
+    let accuracyCircle: google.maps.Circle | undefined
+    let locationWatchId: number | undefined
+    let hasCenteredOnLocation = false
+    let hasUserPanned = false
 
     if (!apiKey || !mapId || buildings.length === 0) return
 
@@ -80,6 +85,62 @@ export function CampusMap({
           disableDefaultUI: true,
           clickableIcons: false,
         })
+        const dragListener = map.addListener("dragstart", () => {
+          hasUserPanned = true
+        })
+        listenerCleanups.push(() => dragListener.remove())
+
+        if (navigator.geolocation) {
+          locationWatchId = navigator.geolocation.watchPosition(
+            ({ coords }) => {
+              if (cancelled) return
+
+              const position = { lat: coords.latitude, lng: coords.longitude }
+
+              if (!hasCenteredOnLocation) {
+                hasCenteredOnLocation = true
+                if (!hasUserPanned) map.panTo(position)
+              }
+
+              if (locationMarker) {
+                locationMarker.position = position
+              } else {
+                const locationDot = document.createElement("div")
+                locationDot.className = "current-location-dot"
+                locationMarker = new AdvancedMarkerElement({
+                  anchorLeft: "-50%",
+                  anchorTop: "-50%",
+                  collisionBehavior: CollisionBehavior.REQUIRED,
+                  content: locationDot,
+                  map,
+                  position,
+                  title: "Your location",
+                  zIndex: 2_147_483_647,
+                })
+              }
+
+              if (accuracyCircle) {
+                accuracyCircle.setCenter(position)
+                accuracyCircle.setRadius(coords.accuracy)
+              } else {
+                accuracyCircle = new google.maps.Circle({
+                  center: position,
+                  clickable: false,
+                  fillColor: "#4285f4",
+                  fillOpacity: 0.15,
+                  map,
+                  radius: coords.accuracy,
+                  strokeColor: "#4285f4",
+                  strokeOpacity: 0.3,
+                  strokeWeight: 1,
+                  zIndex: 1,
+                })
+              }
+            },
+            () => {},
+            { enableHighAccuracy: true, maximumAge: 10_000, timeout: 20_000 },
+          )
+        }
 
         markers = buildings.map((building) => {
           const position = {
@@ -122,6 +183,9 @@ export function CampusMap({
       markers.forEach((marker) => {
         marker.map = null
       })
+      if (locationMarker) locationMarker.map = null
+      accuracyCircle?.setMap(null)
+      if (locationWatchId !== undefined) navigator.geolocation.clearWatch(locationWatchId)
       if (window.gm_authFailure === handleAuthFailure) window.gm_authFailure = undefined
     }
   }, [buildings])
