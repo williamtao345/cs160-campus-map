@@ -169,6 +169,25 @@ body {
   background: var(--muted);
 }
 
+.campus-building-label {
+  color: #263238;
+  cursor: pointer;
+  font-family: 'Geist Variable', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.25rem;
+  paint-order: stroke fill;
+  text-align: center;
+  text-shadow: 0 1px 1px rgb(255 255 255 / 80%);
+  -webkit-text-stroke: 2px rgb(255 255 255 / 92%);
+  white-space: nowrap;
+}
+
+.campus-building-label:hover {
+  color: #003262;
+}
+
 .top-actions {
   position: absolute;
   z-index: 3;

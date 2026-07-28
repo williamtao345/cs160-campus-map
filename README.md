@@ -18,7 +18,7 @@ cd web
 npm ci
 ```
 
-Create the ignored environment file. Add a browser-restricted Google Maps JavaScript API key and the Firebase web app configuration from Firebase Console:
+Create the ignored environment file. Add a browser-restricted Google Maps JavaScript API key, a JavaScript vector map ID associated with the published no-label cloud style, and the Firebase web app configuration from Firebase Console:
 
 ```sh
 cp .env.example .env
@@ -73,7 +73,7 @@ The development server always uses port `5173`. When developing in WSL, open the
 
 ## Deploy
 
-The GitHub Pages workflow tests, builds, and publishes `web/dist/` when changes reach `main`. Add the Maps API key as a repository Actions secret named `GOOGLE_MAPS_API_KEY`. Add the Firebase web configuration as repository Actions variables named `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_PROJECT_ID`, `FIREBASE_STORAGE_BUCKET`, `FIREBASE_MESSAGING_SENDER_ID`, `FIREBASE_APP_ID`, and `FIREBASE_DATABASE_URL`. Configure Pages to use GitHub Actions. Deployment fails if any required value is absent.
+The GitHub Pages workflow tests, builds, and publishes `web/dist/` when changes reach `main`. Add the Maps API key as a repository Actions secret named `GOOGLE_MAPS_API_KEY`. Add the JavaScript vector map ID as a repository Actions variable named `GOOGLE_MAPS_MAP_ID`. Add the Firebase web configuration as repository Actions variables named `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_PROJECT_ID`, `FIREBASE_STORAGE_BUCKET`, `FIREBASE_MESSAGING_SENDER_ID`, `FIREBASE_APP_ID`, and `FIREBASE_DATABASE_URL`. Configure Pages to use GitHub Actions. Deployment fails if any required value is absent.
 
 The Maps and Firebase web API keys are included in the browser bundle by design. Realtime Database access is protected by `database.rules.json`; protect the Maps key with an HTTP referrer restriction, restrict it to the Maps JavaScript API, and configure an appropriate usage quota. Use these website referrers:
 

@@ -41,45 +41,71 @@ async function renderApp() {
 
 function installGoogleMapsMock() {
   const maps: Array<{
+    options: google.maps.MapOptions
     panTo: ReturnType<typeof vi.fn>
+    setZoom: (zoom: number) => void
   }> = []
   const markers: Array<{
-    options: google.maps.MarkerOptions
+    map: unknown
+    options: google.maps.marker.AdvancedMarkerElementOptions
     click: () => void
-    removeListener: ReturnType<typeof vi.fn>
-    setMap: ReturnType<typeof vi.fn>
+    removeEventListener: ReturnType<typeof vi.fn>
   }> = []
 
   class MockMap {
+    options: google.maps.MapOptions
     panTo = vi.fn()
+    zoom = 16
+    zoomChanged = () => {}
 
-    constructor() {
+    constructor(_element: HTMLElement, options: google.maps.MapOptions) {
+      this.options = options
       maps.push(this)
+    }
+
+    addListener(eventName: string, handler: () => void) {
+      if (eventName === "zoom_changed") this.zoomChanged = handler
+      return { remove: vi.fn() }
+    }
+
+    getZoom() {
+      return this.zoom
+    }
+
+    setZoom(zoom: number) {
+      this.zoom = zoom
+      this.zoomChanged()
     }
   }
 
-  class MockMarker {
-    options: google.maps.MarkerOptions
+  class MockAdvancedMarkerElement {
+    map: unknown
+    options: google.maps.marker.AdvancedMarkerElementOptions
     click = () => {}
-    removeListener = vi.fn()
-    setMap = vi.fn()
+    removeEventListener = vi.fn()
 
-    constructor(options: google.maps.MarkerOptions) {
+    constructor(options: google.maps.marker.AdvancedMarkerElementOptions) {
       this.options = options
+      this.map = options.map ?? null
       markers.push(this)
     }
 
-    addListener(_eventName: string, handler: () => void) {
-      this.click = handler
-      return { remove: this.removeListener }
+    addEventListener(eventName: string, handler: () => void) {
+      if (eventName === "gmp-click") this.click = handler
     }
+  }
+
+  const CollisionBehavior = {
+    OPTIONAL_AND_HIDES_LOWER_PRIORITY: "OPTIONAL_AND_HIDES_LOWER_PRIORITY",
   }
 
   vi.stubGlobal("google", {
     maps: {
       Map: MockMap,
-      Marker: MockMarker,
-      SymbolPath: { CIRCLE: "CIRCLE" },
+      importLibrary: vi.fn(async () => ({
+        AdvancedMarkerElement: MockAdvancedMarkerElement,
+        CollisionBehavior,
+      })),
     },
   })
 
@@ -89,6 +115,7 @@ function installGoogleMapsMock() {
 describe("campus map app", () => {
   beforeEach(() => {
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "")
+    vi.stubEnv("VITE_GOOGLE_MAPS_MAP_ID", "test-map-id")
     vi.mocked(loadBuildings).mockResolvedValue(buildings)
     vi.mocked(loadAmenitiesForBuilding).mockImplementation(async (building) => (
       amenities.filter((amenity) => amenity.buildingId === building.id)
@@ -108,6 +135,14 @@ describe("campus map app", () => {
   })
 
   it("shows the map fallback when an API key is not configured", async () => {
+    await renderApp()
+
+    expect(screen.getByText("Google Maps is not configured.")).toBeInTheDocument()
+  })
+
+  it("shows the map fallback when a map ID is not configured", async () => {
+    vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
+    vi.stubEnv("VITE_GOOGLE_MAPS_MAP_ID", "")
     await renderApp()
 
     expect(screen.getByText("Google Maps is not configured.")).toBeInTheDocument()
@@ -428,18 +463,26 @@ describe("campus map app", () => {
 
     const coryBuilding = buildings.find((building) => building.name === "Cory Hall")
     const coryMarker = markers.find((marker) => marker.options.title === "Cory Hall")
+    const offCampusMarker = markers.find((marker) => marker.options.title === "1893 Le Roy Avenue")
 
+    expect(maps[0].options.mapId).toBe("test-map-id")
     expect(coryMarker?.options.position).toEqual({
       lat: coryBuilding?.coordinates.latitude,
       lng: coryBuilding?.coordinates.longitude,
     })
-    expect(coryMarker?.options.icon).toMatchObject({
-      path: "CIRCLE",
-      scale: 5,
-      fillColor: "#003262",
-      strokeColor: "#ffffff",
-      strokeWeight: 2,
+    expect(coryMarker?.options).toMatchObject({
+      anchorLeft: "-50%",
+      anchorTop: "-50%",
+      collisionBehavior: "OPTIONAL_AND_HIDES_LOWER_PRIORITY",
+      gmpClickable: true,
     })
+    expect(coryMarker?.options.content).toHaveClass("campus-building-label")
+    expect(coryMarker?.options.content).toHaveTextContent("Cory Hall")
+    expect(coryMarker?.map).toBe(maps[0])
+    expect(offCampusMarker?.map).toBe(maps[0])
+
+    act(() => maps[0].setZoom(15))
+    expect(markers.every((marker) => marker.map === maps[0])).toBe(true)
 
     act(() => coryMarker?.click())
 
@@ -450,8 +493,8 @@ describe("campus map app", () => {
     expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(10)
 
     unmount()
-    expect(markers.every((marker) => marker.removeListener.mock.calls.length === 1)).toBe(true)
-    expect(markers.every((marker) => marker.setMap.mock.calls[0]?.[0] === null)).toBe(true)
+    expect(markers.every((marker) => marker.removeEventListener.mock.calls.length === 1)).toBe(true)
+    expect(markers.every((marker) => marker.map === null)).toBe(true)
   })
 
   it("shows a useful message when Google Maps rejects the key", async () => {

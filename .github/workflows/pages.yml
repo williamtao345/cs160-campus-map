@@ -48,6 +48,7 @@ jobs:
       - name: Build static artifact
         env:
           VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          VITE_GOOGLE_MAPS_MAP_ID: ${{ vars.GOOGLE_MAPS_MAP_ID }}
           VITE_FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
@@ -57,6 +58,7 @@ jobs:
           VITE_FIREBASE_DATABASE_URL: ${{ vars.FIREBASE_DATABASE_URL }}
         run: |
           test -n "${VITE_GOOGLE_MAPS_API_KEY:-}"
+          test -n "${VITE_GOOGLE_MAPS_MAP_ID:-}"
           test -n "${VITE_FIREBASE_API_KEY:-}"
           test -n "${VITE_FIREBASE_AUTH_DOMAIN:-}"
           test -n "${VITE_FIREBASE_PROJECT_ID:-}"
