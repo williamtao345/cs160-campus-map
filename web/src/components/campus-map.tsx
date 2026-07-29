@@ -5,6 +5,20 @@ import campusBuildingPolygons from "@/data/campus-building-polygons.json"
 
 let googleMapsPromise: Promise<void> | undefined
 
+const defaultMapZoom = 16
+const routeViewportPadding = {
+  top: 64,
+  right: 24,
+  bottom: 280,
+  left: 24,
+} satisfies google.maps.Padding
+const routeViewportVerticalOffset = (routeViewportPadding.bottom - routeViewportPadding.top) / 2
+
+function panToPaddedPosition(map: google.maps.Map, position: google.maps.LatLngLiteral) {
+  map.panTo(position)
+  map.panBy(0, routeViewportVerticalOffset)
+}
+
 function loadGoogleMaps(apiKey: string) {
   if (window.google?.maps) return Promise.resolve()
   if (googleMapsPromise) return googleMapsPromise
@@ -50,6 +64,7 @@ export function CampusMap({
   const mapRef = useRef<HTMLDivElement>(null)
   const onBuildingSelectRef = useRef(onBuildingSelect)
   const onLocationChangeRef = useRef(onLocationChange)
+  const hadActiveRouteRef = useRef(false)
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null)
   const [error, setError] = useState<string | null>(
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY && import.meta.env.VITE_GOOGLE_MAPS_MAP_ID
@@ -91,7 +106,7 @@ export function CampusMap({
 
         const map = new google.maps.Map(mapRef.current, {
           center: { lat: 37.8719, lng: -122.2585 },
-          zoom: 16,
+          zoom: defaultMapZoom,
           mapId,
           mapTypeId: "roadmap",
           disableDefaultUI: true,
@@ -122,7 +137,7 @@ export function CampusMap({
 
               if (!hasCenteredOnLocation) {
                 hasCenteredOnLocation = true
-                if (!hasUserPanned) map.panTo(position)
+                if (!hasUserPanned) panToPaddedPosition(map, position)
               }
 
               if (locationMarker) {
@@ -186,7 +201,7 @@ export function CampusMap({
             zIndex: building.amenityCounts.total * 10_000 - building.id,
           })
           const handleClick = () => {
-            map.panTo(position)
+            panToPaddedPosition(map, position)
             onBuildingSelectRef.current(building)
           }
 
@@ -219,7 +234,15 @@ export function CampusMap({
     let cancelled = false
     let routePolylines: google.maps.Polyline[] = []
 
-    if (!mapInstance || !routeDestination || !routeOrigin) return
+    if (!mapInstance || !routeDestination || !routeOrigin) {
+      if (mapInstance && hadActiveRouteRef.current) {
+        hadActiveRouteRef.current = false
+        mapInstance.setZoom(defaultMapZoom)
+      }
+      return
+    }
+
+    hadActiveRouteRef.current = true
 
     const destination = {
       lat: routeDestination.coordinates.latitude,
@@ -255,7 +278,7 @@ export function CampusMap({
           },
         })
         routePolylines.forEach((polyline) => polyline.setMap(mapInstance))
-        if (route.viewport) mapInstance.fitBounds(route.viewport)
+        if (route.viewport) mapInstance.fitBounds(route.viewport, routeViewportPadding)
       })
       .catch(() => {})
 

@@ -48,6 +48,7 @@ function installGoogleMapsMock() {
       setStyle: ReturnType<typeof vi.fn>
     }
     fitBounds: ReturnType<typeof vi.fn>
+    panBy: ReturnType<typeof vi.fn>
     panTo: ReturnType<typeof vi.fn>
     setZoom: (zoom: number) => void
     startDrag: () => void
@@ -100,6 +101,7 @@ function installGoogleMapsMock() {
       setStyle: vi.fn(),
     }
     fitBounds = vi.fn()
+    panBy = vi.fn()
     panTo = vi.fn()
     zoom = 16
     zoomChanged = () => {}
@@ -120,10 +122,10 @@ function installGoogleMapsMock() {
       return this.zoom
     }
 
-    setZoom(zoom: number) {
+    setZoom = vi.fn((zoom: number) => {
       this.zoom = zoom
       this.zoomChanged()
-    }
+    })
 
     startDrag() {
       this.dragStarted()
@@ -658,6 +660,7 @@ describe("campus map app", () => {
     act(() => coryMarker?.click())
 
     expect(maps[0].panTo).toHaveBeenCalledWith(coryMarker?.options.position)
+    expect(maps[0].panBy).toHaveBeenCalledWith(0, 108)
     expect(screen.queryByRole("searchbox")).not.toBeInTheDocument()
     expect(await screen.findByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
     expect(screen.getByText("10 total amenities")).toBeInTheDocument()
@@ -724,7 +727,12 @@ describe("campus map app", () => {
       },
     })
     expect(polylines[0].map).toBe(maps[0])
-    expect(maps[0].fitBounds).toHaveBeenCalledWith(routeViewport)
+    expect(maps[0].fitBounds).toHaveBeenCalledWith(routeViewport, {
+      top: 64,
+      right: 24,
+      bottom: 280,
+      left: 24,
+    })
 
     act(() => updatePosition({
       coords: {
@@ -749,11 +757,14 @@ describe("campus map app", () => {
     await userEvent.setup().click(screen.getByRole("button", { name: "Back" }))
     expect(screen.getByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
     expect(polylines[0].map).toBe(maps[0])
+    expect(maps[0].setZoom).not.toHaveBeenCalled()
 
     await userEvent.setup().click(screen.getByRole("button", { name: "Back" }))
     expect(screen.getByRole("searchbox")).toBeInTheDocument()
     expect(polylines[0].setMap).toHaveBeenLastCalledWith(null)
     expect(polylines[0].map).toBeNull()
+    expect(maps[0].setZoom).toHaveBeenCalledOnce()
+    expect(maps[0].setZoom).toHaveBeenCalledWith(16)
     unmount()
   })
 
@@ -804,6 +815,8 @@ describe("campus map app", () => {
     expect(locationMarker?.map).toBe(maps[0])
     expect(maps[0].panTo).toHaveBeenCalledOnce()
     expect(maps[0].panTo).toHaveBeenCalledWith({ lat: 37.8721, lng: -122.2579 })
+    expect(maps[0].panBy).toHaveBeenCalledOnce()
+    expect(maps[0].panBy).toHaveBeenCalledWith(0, 108)
     expect(circles[0].options).toMatchObject({
       center: { lat: 37.8721, lng: -122.2579 },
       clickable: false,
@@ -832,6 +845,7 @@ describe("campus map app", () => {
     expect(circles[0].center).toEqual({ lat: 37.873, lng: -122.259 })
     expect(circles[0].radius).toBe(8)
     expect(maps[0].panTo).toHaveBeenCalledOnce()
+    expect(maps[0].panBy).toHaveBeenCalledOnce()
 
     unmount()
     expect(geolocation.clearWatch).toHaveBeenCalledWith(42)
@@ -872,6 +886,7 @@ describe("campus map app", () => {
     }))
 
     expect(maps[0].panTo).not.toHaveBeenCalled()
+    expect(maps[0].panBy).not.toHaveBeenCalled()
     unmount()
   })
 
