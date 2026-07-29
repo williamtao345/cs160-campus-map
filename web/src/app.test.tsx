@@ -389,14 +389,17 @@ describe("campus map app", () => {
     }
   })
 
-  it("shows availability status instead of accessibility on search results", async () => {
+  it("only shows availability badges on amenity results", async () => {
     const user = userEvent.setup()
     const sampleRestrooms = restrooms.slice(0, 3)
-    const originalStatuses = sampleRestrooms.map((restroom) => restroom.isAvailable)
+    const originalValues = sampleRestrooms.map(({ isAvailable, restrictedAccess, stallType }) => ({ isAvailable, restrictedAccess, stallType }))
 
     try {
       sampleRestrooms[0].isAvailable = true
+      sampleRestrooms[0].stallType = "single"
+      sampleRestrooms[0].restrictedAccess = true
       sampleRestrooms[1].isAvailable = false
+      sampleRestrooms[1].stallType = "multi"
       sampleRestrooms[2].isAvailable = null
 
       await renderApp()
@@ -409,15 +412,23 @@ describe("campus map app", () => {
       expect(screen.queryByText("Unknown")).not.toBeInTheDocument()
       expect(screen.queryByText(/^Accessible$/)).not.toBeInTheDocument()
       expect(screen.queryByText(/^Not accessible$/)).not.toBeInTheDocument()
+      expect(screen.queryByText("Single-stall")).not.toBeInTheDocument()
+      expect(screen.queryByText("Multi-stall")).not.toBeInTheDocument()
+      expect(screen.queryByText("Restricted access")).not.toBeInTheDocument()
     } finally {
       sampleRestrooms.forEach((restroom, index) => {
-        restroom.isAvailable = originalStatuses[index]
+        Object.assign(restroom, originalValues[index])
       })
     }
   })
 
   it("shows available GSPP restrooms, its water station, and Evans vending machines", async () => {
     const user = userEvent.setup()
+    vi.mocked(loadAmenitiesForBuilding).mockImplementation(async (building) => (
+      amenities
+        .filter((amenity) => amenity.buildingId === building.id)
+        .map((amenity) => amenity.amenityType === "waterRefillStation" ? { ...amenity, accessible: true } : amenity)
+    ))
     await renderApp()
     const searchbox = screen.getByRole("searchbox")
 
@@ -427,8 +438,11 @@ describe("campus map app", () => {
 
     expect(screen.getByRole("heading", { name: "3 Restrooms" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "1 Water refill station" })).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0].querySelector(".lucide-toilet")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Water refill station", level: 4 }).querySelector(".lucide-droplets")).toBeInTheDocument()
     expect(screen.getByText("Floor 1 · Near Room GSPP 150")).toBeInTheDocument()
     expect(screen.getAllByText("Available")).toHaveLength(3)
+    expect(screen.queryByText(/^Accessible$/)).not.toBeInTheDocument()
 
     await user.click(screen.getByRole("button", { name: "Back" }))
     const returnedSearchbox = screen.getByRole("searchbox")
@@ -438,6 +452,7 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: /Evans Hall.*amenities/i }))
 
     expect(screen.getByRole("heading", { name: "1 Vending machine" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Vending machine", level: 4 }).querySelector(".lucide-popcorn")).toBeInTheDocument()
     expect(screen.getByText("Available")).toBeInTheDocument()
   })
 

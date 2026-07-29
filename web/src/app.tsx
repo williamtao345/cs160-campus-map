@@ -63,11 +63,18 @@ const amenityTypeLabels: Record<AmenityType, { singular: string; plural: string 
   studySpace: { singular: "Study space", plural: "Study spaces" },
 }
 
+const amenityTypeIcons = {
+  restroom: ToiletIcon,
+  waterRefillStation: DropletsIcon,
+  vendingMachine: PopcornIcon,
+  studySpace: BookOpenIcon,
+} satisfies Record<AmenityType, typeof ToiletIcon>
+
 const buildingAmenityIcons = [
-  { amenityType: "restroom", countKey: "restrooms", label: "Restrooms available", Icon: ToiletIcon },
-  { amenityType: "waterRefillStation", countKey: "waterRefillStations", label: "Water refill stations available", Icon: DropletsIcon },
-  { amenityType: "vendingMachine", countKey: "vendingMachines", label: "Vending machines available", Icon: PopcornIcon },
-  { amenityType: "studySpace", countKey: "studySpaces", label: "Study spaces available", Icon: BookOpenIcon },
+  { amenityType: "restroom", countKey: "restrooms", label: "Restrooms available", Icon: amenityTypeIcons.restroom },
+  { amenityType: "waterRefillStation", countKey: "waterRefillStations", label: "Water refill stations available", Icon: amenityTypeIcons.waterRefillStation },
+  { amenityType: "vendingMachine", countKey: "vendingMachines", label: "Vending machines available", Icon: amenityTypeIcons.vendingMachine },
+  { amenityType: "studySpace", countKey: "studySpaces", label: "Study spaces available", Icon: amenityTypeIcons.studySpace },
 ] as const
 
 function distanceBetween(first: Coordinates, second: Coordinates) {
@@ -144,18 +151,20 @@ function AvailabilityBadge({ isAvailable }: { isAvailable: boolean | null }) {
 
 function RestroomResult({ restroom, onSelect }: { restroom: Restroom; onSelect: () => void }) {
   const locationLabel = restroomLocationLabel(restroom)
+  const Icon = amenityTypeIcons.restroom
 
   return (
     <button type="button" className="block w-full rounded-xl text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={onSelect}>
       <div className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10 transition-colors hover:bg-muted/50">
         <div className="min-w-0 flex-1">
-          <p className="font-heading font-medium leading-snug">{categoryLabel(restroom.category)} restroom</p>
+          <p className="flex items-center gap-2 font-heading font-medium leading-snug">
+            <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            {categoryLabel(restroom.category)} restroom
+          </p>
           {locationLabel && <p className="mt-1 text-muted-foreground">{locationLabel}</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
           <AvailabilityBadge isAvailable={restroom.isAvailable} />
-          {restroom.stallType && <Badge variant="outline">{restroom.stallType === "single" ? "Single-stall" : "Multi-stall"}</Badge>}
-          {restroom.restrictedAccess && <Badge variant="outline">Restricted access</Badge>}
         </div>
       </div>
     </button>
@@ -163,6 +172,7 @@ function RestroomResult({ restroom, onSelect }: { restroom: Restroom; onSelect: 
 }
 
 function GeneralAmenityResult({ amenity }: { amenity: GeneralAmenity }) {
+  const Icon = amenityTypeIcons[amenity.amenityType]
   const locationLabel = [
     amenity.floorNumber ? `Floor ${amenity.floorNumber}` : null,
     amenity.locationDetails,
@@ -171,12 +181,14 @@ function GeneralAmenityResult({ amenity }: { amenity: GeneralAmenity }) {
   return (
     <article className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10">
       <div className="min-w-0 flex-1">
-        <h4 className="font-heading font-medium leading-snug">{amenityTypeLabels[amenity.amenityType].singular}</h4>
+        <h4 className="flex items-center gap-2 font-heading font-medium leading-snug">
+          <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          {amenityTypeLabels[amenity.amenityType].singular}
+        </h4>
         {locationLabel && <p className="mt-1 text-muted-foreground">{locationLabel}</p>}
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
         <AvailabilityBadge isAvailable={amenity.isAvailable} />
-        {amenity.accessible !== null && <Badge variant="outline">{amenity.accessible ? "Accessible" : "Not accessible"}</Badge>}
       </div>
     </article>
   )
