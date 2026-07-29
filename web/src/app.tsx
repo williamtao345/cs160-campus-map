@@ -16,12 +16,14 @@ import { CampusMap } from "@/components/campus-map"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   loadAmenitiesForBuilding,
   loadBuildings,
@@ -62,10 +64,10 @@ const amenityTypeLabels: Record<AmenityType, { singular: string; plural: string 
 }
 
 const buildingAmenityIcons = [
-  { countKey: "restrooms", label: "Restrooms available", Icon: ToiletIcon },
-  { countKey: "waterRefillStations", label: "Water refill stations available", Icon: DropletsIcon },
-  { countKey: "vendingMachines", label: "Vending machines available", Icon: PopcornIcon },
-  { countKey: "studySpaces", label: "Study spaces available", Icon: BookOpenIcon },
+  { amenityType: "restroom", countKey: "restrooms", label: "Restrooms available", Icon: ToiletIcon },
+  { amenityType: "waterRefillStation", countKey: "waterRefillStations", label: "Water refill stations available", Icon: DropletsIcon },
+  { amenityType: "vendingMachine", countKey: "vendingMachines", label: "Vending machines available", Icon: PopcornIcon },
+  { amenityType: "studySpace", countKey: "studySpaces", label: "Study spaces available", Icon: BookOpenIcon },
 ] as const
 
 function distanceBetween(first: Coordinates, second: Coordinates) {
@@ -110,6 +112,21 @@ function restroomLocationLabel(restroom: Restroom) {
     restroom.floorNumber ? `Floor ${restroom.floorNumber}` : null,
     restroom.roomNumber ? `Room ${restroom.roomNumber}` : null,
   ].filter(Boolean).join(" · ")
+}
+
+function compareLevels(first: string, second: string) {
+  const sortValue = (level: string) => {
+    if (/^(b|basement)$/i.test(level)) return -2
+    if (/^(g|ground)$/i.test(level)) return -1
+    const numericLevel = Number(level)
+    return Number.isFinite(numericLevel) ? numericLevel : Number.MAX_SAFE_INTEGER
+  }
+
+  return sortValue(first) - sortValue(second) || first.localeCompare(second, undefined, { numeric: true })
+}
+
+function levelLabel(level: string) {
+  return /^(g|ground)$/i.test(level) ? "Ground" : `Level ${level}`
 }
 
 function AvailabilityBadge({ isAvailable }: { isAvailable: boolean | null }) {
@@ -274,8 +291,26 @@ function BuildingDetails({
   preferredCategory: Restroom["category"] | null
   onSelectRestroom: (restroom: Restroom) => void
 }) {
+  const [selectedAmenityType, setSelectedAmenityType] = useState<AmenityType | "all">("all")
+  const [selectedLevel, setSelectedLevel] = useState("all")
+  const availableAmenityIcons = buildingAmenityIcons.filter(({ amenityType }) => (
+    amenities.some((amenity) => amenity.amenityType === amenityType)
+  ))
+  const levels = [...new Set(amenities.flatMap((amenity) => amenity.floorNumber === null ? [] : [amenity.floorNumber]))]
+    .sort(compareLevels)
+  const hasUnknownLevel = amenities.some((amenity) => amenity.floorNumber === null)
+  const levelItems = [
+    { value: "all", label: "All levels" },
+    ...levels.map((level) => ({ value: level, label: levelLabel(level) })),
+    ...(hasUnknownLevel ? [{ value: "unknown", label: "Others" }] : []),
+  ]
+  const filteredAmenities = amenities.filter((amenity) => (
+    (selectedAmenityType === "all" || amenity.amenityType === selectedAmenityType)
+    && (selectedLevel === "all"
+      || (selectedLevel === "unknown" ? amenity.floorNumber === null : amenity.floorNumber === selectedLevel))
+  ))
   const amenitiesByType = new Map<AmenityType, Amenity[]>()
-  amenities.forEach((amenity) => {
+  filteredAmenities.forEach((amenity) => {
     const groupedAmenities = amenitiesByType.get(amenity.amenityType) ?? []
     groupedAmenities.push(amenity)
     amenitiesByType.set(amenity.amenityType, groupedAmenities)
@@ -288,14 +323,56 @@ function BuildingDetails({
 
   return (
     <article className="flex flex-col gap-5">
-      <header className="flex flex-col gap-1">
+      <header>
         <h2 className="font-heading text-xl font-medium">{building.name}</h2>
-        <p className="text-sm text-muted-foreground">
-          {amenities.length.toLocaleString()} total {amenities.length === 1 ? "amenity" : "amenities"}
-        </p>
       </header>
 
+      {amenities.length > 0 && (
+        <ButtonGroup className="flex-wrap" aria-label="Amenity filters">
+          <ButtonGroup aria-label="Filter by amenity type">
+            <ToggleGroup
+              value={[selectedAmenityType]}
+              onValueChange={(values) => {
+                const nextValue = values[0] as AmenityType | "all" | undefined
+                if (nextValue) setSelectedAmenityType(nextValue)
+              }}
+              variant="outline"
+              spacing={0}
+            >
+              <ToggleGroupItem value="all" aria-label="Show all amenity types">All</ToggleGroupItem>
+              {availableAmenityIcons.map(({ amenityType, Icon }) => (
+                <ToggleGroupItem
+                  key={amenityType}
+                  value={amenityType}
+                  aria-label={`Show ${amenityTypeLabels[amenityType].plural.toLocaleLowerCase()}`}
+                  title={amenityTypeLabels[amenityType].plural}
+                >
+                  <Icon aria-hidden="true" />
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </ButtonGroup>
+          <ButtonGroup aria-label="Filter by level">
+            <Select items={levelItems} value={selectedLevel} onValueChange={(value) => {
+              if (value !== null) setSelectedLevel(value)
+            }}>
+              <SelectTrigger aria-label="Filter by level">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="end" alignItemWithTrigger={false}>
+                <SelectGroup>
+                  {levelItems.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </ButtonGroup>
+        </ButtonGroup>
+      )}
+
       {amenities.length === 0 && <p className="text-sm text-muted-foreground">No amenities have been recorded for this building.</p>}
+      {amenities.length > 0 && filteredAmenities.length === 0 && (
+        <p className="text-sm text-muted-foreground">No amenities match these filters.</p>
+      )}
 
       {amenityTypeOrder.map((amenityType) => {
         const groupedAmenities = amenitiesByType.get(amenityType)

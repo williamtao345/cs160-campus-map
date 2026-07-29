@@ -323,9 +323,9 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: /Cory Hall.*10 amenities/i }))
 
     expect(screen.getByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
-    expect(screen.getByText("10 total amenities")).toBeInTheDocument()
+    expect(screen.queryByText("10 total amenities")).not.toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "10 Restrooms" })).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(10)
+    expect(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })).toHaveLength(10)
 
     await user.click(screen.getByRole("button", { name: /Women's restroom.*Floor 1.*Room 112/i }))
 
@@ -342,7 +342,7 @@ describe("campus map app", () => {
 
     await user.click(screen.getByRole("button", { name: "Back" }))
     expect(screen.getByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(10)
+    expect(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })).toHaveLength(10)
 
     await user.click(screen.getByRole("button", { name: "Back" }))
     expect(drawer).toHaveAttribute("data-expanded", "")
@@ -439,6 +439,58 @@ describe("campus map app", () => {
 
     expect(screen.getByRole("heading", { name: "1 Vending machine" })).toBeInTheDocument()
     expect(screen.getByText("Available")).toBeInTheDocument()
+  })
+
+  it("filters building amenities by type and level", async () => {
+    const user = userEvent.setup()
+    await renderApp()
+
+    await user.type(screen.getByRole("searchbox"), "2607 Hearst")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /2607 Hearst Avenue.*4 amenities/i }))
+
+    const allTypes = screen.getByRole("button", { name: "Show all amenity types" })
+    const restroomsFilter = screen.getByRole("button", { name: "Show restrooms" })
+    const waterFilter = screen.getByRole("button", { name: "Show water refill stations" })
+    expect(allTypes).toHaveAttribute("aria-pressed", "true")
+    expect(restroomsFilter).toBeInTheDocument()
+    expect(waterFilter).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Show vending machines" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Show study spaces" })).not.toBeInTheDocument()
+
+    await user.click(waterFilter)
+    expect(waterFilter).toHaveAttribute("aria-pressed", "true")
+    expect(screen.getByRole("heading", { name: "1 Water refill station" })).toBeInTheDocument()
+    expect(screen.queryByRole("heading", { name: /Restrooms/ })).not.toBeInTheDocument()
+
+    await user.click(allTypes)
+    await user.click(screen.getByRole("combobox", { name: "Filter by level" }))
+    await user.click(await screen.findByRole("option", { name: "Level 3" }))
+    expect(screen.getByRole("heading", { name: "1 Restroom" })).toBeInTheDocument()
+    expect(screen.queryByRole("heading", { name: /Water refill station/ })).not.toBeInTheDocument()
+
+    await user.click(waterFilter)
+    expect(screen.getByText("No amenities match these filters.")).toBeInTheDocument()
+
+    await user.click(allTypes)
+    await user.click(screen.getByRole("combobox", { name: "Filter by level" }))
+    await user.click(await screen.findByRole("option", { name: "All levels" }))
+    expect(screen.getByRole("heading", { name: "3 Restrooms" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "1 Water refill station" })).toBeInTheDocument()
+  })
+
+  it("offers an other-level option for amenities without floor data", async () => {
+    const user = userEvent.setup()
+    await renderApp()
+
+    await user.type(screen.getByRole("searchbox"), "2121 Allston Street")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /2121 Allston Street.*4 amenities/i }))
+    await user.click(screen.getByRole("combobox", { name: "Filter by level" }))
+    await user.click(await screen.findByRole("option", { name: "Others" }))
+
+    expect(screen.getByRole("combobox", { name: "Filter by level" })).toHaveTextContent("Others")
+    expect(screen.getByRole("heading", { name: "4 Restrooms" })).toBeInTheDocument()
   })
 
   it("does not search restroom locations", async () => {
@@ -569,7 +621,7 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: "Search" }))
     await user.click(screen.getByRole("button", { name: /Cory Hall.*10 amenities/i }))
 
-    expect(screen.getAllByRole("button", { name: /restroom/i })[0]).toHaveAccessibleName(/^Gender-inclusive restroom/)
+    expect(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0]).toHaveAccessibleName(/^Gender-inclusive restroom/)
   })
 
   it("shows the three nearest buildings until a search is submitted", async () => {
@@ -677,8 +729,8 @@ describe("campus map app", () => {
     expect(maps[0].panBy).toHaveBeenCalledWith(0, 108)
     expect(screen.queryByRole("searchbox")).not.toBeInTheDocument()
     expect(await screen.findByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
-    expect(screen.getByText("10 total amenities")).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: /restroom/i })).toHaveLength(10)
+    expect(screen.queryByText("10 total amenities")).not.toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })).toHaveLength(10)
 
     unmount()
     expect(markers.every((marker) => marker.removeEventListener.mock.calls.length === 1)).toBe(true)
@@ -764,7 +816,7 @@ describe("campus map app", () => {
     }))
     expect(computeRoutes).toHaveBeenCalledOnce()
 
-    await userEvent.setup().click(screen.getAllByRole("button", { name: /restroom/i })[0])
+    await userEvent.setup().click(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0])
     expect(screen.getByText("Cory Hall")).toBeInTheDocument()
     expect(polylines[0].map).toBe(maps[0])
 
