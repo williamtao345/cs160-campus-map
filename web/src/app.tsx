@@ -537,6 +537,7 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState("")
   const [submittedQuery, setSubmittedQuery] = useState<string | null>(null)
   const [userPosition, setUserPosition] = useState<Coordinates | null>(null)
+  const [routeOrigin, setRouteOrigin] = useState<Coordinates | null>(null)
   const amenityCache = useRef(new Map<number, Amenity[]>())
   const amenityRequest = useRef(0)
   const preferredCategory = preferredRestroomCategory(gender)
@@ -576,6 +577,12 @@ export function App() {
       setIsAuthLoading(false)
     },
   ), [])
+
+  useEffect(() => {
+    if ((view === "building" || view === "restroom") && selectedBuilding && !routeOrigin && userPosition) {
+      setRouteOrigin(userPosition)
+    }
+  }, [routeOrigin, selectedBuilding, userPosition, view])
 
   async function signIn() {
     setAuthError("")
@@ -617,6 +624,7 @@ export function App() {
     setSubmittedQuery(query)
     setSelectedBuilding(null)
     setSelectedRestroom(null)
+    setRouteOrigin(null)
     setView("search")
     setSnapPoint(1)
   }
@@ -625,6 +633,7 @@ export function App() {
     const request = ++amenityRequest.current
     setSelectedBuilding(building)
     setSelectedRestroom(null)
+    setRouteOrigin(userPosition)
     setAmenityLoadError("")
     showView("building")
 
@@ -656,13 +665,20 @@ export function App() {
       showView("building")
       return
     }
+    setRouteOrigin(null)
     showView("search")
   }
 
   return (
     <main className="app-shell">
       <h1 className="sr-only">UC Berkeley Campus Amenities</h1>
-      <CampusMap buildings={buildings} onBuildingSelect={openBuilding} onLocationChange={setUserPosition} />
+      <CampusMap
+        buildings={buildings}
+        onBuildingSelect={openBuilding}
+        onLocationChange={setUserPosition}
+        routeDestination={view === "building" || view === "restroom" ? selectedBuilding : null}
+        routeOrigin={routeOrigin}
+      />
 
       <nav className="top-actions" aria-label="App actions">
         <Button type="button" className="bg-accent text-[var(--berkeley-blue-dark)] hover:bg-accent/80" onClick={() => showView("create")}>

@@ -47,6 +47,7 @@ function installGoogleMapsMock() {
       remove: ReturnType<typeof vi.fn>
       setStyle: ReturnType<typeof vi.fn>
     }
+    fitBounds: ReturnType<typeof vi.fn>
     panTo: ReturnType<typeof vi.fn>
     setZoom: (zoom: number) => void
     startDrag: () => void
@@ -65,7 +66,31 @@ function installGoogleMapsMock() {
     map: google.maps.Map | null | undefined
     setMap: ReturnType<typeof vi.fn>
   }> = []
+  const polylines: Array<{
+    map: google.maps.Map | null
+    options: google.maps.routes.RoutePolylineOptions | undefined
+    setMap: ReturnType<typeof vi.fn>
+  }> = []
   const polygonFeatures = [{ id: "campus-buildings" }]
+  const routeViewport = { id: "route-viewport" } as unknown as google.maps.LatLngBounds
+  const computeRoutes = vi.fn(async (_request: google.maps.routes.ComputeRoutesRequest) => ({
+    fallbackInfo: null,
+    geocodingResults: null,
+    routes: [{
+      createPolylines: (options?: google.maps.routes.RoutePolylineOptions) => {
+        const polyline = {
+          map: null as google.maps.Map | null,
+          options,
+          setMap: vi.fn((map: google.maps.Map | null) => {
+            polyline.map = map
+          }),
+        }
+        polylines.push(polyline)
+        return [polyline]
+      },
+      viewport: routeViewport,
+    }],
+  }))
 
   class MockMap {
     options: google.maps.MapOptions
@@ -74,6 +99,7 @@ function installGoogleMapsMock() {
       remove: vi.fn(),
       setStyle: vi.fn(),
     }
+    fitBounds = vi.fn()
     panTo = vi.fn()
     zoom = 16
     zoomChanged = () => {}
@@ -158,14 +184,16 @@ function installGoogleMapsMock() {
     maps: {
       Map: MockMap,
       Circle: MockCircle,
-      importLibrary: vi.fn(async () => ({
+      importLibrary: vi.fn(async (libraryName: string) => libraryName === "routes" ? {
+        Route: { computeRoutes },
+      } : {
         AdvancedMarkerElement: MockAdvancedMarkerElement,
         CollisionBehavior,
-      })),
+      }),
     },
   })
 
-  return { circles, maps, markers, polygonFeatures }
+  return { circles, computeRoutes, maps, markers, polygonFeatures, polylines, routeViewport }
 }
 
 describe("campus map app", () => {
@@ -639,6 +667,94 @@ describe("campus map app", () => {
     expect(markers.every((marker) => marker.removeEventListener.mock.calls.length === 1)).toBe(true)
     expect(markers.every((marker) => marker.map === null)).toBe(true)
     expect(maps[0].data.remove).toHaveBeenCalledWith(polygonFeatures[0])
+  })
+
+  it("shows one walking route for the selected building until leaving its details", async () => {
+    vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
+    let updatePosition: PositionCallback = () => {}
+    vi.stubGlobal("navigator", {
+      geolocation: {
+        clearWatch: vi.fn(),
+        watchPosition: vi.fn((onSuccess: PositionCallback) => {
+          updatePosition = onSuccess
+          return 42
+        }),
+      },
+    })
+    const { computeRoutes, maps, markers, polylines, routeViewport } = installGoogleMapsMock()
+    const { unmount } = await renderApp()
+
+    await waitFor(() => expect(markers).toHaveLength(buildings.length))
+    act(() => updatePosition({
+      coords: {
+        accuracy: 14,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        latitude: 37.8721,
+        longitude: -122.2579,
+        speed: null,
+        toJSON: () => ({}),
+      },
+      timestamp: 1,
+      toJSON: () => ({}),
+    }))
+
+    const coryBuilding = buildings.find((building) => building.name === "Cory Hall")!
+    act(() => markers.find((marker) => marker.options.title === "Cory Hall")?.click())
+
+    await screen.findByRole("heading", { name: "Cory Hall" })
+    await waitFor(() => expect(computeRoutes).toHaveBeenCalledOnce())
+    expect(computeRoutes).toHaveBeenCalledWith({
+      destination: {
+        lat: coryBuilding.coordinates.latitude,
+        lng: coryBuilding.coordinates.longitude,
+      },
+      fields: ["path", "viewport"],
+      origin: { lat: 37.8721, lng: -122.2579 },
+      travelMode: "WALKING",
+    })
+    expect(polylines).toHaveLength(1)
+    expect(polylines[0].options).toEqual({
+      polylineOptions: {
+        clickable: false,
+        strokeColor: "#003262",
+        strokeOpacity: 0.9,
+        strokeWeight: 4,
+      },
+    })
+    expect(polylines[0].map).toBe(maps[0])
+    expect(maps[0].fitBounds).toHaveBeenCalledWith(routeViewport)
+
+    act(() => updatePosition({
+      coords: {
+        accuracy: 10,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        latitude: 37.8722,
+        longitude: -122.258,
+        speed: null,
+        toJSON: () => ({}),
+      },
+      timestamp: 2,
+      toJSON: () => ({}),
+    }))
+    expect(computeRoutes).toHaveBeenCalledOnce()
+
+    await userEvent.setup().click(screen.getAllByRole("button", { name: /restroom/i })[0])
+    expect(screen.getByText("Cory Hall")).toBeInTheDocument()
+    expect(polylines[0].map).toBe(maps[0])
+
+    await userEvent.setup().click(screen.getByRole("button", { name: "Back" }))
+    expect(screen.getByRole("heading", { name: "Cory Hall" })).toBeInTheDocument()
+    expect(polylines[0].map).toBe(maps[0])
+
+    await userEvent.setup().click(screen.getByRole("button", { name: "Back" }))
+    expect(screen.getByRole("searchbox")).toBeInTheDocument()
+    expect(polylines[0].setMap).toHaveBeenLastCalledWith(null)
+    expect(polylines[0].map).toBeNull()
+    unmount()
   })
 
   it("tracks the user's current position with a Google-style marker and accuracy halo", async () => {

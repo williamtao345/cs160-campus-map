@@ -38,14 +38,19 @@ export function CampusMap({
   buildings,
   onBuildingSelect,
   onLocationChange,
+  routeDestination,
+  routeOrigin,
 }: {
   buildings: Building[]
   onBuildingSelect: (building: Building) => void
   onLocationChange: (position: { latitude: number; longitude: number }) => void
+  routeDestination: Building | null
+  routeOrigin: { latitude: number; longitude: number } | null
 }) {
   const mapRef = useRef<HTMLDivElement>(null)
   const onBuildingSelectRef = useRef(onBuildingSelect)
   const onLocationChangeRef = useRef(onLocationChange)
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null)
   const [error, setError] = useState<string | null>(
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY && import.meta.env.VITE_GOOGLE_MAPS_MAP_ID
       ? null
@@ -92,6 +97,7 @@ export function CampusMap({
           disableDefaultUI: true,
           clickableIcons: false,
         })
+        setMapInstance(map)
         polygonLayer = map.data
         polygonFeatures = polygonLayer.addGeoJson(campusBuildingPolygons)
         polygonLayer.setStyle({
@@ -196,6 +202,7 @@ export function CampusMap({
 
     return () => {
       cancelled = true
+      setMapInstance(null)
       listenerCleanups.forEach((cleanup) => cleanup())
       markers.forEach((marker) => {
         marker.map = null
@@ -207,6 +214,56 @@ export function CampusMap({
       if (window.gm_authFailure === handleAuthFailure) window.gm_authFailure = undefined
     }
   }, [buildings])
+
+  useEffect(() => {
+    let cancelled = false
+    let routePolylines: google.maps.Polyline[] = []
+
+    if (!mapInstance || !routeDestination || !routeOrigin) return
+
+    const destination = {
+      lat: routeDestination.coordinates.latitude,
+      lng: routeDestination.coordinates.longitude,
+    }
+    const origin = {
+      lat: routeOrigin.latitude,
+      lng: routeOrigin.longitude,
+    }
+
+    google.maps.importLibrary("routes")
+      .then(async (library) => {
+        const { Route } = library as google.maps.RoutesLibrary
+        return Route.computeRoutes({
+          destination,
+          fields: ["path", "viewport"],
+          origin,
+          travelMode: "WALKING",
+        })
+      })
+      .then(({ routes }) => {
+        if (cancelled) return
+
+        const route = routes?.[0]
+        if (!route) return
+
+        routePolylines = route.createPolylines({
+          polylineOptions: {
+            clickable: false,
+            strokeColor: "#003262",
+            strokeOpacity: 0.9,
+            strokeWeight: 4,
+          },
+        })
+        routePolylines.forEach((polyline) => polyline.setMap(mapInstance))
+        if (route.viewport) mapInstance.fitBounds(route.viewport)
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+      routePolylines.forEach((polyline) => polyline.setMap(null))
+    }
+  }, [mapInstance, routeDestination, routeOrigin])
 
   return (
     <section className="campus-map" aria-label="UC Berkeley campus map">
