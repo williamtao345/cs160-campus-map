@@ -301,6 +301,7 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: "Search" }))
 
     const coryResult = screen.getByRole("button", { name: /Cory Hall.*10 amenities/i })
+    expect(within(coryResult).queryByText(/\d+(?:\.\d+)? mi/)).not.toBeInTheDocument()
     expect(within(coryResult).getByLabelText("Restrooms available")).toBeInTheDocument()
     expect(within(coryResult).queryByLabelText("Water refill stations available")).not.toBeInTheDocument()
     expect(within(coryResult).queryByLabelText("Vending machines available")).not.toBeInTheDocument()
@@ -639,7 +640,7 @@ describe("campus map app", () => {
     expect(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0]).toHaveAccessibleName(/^Gender-inclusive restroom/)
   })
 
-  it("shows the three nearest buildings until a search is submitted", async () => {
+  it("shows live distances for nearest, searched, and selected buildings", async () => {
     const user = userEvent.setup()
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
     const locationBuildings = [
@@ -686,7 +687,26 @@ describe("campus map app", () => {
       expect.stringContaining("Second Building"),
       expect.stringContaining("Third Building"),
     ])
+    expect(within(nearestRegion).getByText("0.07 mi")).toBeInTheDocument()
+    expect(within(nearestRegion).getByText("0.69 mi")).toBeInTheDocument()
+    expect(within(nearestRegion).getByText("1.4 mi")).toBeInTheDocument()
     expect(within(nearestRegion).queryByText("Far Building")).not.toBeInTheDocument()
+
+    act(() => updatePosition({
+      coords: {
+        accuracy: 10,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        latitude: 37.0005,
+        longitude: -122.25,
+        speed: null,
+        toJSON: () => ({}),
+      },
+      timestamp: 2,
+      toJSON: () => ({}),
+    }))
+    expect(within(nearestRegion).getByText("0.03 mi")).toBeInTheDocument()
 
     await user.type(screen.getByRole("searchbox"), "Far Building")
     await user.click(screen.getByRole("button", { name: "Search" }))
@@ -694,7 +714,12 @@ describe("campus map app", () => {
     const searchRegion = screen.getByRole("region", { name: "Campus Buildings" })
     expect(within(searchRegion).getAllByRole("button")).toHaveLength(1)
     expect(within(searchRegion).getByText("Far Building")).toBeInTheDocument()
+    expect(within(searchRegion).getByText("2.0 mi")).toBeInTheDocument()
     expect(within(searchRegion).queryByText("Nearest Building")).not.toBeInTheDocument()
+
+    await user.click(within(searchRegion).getByRole("button", { name: /Far Building/ }))
+    expect(await screen.findByRole("heading", { name: "Far Building" })).toBeInTheDocument()
+    expect(screen.getByText("2.0 mi")).toBeInTheDocument()
     unmount()
   })
 

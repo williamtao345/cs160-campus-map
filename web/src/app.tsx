@@ -49,6 +49,7 @@ const amenityTypes = ["Restroom", "Water refill station", "Vending machine", "St
 const collapsedSnapPoint = "16rem"
 const resultLimit = 50
 const nearestBuildingLimit = 3
+const earthRadiusMiles = 3_958.8
 const amenityTypeOrder: AmenityType[] = ["restroom", "waterRefillStation", "vendingMachine", "studySpace"]
 
 type Coordinates = {
@@ -77,7 +78,7 @@ const buildingAmenityIcons = [
   { amenityType: "studySpace", countKey: "studySpaces", label: "Study spaces available", Icon: amenityTypeIcons.studySpace },
 ] as const
 
-function distanceBetween(first: Coordinates, second: Coordinates) {
+function distanceInMiles(first: Coordinates, second: Coordinates) {
   const radians = Math.PI / 180
   const latitudeDelta = (second.latitude - first.latitude) * radians
   const longitudeDelta = (second.longitude - first.longitude) * radians
@@ -86,12 +87,16 @@ function distanceBetween(first: Coordinates, second: Coordinates) {
   const haversine = Math.sin(latitudeDelta / 2) ** 2
     + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2
 
-  return 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
+  return earthRadiusMiles * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
+}
+
+function distanceLabel(distance: number) {
+  return `${distance.toFixed(distance < 1 ? 2 : 1)} mi`
 }
 
 function nearestBuildings(buildings: Building[], position: Coordinates): BuildingSearchResult[] {
   return buildings
-    .map((building) => ({ building, distance: distanceBetween(position, building.coordinates) }))
+    .map((building) => ({ building, distance: distanceInMiles(position, building.coordinates) }))
     .sort((first, second) => (
       first.distance - second.distance
       || first.building.name.localeCompare(second.building.name)
@@ -194,29 +199,41 @@ function GeneralAmenityResult({ amenity }: { amenity: GeneralAmenity }) {
   )
 }
 
-function BuildingResult({ result, onSelect }: { result: BuildingSearchResult; onSelect: () => void }) {
+function BuildingResult({
+  position,
+  result,
+  onSelect,
+}: {
+  position: Coordinates | null
+  result: BuildingSearchResult
+  onSelect: () => void
+}) {
   const { building, amenityCounts } = result
+  const distance = position === null ? null : distanceInMiles(position, building.coordinates)
 
   return (
     <button type="button" className="block w-full rounded-xl text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={onSelect}>
-      <div className="flex w-full items-center justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10 transition-colors hover:bg-muted/50">
+      <div className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10 transition-colors hover:bg-muted/50">
         <div className="min-w-0 flex-1">
           <p className="font-heading font-medium leading-snug">{building.name}</p>
           {building.shortName && building.shortName !== building.name && <p className="mt-1 text-muted-foreground">{building.shortName}</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
-          <Badge variant="secondary">
-            {amenityCounts.total.toLocaleString()} {amenityCounts.total === 1 ? "amenity" : "amenities"}
-          </Badge>
-          {amenityCounts.total > 0 && (
-            <div className="flex items-center gap-1" aria-label="Available amenity types">
-              {buildingAmenityIcons.map(({ countKey, label, Icon }) => amenityCounts[countKey] > 0 && (
-                <span key={countKey} className="grid size-6 place-items-center text-foreground" aria-label={label} title={label}>
-                  <Icon className="size-4" aria-hidden="true" />
-                </span>
-              ))}
-            </div>
-          )}
+          {distance !== null && <span className="whitespace-nowrap font-medium text-muted-foreground">{distanceLabel(distance)}</span>}
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary">
+              {amenityCounts.total.toLocaleString()} {amenityCounts.total === 1 ? "amenity" : "amenities"}
+            </Badge>
+            {amenityCounts.total > 0 && (
+              <div className="flex items-center gap-1" aria-label="Available amenity types">
+                {buildingAmenityIcons.map(({ countKey, label, Icon }) => amenityCounts[countKey] > 0 && (
+                  <span key={countKey} className="grid size-6 place-items-center text-foreground" aria-label={label} title={label}>
+                    <Icon className="size-4" aria-hidden="true" />
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </button>
@@ -229,6 +246,7 @@ function SearchView({
   onQueryChange,
   onSearch,
   onSelectBuilding,
+  position,
   results,
   totalResultCount,
 }: {
@@ -237,6 +255,7 @@ function SearchView({
   onQueryChange: (query: string) => void
   onSearch: () => void
   onSelectBuilding: (building: Building) => void
+  position: Coordinates | null
   results: BuildingSearchResult[]
   totalResultCount: number
 }) {
@@ -283,7 +302,12 @@ function SearchView({
         {results.length > 0 && (
           <div className="flex flex-col gap-3">
             {results.map((result) => (
-              <BuildingResult key={result.building.id} result={result} onSelect={() => onSelectBuilding(result.building)} />
+              <BuildingResult
+                key={result.building.id}
+                position={position}
+                result={result}
+                onSelect={() => onSelectBuilding(result.building)}
+              />
             ))}
           </div>
         )}
@@ -295,14 +319,17 @@ function SearchView({
 function BuildingDetails({
   building,
   amenities,
+  position,
   preferredCategory,
   onSelectRestroom,
 }: {
   building: Building
   amenities: Amenity[]
+  position: Coordinates | null
   preferredCategory: Restroom["category"] | null
   onSelectRestroom: (restroom: Restroom) => void
 }) {
+  const distance = position === null ? null : distanceInMiles(position, building.coordinates)
   const [selectedAmenityType, setSelectedAmenityType] = useState<AmenityType | "all">("all")
   const [selectedLevel, setSelectedLevel] = useState("all")
   const availableAmenityIcons = buildingAmenityIcons.filter(({ amenityType }) => (
@@ -335,8 +362,9 @@ function BuildingDetails({
 
   return (
     <article className="flex flex-col gap-5">
-      <header>
-        <h2 className="font-heading text-xl font-medium">{building.name}</h2>
+      <header className="flex items-start justify-between gap-4">
+        <h2 className="min-w-0 font-heading text-xl font-medium">{building.name}</h2>
+        {distance !== null && <span className="shrink-0 whitespace-nowrap text-sm font-medium text-muted-foreground">{distanceLabel(distance)}</span>}
       </header>
 
       {amenities.length > 0 && (
@@ -821,6 +849,7 @@ export function App() {
                     onQueryChange={setSearchQuery}
                     onSearch={() => submitSearch(searchQuery)}
                     onSelectBuilding={openBuilding}
+                    position={userPosition}
                     results={visibleBuildings}
                     totalResultCount={matchingBuildings.length}
                   />
@@ -838,6 +867,7 @@ export function App() {
                   <BuildingDetails
                     building={selectedBuilding}
                     amenities={[...selectedAmenities]}
+                    position={userPosition}
                     preferredCategory={preferredCategory}
                     onSelectRestroom={(restroom) => {
                       setSelectedRestroom(restroom)
