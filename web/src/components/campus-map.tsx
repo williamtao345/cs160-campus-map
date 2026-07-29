@@ -6,6 +6,8 @@ import campusBuildingPolygons from "@/data/campus-building-polygons.json"
 let googleMapsPromise: Promise<void> | undefined
 
 const defaultMapZoom = 16
+const minimumMapZoom = 14
+const maximumMapZoom = 18.5
 const routeViewportPadding = {
   top: 64,
   right: 24,
@@ -111,6 +113,8 @@ export function CampusMap({
           mapTypeId: "roadmap",
           disableDefaultUI: true,
           clickableIcons: false,
+          minZoom: minimumMapZoom,
+          maxZoom: maximumMapZoom,
         })
         setMapInstance(map)
         polygonLayer = map.data

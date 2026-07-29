@@ -48,10 +48,12 @@ function installGoogleMapsMock() {
       setStyle: ReturnType<typeof vi.fn>
     }
     fitBounds: ReturnType<typeof vi.fn>
+    fitBoundsZoom: number | undefined
     panBy: ReturnType<typeof vi.fn>
     panTo: ReturnType<typeof vi.fn>
-    setZoom: (zoom: number) => void
+    setZoom: ReturnType<typeof vi.fn>
     startDrag: () => void
+    zoom: number
   }> = []
   const markers: Array<{
     map: unknown
@@ -100,7 +102,14 @@ function installGoogleMapsMock() {
       remove: vi.fn(),
       setStyle: vi.fn(),
     }
-    fitBounds = vi.fn()
+    fitBoundsZoom: number | undefined
+    idle = () => {}
+    fitBounds = vi.fn(() => {
+      if (this.fitBoundsZoom !== undefined) {
+        this.zoom = Math.min(this.fitBoundsZoom, this.options.maxZoom ?? Number.POSITIVE_INFINITY)
+      }
+      this.idle()
+    })
     panBy = vi.fn()
     panTo = vi.fn()
     zoom = 16
@@ -115,7 +124,12 @@ function installGoogleMapsMock() {
     addListener(eventName: string, handler: () => void) {
       if (eventName === "zoom_changed") this.zoomChanged = handler
       if (eventName === "dragstart") this.dragStarted = handler
-      return { remove: vi.fn() }
+      if (eventName === "idle") this.idle = handler
+      return {
+        remove: vi.fn(() => {
+          if (eventName === "idle" && this.idle === handler) this.idle = () => {}
+        }),
+      }
     }
 
     getZoom() {
@@ -765,6 +779,16 @@ describe("campus map app", () => {
     expect(polylines[0].map).toBeNull()
     expect(maps[0].setZoom).toHaveBeenCalledOnce()
     expect(maps[0].setZoom).toHaveBeenCalledWith(16)
+
+    maps[0].setZoom.mockClear()
+    maps[0].fitBoundsZoom = 19
+    act(() => markers.find((marker) => marker.options.title === "Cory Hall")?.click())
+
+    await waitFor(() => expect(computeRoutes).toHaveBeenCalledTimes(2))
+    expect(maps[0].zoom).toBe(18.5)
+    expect(maps[0].setZoom).not.toHaveBeenCalled()
+    expect(maps[0].options.minZoom).toBe(14)
+    expect(maps[0].options.maxZoom).toBe(18.5)
     unmount()
   })
 
