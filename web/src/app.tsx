@@ -2,14 +2,21 @@ import { useEffect, useRef, useState } from "react"
 import type { FormEvent } from "react"
 import {
   ArrowLeftIcon,
+  BabyIcon,
   BookOpenIcon,
+  DropletIcon,
   DropletsIcon,
+  HeartHandshakeIcon,
   LogInIcon,
   LogOutIcon,
+  MicrowaveIcon,
   PlusIcon,
   PopcornIcon,
+  RecycleIcon,
   SettingsIcon,
+  SproutIcon,
   ToiletIcon,
+  UtensilsIcon,
 } from "lucide-react"
 
 import { CampusMap } from "@/components/campus-map"
@@ -43,11 +50,38 @@ import {
 
 type DrawerView = "search" | "building" | "restroom" | "create" | "settings"
 
-const amenityTypes = ["Restroom", "Water refill station", "Vending machine", "Study space"]
-const collapsedSnapPoint = "16rem"
+const amenityTypes = [
+  "Restroom",
+  "Water refill station",
+  "Vending machine",
+  "Study space",
+  "Lactation room",
+  "Microwave",
+  "Zero-waste station",
+  "Eatery",
+  "Campus garden",
+  "Basic needs service",
+  "Changing table",
+  "Menstrual product dispenser",
+]
+const collapsedSnapPoint = "5.75rem"
+const earthRadiusMeters = 6_371_000
 const resultLimit = 50
 const nearestBuildingLimit = 3
-const amenityTypeOrder: AmenityType[] = ["restroom", "waterRefillStation", "vendingMachine", "studySpace"]
+const amenityTypeOrder: AmenityType[] = [
+  "restroom",
+  "waterRefillStation",
+  "vendingMachine",
+  "studySpace",
+  "lactationRoom",
+  "microwave",
+  "zeroWasteStation",
+  "eatery",
+  "campusGarden",
+  "basicNeedService",
+  "changingTable",
+  "menstrualProduct",
+]
 
 type Coordinates = {
   latitude: number
@@ -59,14 +93,30 @@ const amenityTypeLabels: Record<AmenityType, { singular: string; plural: string 
   waterRefillStation: { singular: "Water refill station", plural: "Water refill stations" },
   vendingMachine: { singular: "Vending machine", plural: "Vending machines" },
   studySpace: { singular: "Study space", plural: "Study spaces" },
+  lactationRoom: { singular: "Lactation room", plural: "Lactation rooms" },
+  microwave: { singular: "Microwave", plural: "Microwaves" },
+  zeroWasteStation: { singular: "Zero-waste station", plural: "Zero-waste stations" },
+  eatery: { singular: "Eatery", plural: "Eateries" },
+  campusGarden: { singular: "Campus garden", plural: "Campus gardens" },
+  basicNeedService: { singular: "Basic needs service", plural: "Basic needs services" },
+  changingTable: { singular: "Changing table", plural: "Changing tables" },
+  menstrualProduct: { singular: "Menstrual product dispenser", plural: "Menstrual product dispensers" },
 }
 
 const buildingAmenityIcons = [
-  { countKey: "restrooms", label: "Restrooms available", Icon: ToiletIcon },
-  { countKey: "waterRefillStations", label: "Water refill stations available", Icon: DropletsIcon },
-  { countKey: "vendingMachines", label: "Vending machines available", Icon: PopcornIcon },
-  { countKey: "studySpaces", label: "Study spaces available", Icon: BookOpenIcon },
-] as const
+  { countKey: "restroom", label: "Restrooms available", Icon: ToiletIcon },
+  { countKey: "waterRefillStation", label: "Water refill stations available", Icon: DropletsIcon },
+  { countKey: "vendingMachine", label: "Vending machines available", Icon: PopcornIcon },
+  { countKey: "studySpace", label: "Study spaces available", Icon: BookOpenIcon },
+  { countKey: "lactationRoom", label: "Lactation rooms available", Icon: BabyIcon },
+  { countKey: "microwave", label: "Microwaves available", Icon: MicrowaveIcon },
+  { countKey: "zeroWasteStation", label: "Zero-waste stations available", Icon: RecycleIcon },
+  { countKey: "eatery", label: "Eateries available", Icon: UtensilsIcon },
+  { countKey: "campusGarden", label: "Campus gardens available", Icon: SproutIcon },
+  { countKey: "basicNeedService", label: "Basic needs services available", Icon: HeartHandshakeIcon },
+  { countKey: "changingTable", label: "Changing tables available", Icon: BabyIcon },
+  { countKey: "menstrualProduct", label: "Menstrual product dispensers available", Icon: DropletIcon },
+] as const satisfies ReadonlyArray<{ countKey: AmenityType; label: string; Icon: unknown }>
 
 function distanceBetween(first: Coordinates, second: Coordinates) {
   const radians = Math.PI / 180
@@ -80,16 +130,44 @@ function distanceBetween(first: Coordinates, second: Coordinates) {
   return 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
 }
 
+function sortByDistance<T extends { building: Building }>(results: T[], position: Coordinates): T[] {
+  return [...results].sort((first, second) => (
+    distanceBetween(position, first.building.coordinates) - distanceBetween(position, second.building.coordinates)
+    || first.building.name.localeCompare(second.building.name)
+    || first.building.id - second.building.id
+  ))
+}
+
 function nearestBuildings(buildings: Building[], position: Coordinates): BuildingSearchResult[] {
-  return buildings
-    .map((building) => ({ building, distance: distanceBetween(position, building.coordinates) }))
-    .sort((first, second) => (
-      first.distance - second.distance
-      || first.building.name.localeCompare(second.building.name)
-      || first.building.id - second.building.id
-    ))
-    .slice(0, nearestBuildingLimit)
-    .map(({ building }) => ({ building, amenityCounts: building.amenityCounts }))
+  return sortByDistance(
+    buildings.map((building) => ({ building, amenityCounts: building.amenityCounts })),
+    position,
+  ).slice(0, nearestBuildingLimit)
+}
+
+function metersBetween(position: Coordinates, target: Coordinates) {
+  return distanceBetween(position, target) * earthRadiusMeters
+}
+
+function formatDistance(meters: number) {
+  const feet = meters * 3.28084
+  if (feet <= 1000) return `${Math.max(10, Math.round(feet / 10) * 10)} ft away`
+  return `${(meters / 1609.344).toFixed(1)} mi away`
+}
+
+function distanceColor(meters: number) {
+  const feet = meters * 3.28084
+  if (feet <= 1000) return "#34A853"
+  if (feet <= 2640) return "#FBBC04"
+  return "#EA4335"
+}
+
+function DistanceLabel({ meters, className }: { meters: number; className?: string }) {
+  return (
+    <span className={className} style={{ color: distanceColor(meters) }}>
+      {formatDistance(meters)}
+    </span>
+  )
 }
 
 function categoryLabel(category: Restroom["category"]) {
@@ -165,7 +243,7 @@ function GeneralAmenityResult({ amenity }: { amenity: GeneralAmenity }) {
   )
 }
 
-function BuildingResult({ result, onSelect }: { result: BuildingSearchResult; onSelect: () => void }) {
+function BuildingResult({ result, distanceMeters, onSelect }: { result: BuildingSearchResult; distanceMeters: number | null; onSelect: () => void }) {
   const { building, amenityCounts } = result
 
   return (
@@ -176,6 +254,7 @@ function BuildingResult({ result, onSelect }: { result: BuildingSearchResult; on
           {building.shortName && building.shortName !== building.name && <p className="mt-1 text-muted-foreground">{building.shortName}</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
+          {distanceMeters !== null && <DistanceLabel meters={distanceMeters} className="font-medium" />}
           <Badge variant="secondary">
             {amenityCounts.total.toLocaleString()} {amenityCounts.total === 1 ? "amenity" : "amenities"}
           </Badge>
@@ -202,6 +281,7 @@ function SearchView({
   onSelectBuilding,
   results,
   totalResultCount,
+  userPosition,
 }: {
   hasSearched: boolean
   query: string
@@ -210,6 +290,7 @@ function SearchView({
   onSelectBuilding: (building: Building) => void
   results: BuildingSearchResult[]
   totalResultCount: number
+  userPosition: Coordinates | null
 }) {
   const isSearchDisabled = query.trim().length === 0
 
@@ -254,7 +335,12 @@ function SearchView({
         {results.length > 0 && (
           <div className="flex flex-col gap-3">
             {results.map((result) => (
-              <BuildingResult key={result.building.id} result={result} onSelect={() => onSelectBuilding(result.building)} />
+              <BuildingResult
+                key={result.building.id}
+                result={result}
+                distanceMeters={userPosition ? metersBetween(userPosition, result.building.coordinates) : null}
+                onSelect={() => onSelectBuilding(result.building)}
+              />
             ))}
           </div>
         )}
@@ -267,11 +353,13 @@ function BuildingDetails({
   building,
   amenities,
   preferredCategory,
+  distanceMeters,
   onSelectRestroom,
 }: {
   building: Building
   amenities: Amenity[]
   preferredCategory: Restroom["category"] | null
+  distanceMeters: number | null
   onSelectRestroom: (restroom: Restroom) => void
 }) {
   const amenitiesByType = new Map<AmenityType, Amenity[]>()
@@ -291,6 +379,7 @@ function BuildingDetails({
       <header className="flex flex-col gap-1">
         <h2 className="font-heading text-xl font-medium">{building.name}</h2>
         <p className="text-sm text-muted-foreground">
+          {distanceMeters !== null && <><DistanceLabel meters={distanceMeters} className="font-medium" /> · </>}
           {amenities.length.toLocaleString()} total {amenities.length === 1 ? "amenity" : "amenities"}
         </p>
       </header>
@@ -541,10 +630,14 @@ export function App() {
   const amenityCache = useRef(new Map<number, Amenity[]>())
   const amenityRequest = useRef(0)
   const preferredCategory = preferredRestroomCategory(gender)
+  const searchResults = submittedQuery === null ? [] : searchBuildings(buildings, submittedQuery)
   const matchingBuildings = submittedQuery === null
-    ? userPosition === null ? [] : nearestBuildings(buildings, userPosition)
-    : searchBuildings(buildings, submittedQuery)
+    ? (userPosition === null ? [] : nearestBuildings(buildings, userPosition))
+    : (userPosition === null ? searchResults : sortByDistance(searchResults, userPosition))
   const visibleBuildings = submittedQuery === null ? matchingBuildings : matchingBuildings.slice(0, resultLimit)
+  const selectedBuildingDistanceMeters = userPosition && selectedBuilding
+    ? metersBetween(userPosition, selectedBuilding.coordinates)
+    : null
 
   useEffect(() => {
     let cancelled = false
@@ -734,6 +827,7 @@ export function App() {
                     onSelectBuilding={openBuilding}
                     results={visibleBuildings}
                     totalResultCount={matchingBuildings.length}
+                    userPosition={userPosition}
                   />
                 )
               )}
@@ -750,6 +844,7 @@ export function App() {
                     building={selectedBuilding}
                     amenities={[...selectedAmenities]}
                     preferredCategory={preferredCategory}
+                    distanceMeters={selectedBuildingDistanceMeters}
                     onSelectRestroom={(restroom) => {
                       setSelectedRestroom(restroom)
                       showView("restroom")

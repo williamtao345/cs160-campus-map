@@ -1,0 +1,429 @@
+{
+  "_status": "NEEDS MANUAL REVIEW \u2014 not consumed by scripts/seed-database.mjs",
+  "_note": "These 37 items from the aggregated amenities merge (ArcGIS restroom scrape + Berkeley Food Institute Foodscape Map) could not be confidently attached to a building in buildings.json \u2014 either they're off-campus, are a path/plaza/gate rather than a building interior, or sit just outside the 45m/150m matching threshold used during the merge. Each item includes a nearest_building_guess for manual review. This file is intentionally NOT referenced by scripts/seed-database.mjs's amenitySources list, so it has no effect on the app until someone manually reviews and promotes individual items into the appropriate category file above with a real buildingId.",
+  "basic_needs": [
+    {
+      "item": {
+        "name": "Garden & Farming Skills",
+        "lon": -122.266268,
+        "lat": 37.871674,
+        "division": "College of Natural Resources",
+        "department": "Berkeley Food Institute",
+        "description": "Campus gardens are spaces to learn skills to feed yourself and are a vital part of our Basic Needs community.",
+        "website": "https://food.berkeley.edu/programs/community-engagement-edu/campus-gardens/",
+        "building_text": "University Hall"
+      },
+      "nearest_dist_m": 85.5,
+      "nearest_building_guess": "Berkeley Art Museum and Pacific Film Archive"
+    }
+  ],
+  "eateries": [
+    {
+      "item": {
+        "name": "Bay View Cafe (Cafeteria)",
+        "lon": -122.250783,
+        "lat": 37.875891,
+        "ownership": "Epicurean Group",
+        "bldg_name": "Lawrence Berkeley National Lab",
+        "hours": "Mon-Fri: Breakfast/Lunch/Coffee",
+        "cal1card": "No",
+        "eatwell": "No",
+        "website": "https://www.bayviewcafelbl.com/",
+        "price": "$10-15"
+      },
+      "nearest_dist_m": 334.3,
+      "nearest_building_guess": "Foothill Housing Building 8"
+    },
+    {
+      "item": {
+        "name": "Eunice Cafe 2",
+        "lon": -122.332637,
+        "lat": 37.91666,
+        "ownership": "Other Private Third Party",
+        "bldg_name": "Richmond Field Station",
+        "hours": "Mon-Fri: 8am - 3pm",
+        "cal1card": "No",
+        "eatwell": "No",
+        "website": "https://www.yelp.com/biz/eunice-cafe-2-richmond",
+        "price": "$10-15"
+      },
+      "nearest_dist_m": 4304.4,
+      "nearest_building_guess": "Family Student Housing Grounds Shop"
+    },
+    {
+      "item": {
+        "name": "Edwards Track",
+        "lon": -122.26483,
+        "lat": 37.868879,
+        "ownership": "CalDining",
+        "bldg_name": "Edwards Track",
+        "hours": "During sports games only.",
+        "cal1card": "Yes",
+        "eatwell": "No",
+        "website": "https://caldining.berkeley.edu/connect/concessions",
+        "price": "< $10"
+      },
+      "nearest_dist_m": 118.1,
+      "nearest_building_guess": "Legends Aquatic Center"
+    },
+    {
+      "item": {
+        "name": "Evans Diamond",
+        "lon": -122.263409,
+        "lat": 37.869397,
+        "ownership": "CalDining",
+        "bldg_name": "Evans Diamond",
+        "hours": "During sports games only.",
+        "cal1card": "Yes",
+        "eatwell": "No",
+        "website": "https://caldining.berkeley.edu/connect/concessions",
+        "price": "< $10"
+      },
+      "nearest_dist_m": 67.2,
+      "nearest_building_guess": "Evans Field Dugout"
+    }
+  ],
+  "gardens": [
+    {
+      "item": {
+        "name": "Blake Garden",
+        "lon": -122.284945,
+        "lat": 37.913539,
+        "manager": "College of Environmental Design",
+        "acreage": "10.5",
+        "date": "1922-24",
+        "hours": "Mon-Fri 8am-4:30pm, closed university holidays"
+      },
+      "nearest_dist_m": 3295.4,
+      "nearest_building_guess": "Gill Tract Agricultural Operations Building"
+    },
+    {
+      "item": {
+        "name": "Cloyne Court Hotel Garden",
+        "lon": -122.258085,
+        "lat": 37.876127,
+        "manager": "Berkeley Student Cooperative",
+        "acreage": "<.25",
+        "date": "1946",
+        "hours": "Coop residents and guests only."
+      },
+      "nearest_dist_m": 46.9,
+      "nearest_building_guess": "2607 Hearst Avenue"
+    },
+    {
+      "item": {
+        "name": "Fenwick Weavers' Village",
+        "lon": -122.260232,
+        "lat": 37.865125,
+        "manager": "Berkeley Student Cooperative",
+        "acreage": "<.25",
+        "date": "1981",
+        "hours": "Coop residents (UCB exclusive during academic year) and guests only."
+      },
+      "nearest_dist_m": 71.9,
+      "nearest_building_guess": "2427 Dwight Way"
+    },
+    {
+      "item": {
+        "name": "Garden Village",
+        "lon": -122.265032,
+        "lat": 37.864575,
+        "manager": "UCB Student Housing, Top Leaf Farms, Bluma Flower Farms",
+        "acreage": "0.275",
+        "date": "2016",
+        "hours": "Varies depending on plot owned by different businesses."
+      },
+      "nearest_dist_m": 153.6,
+      "nearest_building_guess": "2425 Atherton Street"
+    },
+    {
+      "item": {
+        "name": "Indigenous Community Learning Garden",
+        "lon": -122.267066,
+        "lat": 37.876529,
+        "manager": "Native American Student Development",
+        "acreage": "<.25",
+        "date": "2021",
+        "hours": "Open for NASD and Faculty approved volunteers"
+      },
+      "nearest_dist_m": 84.6,
+      "nearest_building_guess": "Oxford Tract - Genetics & Plant Biology Greenhouse"
+    },
+    {
+      "item": {
+        "name": "Lothlorien",
+        "lon": -122.249523,
+        "lat": 37.867903,
+        "manager": "Berkeley Student Cooperative",
+        "acreage": "<.25",
+        "date": "1971",
+        "hours": "Coop residents and guests only."
+      },
+      "nearest_dist_m": 230.8,
+      "nearest_building_guess": "Clark Kerr Campus 5 - Child Care"
+    },
+    {
+      "item": {
+        "name": "People's Park Community Garden",
+        "lon": -122.257876,
+        "lat": 37.865865,
+        "manager": "Ecology Center & Facilities Services",
+        "acreage": "<.25",
+        "date": "1969",
+        "hours": "Open for visitors 24-7, contact Ecology Center for specific events."
+      },
+      "nearest_dist_m": 72.3,
+      "nearest_building_guess": "Anna Head Building E"
+    },
+    {
+      "item": {
+        "name": "Rochdale Village Apartments",
+        "lon": -122.259789,
+        "lat": 37.865605,
+        "manager": "Berkeley Student Cooperative",
+        "acreage": "<.25",
+        "date": "1971",
+        "hours": "Coop residents (UCB exclusive during academic year) and guests only."
+      },
+      "nearest_dist_m": 47.7,
+      "nearest_building_guess": "2427 Dwight Way"
+    },
+    {
+      "item": {
+        "name": "Student Organic Garden Association",
+        "lon": -122.2676,
+        "lat": 37.8767,
+        "manager": "College of Natural Resources",
+        "acreage": "0.5",
+        "date": "1971",
+        "hours": "Sun 10am-2pm"
+      },
+      "nearest_dist_m": 113.0,
+      "nearest_building_guess": "Oxford Tract - Genetics & Plant Biology Greenhouse"
+    },
+    {
+      "item": {
+        "name": "The University Village Community Garden",
+        "lon": -122.3054856,
+        "lat": 37.88362236,
+        "manager": "UC Village",
+        "acreage": "~2",
+        "date": "1970",
+        "hours": "See website; not in use until Spring 2020"
+      },
+      "nearest_dist_m": 85.8,
+      "nearest_building_guess": "Family Student Housing Grounds Shop"
+    },
+    {
+      "item": {
+        "name": "UC Gill Tract Community Farm",
+        "lon": -122.2982,
+        "lat": 37.8864,
+        "manager": "UC Berkeley with Gill Tract Farm Coalition",
+        "acreage": "1.5",
+        "date": "2013",
+        "hours": "Sun 12-5pm, Mon 11am-2pm, Tue 2-5pm, Wed 11am-2pm, Thu 2-5pm"
+      },
+      "nearest_dist_m": 77.8,
+      "nearest_building_guess": "Gill Tract Agricultural Operations Building"
+    }
+  ],
+  "lactation": [
+    {
+      "item": {
+        "name": "University Hall Lactation Room",
+        "lat": 37.871906,
+        "lon": -122.266304,
+        "notes": "",
+        "link": "https://uhs.berkeley.edu/facstaff/wellness/breastfeeding-support"
+      },
+      "nearest_dist_m": 110.8,
+      "nearest_building_guess": "Berkeley Art Museum and Pacific Film Archive"
+    }
+  ],
+  "microwave": [],
+  "water_refill": [
+    {
+      "item": {
+        "name": "2515 Channing Way (Academic Achievement Program)",
+        "lon": -122.2585399,
+        "lat": 37.8718992
+      },
+      "nearest_dist_m": 49.9,
+      "nearest_building_guess": "Doe Annex"
+    },
+    {
+      "item": {
+        "name": "Architects and Engineers",
+        "lon": -122.2688665,
+        "lat": 37.8736168
+      },
+      "nearest_dist_m": 82.7,
+      "nearest_building_guess": "Berkeley Way West"
+    },
+    {
+      "item": {
+        "name": "Berkeley Wireless Research Institute",
+        "lon": -122.267441,
+        "lat": 37.869197
+      },
+      "nearest_dist_m": 83.7,
+      "nearest_building_guess": "2121 Allston Street"
+    },
+    {
+      "item": {
+        "name": "University Hall",
+        "lon": -122.2662639,
+        "lat": 37.8722049
+      },
+      "nearest_dist_m": 82.0,
+      "nearest_building_guess": "Helen Diller Anchor House"
+    }
+  ],
+  "zero_waste": [
+    {
+      "item": {
+        "name": "North Entrance Memorial Glade",
+        "lon": -122.2599746,
+        "lat": 37.87326917
+      },
+      "nearest_dist_m": 48.4,
+      "nearest_building_guess": "C. V. Starr East Asian Library"
+    },
+    {
+      "item": {
+        "name": "South Path Drive",
+        "lon": -122.2564236,
+        "lat": 37.87219254
+      },
+      "nearest_dist_m": 50.1,
+      "nearest_building_guess": "Gilman Hall"
+    },
+    {
+      "item": {
+        "name": "Glade Path",
+        "lon": -122.2587112,
+        "lat": 37.87315167
+      },
+      "nearest_dist_m": 74.8,
+      "nearest_building_guess": "David Gardner Stacks"
+    },
+    {
+      "item": {
+        "name": "Cronk Gate",
+        "lon": -122.2530092,
+        "lat": 37.87171932
+      },
+      "nearest_dist_m": 57.4,
+      "nearest_building_guess": "Walter A. Haas Student Services Building"
+    },
+    {
+      "item": {
+        "name": "Campanili East",
+        "lon": -122.258332,
+        "lat": 37.87179078
+      },
+      "nearest_dist_m": 52.9,
+      "nearest_building_guess": "South Hall"
+    },
+    {
+      "item": {
+        "name": "Grade Street",
+        "lon": -122.2608047,
+        "lat": 37.86992118
+      },
+      "nearest_dist_m": 48.8,
+      "nearest_building_guess": "Alumni House"
+    },
+    {
+      "item": {
+        "name": "Golden Bear Cafe Walkway",
+        "lon": -122.2594767,
+        "lat": 37.86984999
+      },
+      "nearest_dist_m": 66.7,
+      "nearest_building_guess": "Sproul Hall"
+    },
+    {
+      "item": {
+        "name": "Golden Bear Cafe Entry",
+        "lon": -122.2596078,
+        "lat": 37.86990345
+      },
+      "nearest_dist_m": 57.1,
+      "nearest_building_guess": "Student Center"
+    },
+    {
+      "item": {
+        "name": "Sather Gate",
+        "lon": -122.2593613,
+        "lat": 37.87014324
+      },
+      "nearest_dist_m": 49.7,
+      "nearest_building_guess": "Architects & Engineers Building"
+    },
+    {
+      "item": {
+        "name": "Birge Path",
+        "lon": -122.2554668,
+        "lat": 37.87041373
+      },
+      "nearest_dist_m": 59.5,
+      "nearest_building_guess": "Hargrove Music Library"
+    },
+    {
+      "item": {
+        "name": "Spieker Plaza",
+        "lon": -122.2616218,
+        "lat": 37.86893449
+      },
+      "nearest_dist_m": 46.5,
+      "nearest_building_guess": "2401 Bancroft Way"
+    },
+    {
+      "item": {
+        "name": "Lower Crescent",
+        "lon": -122.2655592,
+        "lat": 37.87060588
+      },
+      "nearest_dist_m": 81.8,
+      "nearest_building_guess": "Berkeley Art Museum and Pacific Film Archive"
+    },
+    {
+      "item": {
+        "name": "Crescent",
+        "lon": -122.2651391,
+        "lat": 37.87182387
+      },
+      "nearest_dist_m": 108.5,
+      "nearest_building_guess": "Mulford Hall"
+    },
+    {
+      "item": {
+        "name": "West Circle",
+        "lon": -122.2633246,
+        "lat": 37.87207741
+      },
+      "nearest_dist_m": 74.4,
+      "nearest_building_guess": "Weill Hall"
+    },
+    {
+      "item": {
+        "name": "University Drive",
+        "lon": -122.2624248,
+        "lat": 37.87277664
+      },
+      "nearest_dist_m": 49.2,
+      "nearest_building_guess": "Wellman Hall"
+    },
+    {
+      "item": {
+        "name": "Campanile Way West Entrance",
+        "lon": -122.2632331,
+        "lat": 37.87077315
+      },
+      "nearest_dist_m": 55.2,
+      "nearest_building_guess": "Central Heating Plant"
+    }
+  ]
+}

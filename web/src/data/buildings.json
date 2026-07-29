@@ -1928,8 +1928,8 @@
     "id": 261,
     "gisId": 736,
     "caan": "1076",
-    "name": "xučyun ruwway",
-    "shortName": "xučyun ruwway",
+    "name": "xu\u010dyun ruwway",
+    "shortName": "xu\u010dyun ruwway",
     "coordinates": {
       "latitude": 37.88480832373512,
       "longitude": -122.29938653623532
@@ -1944,6 +1944,721 @@
     "coordinates": {
       "latitude": 37.869103258793544,
       "longitude": -122.26097633903478
+    }
+  },
+  {
+    "id": 272,
+    "gisId": null,
+    "caan": null,
+    "name": "1608 4th Street",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.873254,
+      "longitude": -122.30232
+    }
+  },
+  {
+    "id": 273,
+    "gisId": null,
+    "caan": null,
+    "name": "1995 University Avenue",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.87203,
+      "longitude": -122.271382
+    }
+  },
+  {
+    "id": 274,
+    "gisId": null,
+    "caan": null,
+    "name": "2425 Atherton Street",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.865715,
+      "longitude": -122.264048
+    }
+  },
+  {
+    "id": 275,
+    "gisId": null,
+    "caan": null,
+    "name": "2427 Dwight Way",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.865279,
+      "longitude": -122.259437
+    }
+  },
+  {
+    "id": 276,
+    "gisId": null,
+    "caan": null,
+    "name": "2451 Ridge Road",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.87616,
+      "longitude": -122.261112
+    }
+  },
+  {
+    "id": 277,
+    "gisId": null,
+    "caan": null,
+    "name": "2535 Channing Way",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.86733,
+      "longitude": -122.257351
+    }
+  },
+  {
+    "id": 278,
+    "gisId": null,
+    "caan": null,
+    "name": "Anna Head Building B",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.866596,
+      "longitude": -122.256668
+    }
+  },
+  {
+    "id": 279,
+    "gisId": null,
+    "caan": null,
+    "name": "Anna Head Building C",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.86675,
+      "longitude": -122.256918
+    }
+  },
+  {
+    "id": 280,
+    "gisId": null,
+    "caan": null,
+    "name": "Bancroft Parking Structure",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.86952,
+      "longitude": -122.255868
+    }
+  },
+  {
+    "id": 281,
+    "gisId": null,
+    "caan": null,
+    "name": "Beverly Cleary Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.866429,
+      "longitude": -122.259493
+    }
+  },
+  {
+    "id": 282,
+    "gisId": null,
+    "caan": null,
+    "name": "Botanical Garden Annex",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.875445,
+      "longitude": -122.238345
+    }
+  },
+  {
+    "id": 283,
+    "gisId": null,
+    "caan": null,
+    "name": "Botanical Garden Commons",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.874718,
+      "longitude": -122.23807
+    }
+  },
+  {
+    "id": 284,
+    "gisId": null,
+    "caan": null,
+    "name": "Botanical Garden House 1",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.872897,
+      "longitude": -122.23672
+    }
+  },
+  {
+    "id": 285,
+    "gisId": null,
+    "caan": null,
+    "name": "Botanical Garden House 2",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.873,
+      "longitude": -122.236852
+    }
+  },
+  {
+    "id": 286,
+    "gisId": null,
+    "caan": null,
+    "name": "Botanical Garden Kiosk",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.875172,
+      "longitude": -122.238633
+    }
+  },
+  {
+    "id": 287,
+    "gisId": null,
+    "caan": null,
+    "name": "Botanical Garden Tropical House",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.873793,
+      "longitude": -122.238185
+    }
+  },
+  {
+    "id": 288,
+    "gisId": null,
+    "caan": null,
+    "name": "Botanical Garden Workshop",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.873172,
+      "longitude": -122.237905
+    }
+  },
+  {
+    "id": 289,
+    "gisId": null,
+    "caan": null,
+    "name": "Bowles Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.8733,
+      "longitude": -122.25314
+    }
+  },
+  {
+    "id": 290,
+    "gisId": null,
+    "caan": null,
+    "name": "Central Heating Plant",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.870327,
+      "longitude": -122.263507
+    }
+  },
+  {
+    "id": 291,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 10 - Dining Center",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.863704,
+      "longitude": -122.248605
+    }
+  },
+  {
+    "id": 292,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 11 - Suites",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.863772,
+      "longitude": -122.249548
+    }
+  },
+  {
+    "id": 293,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 12 - Residence Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.86325,
+      "longitude": -122.249317
+    }
+  },
+  {
+    "id": 294,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 13 - Steam Plant",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.863148,
+      "longitude": -122.248554
+    }
+  },
+  {
+    "id": 295,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 14 - Campus Center",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.863618,
+      "longitude": -122.249848
+    }
+  },
+  {
+    "id": 296,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 15 - Child Care Center",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.862562,
+      "longitude": -122.249578
+    }
+  },
+  {
+    "id": 297,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 16 - Suites",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.862659,
+      "longitude": -122.249137
+    }
+  },
+  {
+    "id": 298,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 17 - Keller Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.862775,
+      "longitude": -122.248411
+    }
+  },
+  {
+    "id": 299,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 18 - Faculty House",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.862662,
+      "longitude": -122.247645
+    }
+  },
+  {
+    "id": 300,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 19 - Faculty Apartments",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.862789,
+      "longitude": -122.245921
+    }
+  },
+  {
+    "id": 301,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 2 - Suites",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.864781,
+      "longitude": -122.249966
+    }
+  },
+  {
+    "id": 302,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 2 - Suites",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.864906,
+      "longitude": -122.249584
+    }
+  },
+  {
+    "id": 303,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 20 - Faculty Apartments",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.86309,
+      "longitude": -122.24528
+    }
+  },
+  {
+    "id": 304,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 21 - Storage",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.863473,
+      "longitude": -122.24568
+    }
+  },
+  {
+    "id": 305,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 22 - Archives",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.864074,
+      "longitude": -122.246484
+    }
+  },
+  {
+    "id": 306,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 3 - Residence Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.865064,
+      "longitude": -122.248917
+    }
+  },
+  {
+    "id": 307,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 4 - Residence Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.865518,
+      "longitude": -122.248665
+    }
+  },
+  {
+    "id": 308,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 5 - Child Care",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.86583,
+      "longitude": -122.249585
+    }
+  },
+  {
+    "id": 309,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 6 - Residence Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.863953,
+      "longitude": -122.247308
+    }
+  },
+  {
+    "id": 310,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 7 - Residence Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.863856,
+      "longitude": -122.24762
+    }
+  },
+  {
+    "id": 311,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 8 - Maslach Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.86419,
+      "longitude": -122.248128
+    }
+  },
+  {
+    "id": 312,
+    "gisId": null,
+    "caan": null,
+    "name": "Clark Kerr Campus 9 - Suites",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.863693,
+      "longitude": -122.248108
+    }
+  },
+  {
+    "id": 313,
+    "gisId": null,
+    "caan": null,
+    "name": "Early Childhood Education Center",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.865968,
+      "longitude": -122.261603
+    }
+  },
+  {
+    "id": 314,
+    "gisId": null,
+    "caan": null,
+    "name": "Ellsworth Parking Structure",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.866008,
+      "longitude": -122.262583
+    }
+  },
+  {
+    "id": 315,
+    "gisId": null,
+    "caan": null,
+    "name": "Foothill Housing Building 2",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.876356,
+      "longitude": -122.256512
+    }
+  },
+  {
+    "id": 316,
+    "gisId": null,
+    "caan": null,
+    "name": "Foothill Housing Building 3",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.876335,
+      "longitude": -122.256092
+    }
+  },
+  {
+    "id": 317,
+    "gisId": null,
+    "caan": null,
+    "name": "Foothill Housing Building 4",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.875303,
+      "longitude": -122.255983
+    }
+  },
+  {
+    "id": 318,
+    "gisId": null,
+    "caan": null,
+    "name": "Foothill Housing Building 6",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.87542,
+      "longitude": -122.255188
+    }
+  },
+  {
+    "id": 319,
+    "gisId": null,
+    "caan": null,
+    "name": "Foothill Housing Building 8",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.874784,
+      "longitude": -122.254319
+    }
+  },
+  {
+    "id": 320,
+    "gisId": null,
+    "caan": null,
+    "name": "Foothill Housing Building 9",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.874312,
+      "longitude": -122.254336
+    }
+  },
+  {
+    "id": 321,
+    "gisId": null,
+    "caan": null,
+    "name": "Gateway",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.874186,
+      "longitude": -122.263515
+    }
+  },
+  {
+    "id": 322,
+    "gisId": null,
+    "caan": null,
+    "name": "Gill Tract Agricultural Operations Building",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.88609,
+      "longitude": -122.298994
+    }
+  },
+  {
+    "id": 323,
+    "gisId": null,
+    "caan": null,
+    "name": "Hearst Greek Theatre",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.873355,
+      "longitude": -122.254265
+    }
+  },
+  {
+    "id": 324,
+    "gisId": null,
+    "caan": null,
+    "name": "Legends Aquatic Center",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.867835,
+      "longitude": -122.26507
+    }
+  },
+  {
+    "id": 325,
+    "gisId": null,
+    "caan": null,
+    "name": "Lower Hearst Parking Structure",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.875262,
+      "longitude": -122.26129
+    }
+  },
+  {
+    "id": 326,
+    "gisId": null,
+    "caan": null,
+    "name": "Maxwell Family Field & Stadium Parking",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.872446,
+      "longitude": -122.252846
+    }
+  },
+  {
+    "id": 327,
+    "gisId": null,
+    "caan": null,
+    "name": "Old Art Gallery",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.870514,
+      "longitude": -122.25866
+    }
+  },
+  {
+    "id": 328,
+    "gisId": null,
+    "caan": null,
+    "name": "Residential and Student Services Building",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.866755,
+      "longitude": -122.255926
+    }
+  },
+  {
+    "id": 329,
+    "gisId": null,
+    "caan": null,
+    "name": "Senior Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.87186,
+      "longitude": -122.255368
+    }
+  },
+  {
+    "id": 330,
+    "gisId": null,
+    "caan": null,
+    "name": "Underhill Parking Facility & Playing Field",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.867077,
+      "longitude": -122.254875
+    }
+  },
+  {
+    "id": 331,
+    "gisId": null,
+    "caan": null,
+    "name": "Unit 1 Residence Hall - Cheney Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.868078,
+      "longitude": -122.255682
+    }
+  },
+  {
+    "id": 332,
+    "gisId": null,
+    "caan": null,
+    "name": "Unit 1 Residence Hall - Deutsch Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.867592,
+      "longitude": -122.255726
+    }
+  },
+  {
+    "id": 333,
+    "gisId": null,
+    "caan": null,
+    "name": "Unit 1 Residence Hall - Freeborn Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.868086,
+      "longitude": -122.254584
+    }
+  },
+  {
+    "id": 334,
+    "gisId": null,
+    "caan": null,
+    "name": "Unit 1 Residence Hall - Putnam Hall",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.867602,
+      "longitude": -122.254628
+    }
+  },
+  {
+    "id": 335,
+    "gisId": null,
+    "caan": null,
+    "name": "University House",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.874516,
+      "longitude": -122.262232
+    }
+  },
+  {
+    "id": 336,
+    "gisId": null,
+    "caan": null,
+    "name": "Upper Hearst Parking Structure",
+    "shortName": null,
+    "coordinates": {
+      "latitude": 37.875802,
+      "longitude": -122.257308
     }
   }
 ]
