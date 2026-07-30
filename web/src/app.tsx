@@ -70,7 +70,7 @@ const amenityTypes = [
 ]
 const collapsedSnapPoint = "16rem"
 const resultLimit = 50
-const nearestBuildingLimit = 3
+const nearestBuildingLimit = 10
 const earthRadiusMiles = 3_958.8
 const amenityTypeOrder: AmenityType[] = [
   "restroom",
@@ -285,25 +285,22 @@ function BuildingResult({
     <button type="button" className="block w-full rounded-xl text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={onSelect}>
       <div className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10 transition-colors hover:bg-muted/50">
         <div className="min-w-0 flex-1">
-          <p className="font-heading font-medium leading-snug">{building.name}</p>
-          {building.shortName && building.shortName !== building.name && <p className="mt-1 text-muted-foreground">{building.shortName}</p>}
+          <p className="font-heading font-medium leading-snug text-primary">{building.shortName ?? building.name}</p>
+          {amenityCounts.total > 0 && (
+            <div className="mt-2 flex items-center gap-1" aria-label="Available amenity types">
+              {buildingAmenityIcons.map(({ amenityType, label, Icon }) => amenityCounts[amenityType] > 0 && (
+                <span key={amenityType} className="grid size-6 place-items-center text-foreground" aria-label={label} title={label}>
+                  <Icon className="size-4" aria-hidden="true" />
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
           {distance !== null && <DistanceLabel distance={distance} className="whitespace-nowrap text-xs font-medium" />}
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary">
-              {amenityCounts.total.toLocaleString()} {amenityCounts.total === 1 ? "amenity" : "amenities"}
-            </Badge>
-            {amenityCounts.total > 0 && (
-              <div className="flex items-center gap-1" aria-label="Available amenity types">
-                {buildingAmenityIcons.map(({ amenityType, label, Icon }) => amenityCounts[amenityType] > 0 && (
-                  <span key={amenityType} className="grid size-6 place-items-center text-foreground" aria-label={label} title={label}>
-                    <Icon className="size-4" aria-hidden="true" />
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
+          <Badge variant={amenityCounts.total === 0 ? "destructive" : "secondary"}>
+            {amenityCounts.total.toLocaleString()} {amenityCounts.total === 1 ? "amenity" : "amenities"}
+          </Badge>
         </div>
       </div>
     </button>
@@ -360,7 +357,7 @@ function SearchView({
       <section className="space-y-3" aria-labelledby="buildings-heading" aria-live="polite">
         <div className="flex items-center justify-between gap-3">
           <h2 id="buildings-heading" className="text-sm font-medium">
-            {hasSearched ? "Campus Buildings" : "Nearest Buildings"}
+            {hasSearched ? "Campus Buildings" : "Buildings Near You"}
           </h2>
           {hasSearched && totalResultCount > 0 && (
             <p className="text-xs text-muted-foreground">

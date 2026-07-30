@@ -309,8 +309,9 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: "Search" }))
 
     const coryResult = screen.getByRole("button", { name: /Cory Hall.*14 amenities/i })
+    const titleColumn = within(coryResult).getByText("Cory Hall").parentElement
     expect(within(coryResult).queryByText(/\d+(?:\.\d+)? mi/)).not.toBeInTheDocument()
-    expect(within(coryResult).getByLabelText("Restrooms available")).toBeInTheDocument()
+    expect(titleColumn).toContainElement(within(coryResult).getByLabelText("Restrooms available"))
     expect(within(coryResult).getByLabelText("Water refill stations available")).toBeInTheDocument()
     expect(within(coryResult).getByLabelText("Microwaves available")).toBeInTheDocument()
     expect(within(coryResult).getByLabelText("Zero-waste stations available")).toBeInTheDocument()
@@ -322,6 +323,23 @@ describe("campus map app", () => {
     expect(within(coryResult).queryByLabelText("Basic needs services available")).not.toBeInTheDocument()
     expect(within(coryResult).queryByLabelText("Changing tables available")).not.toBeInTheDocument()
     expect(within(coryResult).queryByLabelText("Menstrual product dispensers available")).not.toBeInTheDocument()
+  })
+
+  it("shows a destructive amenity badge for buildings without amenities", async () => {
+    const user = userEvent.setup()
+    const building = buildings.find(({ amenityCounts }) => amenityCounts.total === 0)
+
+    expect(building).toBeDefined()
+    await renderApp()
+
+    await user.type(screen.getByRole("searchbox"), building!.name)
+    await user.click(screen.getByRole("button", { name: "Search" }))
+
+    const displayName = building!.shortName ?? building!.name
+    const result = screen.getByRole("button", {
+      name: (name) => name.includes(displayName) && name.includes("0 amenities"),
+    })
+    expect(within(result).getByText("0 amenities")).toHaveClass("text-destructive")
   })
 
   it("searches buildings case-insensitively and navigates through their amenities", async () => {
@@ -408,7 +426,9 @@ describe("campus map app", () => {
 
     await user.type(searchbox, "MLK bathroom")
     await user.click(screen.getByRole("button", { name: "Search" }))
-    expect(screen.getByRole("button", { name: /Martin Luther King Junior Student Union.*MLK Student Union/i })).toBeInTheDocument()
+    const mlkResult = screen.getByRole("button", { name: /MLK Student Union.*amenit(?:y|ies)/i })
+    expect(within(mlkResult).getByText("MLK Student Union")).toBeInTheDocument()
+    expect(within(mlkResult).queryByText("Martin Luther King Junior Student Union")).not.toBeInTheDocument()
 
     await user.clear(searchbox)
     await user.type(searchbox, "bathroom")
@@ -455,7 +475,7 @@ describe("campus map app", () => {
       await renderApp()
       await user.type(screen.getByRole("searchbox"), sampleRestrooms[0].building.name)
       await user.click(screen.getByRole("button", { name: "Search" }))
-      await user.click(screen.getByRole("button", { name: new RegExp(sampleRestrooms[0].building.name, "i") }))
+      await user.click(screen.getByRole("button", { name: new RegExp(sampleRestrooms[0].building.shortName ?? sampleRestrooms[0].building.name, "i") }))
 
       expect(screen.getByText("Available")).toHaveClass("text-green-800")
       expect(screen.getByText("Out of service")).toHaveClass("text-destructive")
@@ -484,7 +504,7 @@ describe("campus map app", () => {
 
     await user.type(searchbox, "2607 Hearst water refill")
     await user.click(screen.getByRole("button", { name: "Search" }))
-    await user.click(screen.getByRole("button", { name: /2607 Hearst Avenue.*5 amenities/i }))
+    await user.click(screen.getByRole("button", { name: /2607 Hearst Ave\..*5 amenities/i }))
 
     expect(screen.getByRole("heading", { name: "3 Restrooms" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "1 Water refill station" })).toBeInTheDocument()
@@ -513,7 +533,7 @@ describe("campus map app", () => {
 
     await user.type(screen.getByRole("searchbox"), "2607 Hearst")
     await user.click(screen.getByRole("button", { name: "Search" }))
-    await user.click(screen.getByRole("button", { name: /2607 Hearst Avenue.*5 amenities/i }))
+    await user.click(screen.getByRole("button", { name: /2607 Hearst Ave\..*5 amenities/i }))
 
     const allTypes = screen.getByRole("button", { name: "Show all amenity types" })
     const restroomsFilter = screen.getByRole("button", { name: "Show restrooms" })
@@ -551,7 +571,7 @@ describe("campus map app", () => {
 
     await user.type(screen.getByRole("searchbox"), "2121 Allston Street")
     await user.click(screen.getByRole("button", { name: "Search" }))
-    await user.click(screen.getByRole("button", { name: /2121 Allston Street.*4 amenities/i }))
+    await user.click(screen.getByRole("button", { name: /Magnes Museum.*4 amenities/i }))
     await user.click(screen.getByRole("combobox", { name: "Filter by level" }))
     await user.click(await screen.findByRole("option", { name: "Others" }))
 
@@ -713,7 +733,7 @@ describe("campus map app", () => {
     installGoogleMapsMock()
     const { unmount } = await renderApp()
 
-    const emptyNearestRegion = screen.getByRole("region", { name: "Nearest Buildings" })
+    const emptyNearestRegion = screen.getByRole("region", { name: "Buildings Near You" })
     expect(within(emptyNearestRegion).queryAllByRole("button")).toHaveLength(0)
 
     act(() => updatePosition({
@@ -731,16 +751,17 @@ describe("campus map app", () => {
       toJSON: () => ({}),
     }))
 
-    const nearestRegion = screen.getByRole("region", { name: "Nearest Buildings" })
+    const nearestRegion = screen.getByRole("region", { name: "Buildings Near You" })
     expect(within(nearestRegion).getAllByRole("button").map((button) => button.textContent)).toEqual([
       expect.stringContaining("Nearest Building"),
       expect.stringContaining("Second Building"),
       expect.stringContaining("Third Building"),
+      expect.stringContaining("Far Building"),
     ])
     expect(within(nearestRegion).getByText("0.07 mi")).toHaveStyle({ color: "#34A853" })
     expect(within(nearestRegion).getByText("0.69 mi")).toHaveStyle({ color: "#EA4335" })
     expect(within(nearestRegion).getByText("1.4 mi")).toBeInTheDocument()
-    expect(within(nearestRegion).queryByText("Far Building")).not.toBeInTheDocument()
+    expect(within(nearestRegion).getByText("Far Building")).toBeInTheDocument()
 
     act(() => updatePosition({
       coords: {
@@ -1071,7 +1092,7 @@ describe("campus map app", () => {
 
     await waitFor(() => expect(markers).toHaveLength(buildings.length))
     expect(circles).toHaveLength(0)
-    expect(within(screen.getByRole("region", { name: "Nearest Buildings" })).queryAllByRole("button")).toHaveLength(0)
+    expect(within(screen.getByRole("region", { name: "Buildings Near You" })).queryAllByRole("button")).toHaveLength(0)
     expect(screen.queryByText("Google Maps failed to load.")).not.toBeInTheDocument()
 
     unmount()
