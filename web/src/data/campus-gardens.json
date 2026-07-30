@@ -1,0 +1,112 @@
+[
+  {
+    "id": "145-campus-garden-1",
+    "buildingId": 145,
+    "floorNumber": null,
+    "locationDetails": "Casa Zimbabwe Garden",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "Coop residents and guests only.",
+    "rating": null,
+    "notes": "Managed by Berkeley Student Cooperative \u00b7 ~<.25 acres \u00b7 Established 1967"
+  },
+  {
+    "id": "271-campus-garden-1",
+    "buildingId": 271,
+    "floorNumber": null,
+    "locationDetails": "The UC Village Kids Garden",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "Used by Early Childhood Education Program; not in use at the moment.",
+    "rating": null,
+    "notes": "Managed by UC Village \u00b7 ~<.25 acres \u00b7 Established 1999"
+  },
+  {
+    "id": "18-campus-garden-1",
+    "buildingId": 18,
+    "floorNumber": null,
+    "locationDetails": "Pat Brown Container Garden",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "N/A",
+    "rating": null,
+    "notes": "Managed by Cal Dining \u00b7 ~<.25 acres \u00b7 Established 2019"
+  },
+  {
+    "id": "25-campus-garden-1",
+    "buildingId": 25,
+    "floorNumber": null,
+    "locationDetails": "Fannie Lou Hamer Garden",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "N/A",
+    "rating": null,
+    "notes": "Managed by Fannie Lou Hamer Black Resource Center \u00b7 ~<.25 acres \u00b7 Established 2017"
+  },
+  {
+    "id": "9-campus-garden-1",
+    "buildingId": 9,
+    "floorNumber": null,
+    "locationDetails": "Faculty and Staff Community Garden",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "Refer to volunteer opportunities on the webpage",
+    "rating": null,
+    "notes": "Managed by University Health Services \u00b7 ~<.25 acres \u00b7 Established 2019"
+  },
+  {
+    "id": "1-campus-garden-1",
+    "buildingId": 1,
+    "floorNumber": null,
+    "locationDetails": "Basic Needs Indoor Herb Garden",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "Mon-Fri: 9am-5pm",
+    "rating": null,
+    "notes": "Managed by Basic Needs Garden \u00b7 ~<.25 acres \u00b7 Established 2019"
+  },
+  {
+    "id": "1-campus-garden-2",
+    "buildingId": 1,
+    "floorNumber": null,
+    "locationDetails": "Multicultural Community Center Garden",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "Open for visitors 24-7; contact MCC for specific workdays.",
+    "rating": null,
+    "notes": "Managed by Division of Equity and Inclusion \u00b7 ~<.25 acres \u00b7 Established 2017"
+  },
+  {
+    "id": "64-campus-garden-1",
+    "buildingId": 64,
+    "floorNumber": null,
+    "locationDetails": "Oxford Tract",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "Open for researchers, courses, or specific workdays (often Fridays)",
+    "rating": null,
+    "notes": "Managed by College of Natural Resources \u00b7 ~0.53 acres \u00b7 Established 1964"
+  },
+  {
+    "id": "286-campus-garden-1",
+    "buildingId": 286,
+    "floorNumber": null,
+    "locationDetails": "UC Berkeley Botanical Garden",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "Daily: 9am-5pm (no entry after 4:30pm)",
+    "rating": null,
+    "notes": "Managed by Perry Hall \u00b7 ~34 acres \u00b7 Established 1890"
+  },
+  {
+    "id": "291-campus-garden-1",
+    "buildingId": 291,
+    "floorNumber": null,
+    "locationDetails": "Clark Kerr Garden",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": "Fri 1-3pm, Sun 10am-12pm (Fall 2019)",
+    "rating": null,
+    "notes": "Managed by Clark Kerr Grounds; Cal Dining \u00b7 ~<.25 acres \u00b7 Established 2010"
+  }
+]

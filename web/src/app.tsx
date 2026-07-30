@@ -2,14 +2,21 @@ import { useEffect, useRef, useState } from "react"
 import type { FormEvent } from "react"
 import {
   ArrowLeftIcon,
+  BabyIcon,
   BookOpenIcon,
+  DropletIcon,
   DropletsIcon,
+  HeartHandshakeIcon,
   LogInIcon,
   LogOutIcon,
+  MicrowaveIcon,
   PlusIcon,
   PopcornIcon,
+  RecycleIcon,
   SettingsIcon,
+  SproutIcon,
   ToiletIcon,
+  UtensilsIcon,
 } from "lucide-react"
 
 import { CampusMap } from "@/components/campus-map"
@@ -45,12 +52,38 @@ import {
 
 type DrawerView = "search" | "building" | "restroom" | "create" | "settings"
 
-const amenityTypes = ["Restroom", "Water refill station", "Vending machine", "Study space"]
-const collapsedSnapPoint = "16rem"
+const amenityTypes = [
+  "Restroom",
+  "Water refill station",
+  "Vending machine",
+  "Study space",
+  "Lactation room",
+  "Microwave",
+  "Zero-waste station",
+  "Eatery",
+  "Campus garden",
+  "Basic needs service",
+  "Changing table",
+  "Menstrual product dispenser",
+]
+const collapsedSnapPoint = "5.75rem"
 const resultLimit = 50
 const nearestBuildingLimit = 3
 const earthRadiusMiles = 3_958.8
-const amenityTypeOrder: AmenityType[] = ["restroom", "waterRefillStation", "vendingMachine", "studySpace"]
+const amenityTypeOrder: AmenityType[] = [
+  "restroom",
+  "waterRefillStation",
+  "vendingMachine",
+  "studySpace",
+  "lactationRoom",
+  "microwave",
+  "zeroWasteStation",
+  "eatery",
+  "campusGarden",
+  "basicNeedService",
+  "changingTable",
+  "menstrualProduct",
+]
 
 type Coordinates = {
   latitude: number
@@ -62,6 +95,14 @@ const amenityTypeLabels: Record<AmenityType, { singular: string; plural: string 
   waterRefillStation: { singular: "Water refill station", plural: "Water refill stations" },
   vendingMachine: { singular: "Vending machine", plural: "Vending machines" },
   studySpace: { singular: "Study space", plural: "Study spaces" },
+  lactationRoom: { singular: "Lactation room", plural: "Lactation rooms" },
+  microwave: { singular: "Microwave", plural: "Microwaves" },
+  zeroWasteStation: { singular: "Zero-waste station", plural: "Zero-waste stations" },
+  eatery: { singular: "Eatery", plural: "Eateries" },
+  campusGarden: { singular: "Campus garden", plural: "Campus gardens" },
+  basicNeedService: { singular: "Basic needs service", plural: "Basic needs services" },
+  changingTable: { singular: "Changing table", plural: "Changing tables" },
+  menstrualProduct: { singular: "Menstrual product dispenser", plural: "Menstrual product dispensers" },
 }
 
 const amenityTypeIcons = {
@@ -69,13 +110,29 @@ const amenityTypeIcons = {
   waterRefillStation: DropletsIcon,
   vendingMachine: PopcornIcon,
   studySpace: BookOpenIcon,
+  lactationRoom: BabyIcon,
+  microwave: MicrowaveIcon,
+  zeroWasteStation: RecycleIcon,
+  eatery: UtensilsIcon,
+  campusGarden: SproutIcon,
+  basicNeedService: HeartHandshakeIcon,
+  changingTable: BabyIcon,
+  menstrualProduct: DropletIcon,
 } satisfies Record<AmenityType, typeof ToiletIcon>
 
 const buildingAmenityIcons = [
-  { amenityType: "restroom", countKey: "restrooms", label: "Restrooms available", Icon: amenityTypeIcons.restroom },
-  { amenityType: "waterRefillStation", countKey: "waterRefillStations", label: "Water refill stations available", Icon: amenityTypeIcons.waterRefillStation },
-  { amenityType: "vendingMachine", countKey: "vendingMachines", label: "Vending machines available", Icon: amenityTypeIcons.vendingMachine },
-  { amenityType: "studySpace", countKey: "studySpaces", label: "Study spaces available", Icon: amenityTypeIcons.studySpace },
+  { amenityType: "restroom", label: "Restrooms available", Icon: amenityTypeIcons.restroom },
+  { amenityType: "waterRefillStation", label: "Water refill stations available", Icon: amenityTypeIcons.waterRefillStation },
+  { amenityType: "vendingMachine", label: "Vending machines available", Icon: amenityTypeIcons.vendingMachine },
+  { amenityType: "studySpace", label: "Study spaces available", Icon: amenityTypeIcons.studySpace },
+  { amenityType: "lactationRoom", label: "Lactation rooms available", Icon: amenityTypeIcons.lactationRoom },
+  { amenityType: "microwave", label: "Microwaves available", Icon: amenityTypeIcons.microwave },
+  { amenityType: "zeroWasteStation", label: "Zero-waste stations available", Icon: amenityTypeIcons.zeroWasteStation },
+  { amenityType: "eatery", label: "Eateries available", Icon: amenityTypeIcons.eatery },
+  { amenityType: "campusGarden", label: "Campus gardens available", Icon: amenityTypeIcons.campusGarden },
+  { amenityType: "basicNeedService", label: "Basic needs services available", Icon: amenityTypeIcons.basicNeedService },
+  { amenityType: "changingTable", label: "Changing tables available", Icon: amenityTypeIcons.changingTable },
+  { amenityType: "menstrualProduct", label: "Menstrual product dispensers available", Icon: amenityTypeIcons.menstrualProduct },
 ] as const
 
 function distanceInMiles(first: Coordinates, second: Coordinates) {
@@ -92,6 +149,17 @@ function distanceInMiles(first: Coordinates, second: Coordinates) {
 
 function distanceLabel(distance: number) {
   return `${distance.toFixed(distance < 1 ? 2 : 1)} mi`
+}
+
+function distanceColor(distance: number) {
+  const feet = distance * 5280
+  if (feet <= 1000) return "#34A853"
+  if (feet <= 2640) return "#FBBC04"
+  return "#EA4335"
+}
+
+function DistanceLabel({ distance, className }: { distance: number; className?: string }) {
+  return <span className={className} style={{ color: distanceColor(distance) }}>{distanceLabel(distance)}</span>
 }
 
 function nearestBuildings(buildings: Building[], position: Coordinates): BuildingSearchResult[] {
@@ -219,15 +287,15 @@ function BuildingResult({
           {building.shortName && building.shortName !== building.name && <p className="mt-1 text-muted-foreground">{building.shortName}</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
-          {distance !== null && <span className="whitespace-nowrap font-medium text-muted-foreground">{distanceLabel(distance)}</span>}
+          {distance !== null && <DistanceLabel distance={distance} className="whitespace-nowrap text-xs font-medium" />}
           <div className="flex items-center gap-2">
             <Badge variant="secondary">
               {amenityCounts.total.toLocaleString()} {amenityCounts.total === 1 ? "amenity" : "amenities"}
             </Badge>
             {amenityCounts.total > 0 && (
               <div className="flex items-center gap-1" aria-label="Available amenity types">
-                {buildingAmenityIcons.map(({ countKey, label, Icon }) => amenityCounts[countKey] > 0 && (
-                  <span key={countKey} className="grid size-6 place-items-center text-foreground" aria-label={label} title={label}>
+                {buildingAmenityIcons.map(({ amenityType, label, Icon }) => amenityCounts[amenityType] > 0 && (
+                  <span key={amenityType} className="grid size-6 place-items-center text-foreground" aria-label={label} title={label}>
                     <Icon className="size-4" aria-hidden="true" />
                   </span>
                 ))}
@@ -364,7 +432,7 @@ function BuildingDetails({
     <article className="flex flex-col gap-5">
       <header className="flex items-start justify-between gap-4">
         <h2 className="min-w-0 font-heading text-xl font-medium">{building.name}</h2>
-        {distance !== null && <span className="shrink-0 whitespace-nowrap text-sm font-medium text-muted-foreground">{distanceLabel(distance)}</span>}
+        {distance !== null && <DistanceLabel distance={distance} className="shrink-0 whitespace-nowrap text-sm font-medium" />}
       </header>
 
       {amenities.length > 0 && (

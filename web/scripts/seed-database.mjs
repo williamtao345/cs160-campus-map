@@ -10,6 +10,14 @@ const amenitySources = [
   ["water-refill-stations.json", "waterRefillStation", "waterRefillStations"],
   ["vending-machines.json", "vendingMachine", "vendingMachines"],
   ["study-spaces.json", "studySpace", "studySpaces"],
+  ["lactation-rooms.json", "lactationRoom", "lactationRooms"],
+  ["microwaves.json", "microwave", "microwaves"],
+  ["zero-waste-stations.json", "zeroWasteStation", "zeroWasteStations"],
+  ["eateries.json", "eatery", "eateries"],
+  ["campus-gardens.json", "campusGarden", "campusGardens"],
+  ["basic-needs-services.json", "basicNeedService", "basicNeedServices"],
+  ["changing-tables.json", "changingTable", "changingTables"],
+  ["menstrual-products.json", "menstrualProduct", "menstrualProducts"],
 ]
 
 async function readJson(fileName) {
@@ -47,12 +55,9 @@ const amenities = sourceAmenities.map(({ branch, ...amenity }) => {
 const buildings = {}
 for (const building of buildingRecords) {
   const buildingAmenities = Object.values(amenitiesByBuilding[building.id] ?? {}).flatMap((branch) => Object.values(branch))
-  const amenityCounts = {
-    total: buildingAmenities.length,
-    restrooms: buildingAmenities.filter(({ amenityType }) => amenityType === "restroom").length,
-    waterRefillStations: buildingAmenities.filter(({ amenityType }) => amenityType === "waterRefillStation").length,
-    vendingMachines: buildingAmenities.filter(({ amenityType }) => amenityType === "vendingMachine").length,
-    studySpaces: buildingAmenities.filter(({ amenityType }) => amenityType === "studySpace").length,
+  const amenityCounts = { total: buildingAmenities.length }
+  for (const [, amenityType] of amenitySources) {
+    amenityCounts[amenityType] = buildingAmenities.filter((amenity) => amenity.amenityType === amenityType).length
   }
   const availableAmenityTypes = amenitySources
     .map(([, amenityType]) => amenityType)

@@ -1,0 +1,90 @@
+[
+  {
+    "id": "239-basic-need-service-1",
+    "buildingId": 239,
+    "floorNumber": null,
+    "locationDetails": "Cal Dining Food Recovery",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Cal Dining is partnering with the Basic Needs Center to donate overproduced food to the food pantry. \u00b7 Berkeley Residential and Housing Services (Student Affairs) \u00b7 http://caldining.berkeley.edu/sustainability/waste-reduction"
+  },
+  {
+    "id": "255-basic-need-service-1",
+    "buildingId": 255,
+    "floorNumber": null,
+    "locationDetails": "University Village Bear Pantry & Diaper Bank",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Resource at University Village serving UC Berkeley families with basic needs support (food, diapers, wipes, baby food, pet food, hygiene products, school supplies). \u00b7 UC Berkeley Housing (Student Affairs) \u00b7 universityvillage.berkeley.edu/bear-pantry"
+  },
+  {
+    "id": "1-basic-need-service-1",
+    "buildingId": 1,
+    "floorNumber": null,
+    "locationDetails": "CalFresh Clinics and Application Assistance",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Learn about and sign up for CalFresh, which provides up to $234 food dollars each month to qualifying individuals. \u00b7 Basic Needs Center (Equity and Inclusion) \u00b7 http://calfresh.berkeley.edu/"
+  },
+  {
+    "id": "1-basic-need-service-2",
+    "buildingId": 1,
+    "floorNumber": null,
+    "locationDetails": "Event Food Recovery",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Learn about how to ensure excess food from meetings and events does not go to waste. \u00b7 Basic Needs Center (Equity and Inclusion) \u00b7 https://food.berkeley.edu/programs/community-engagement-edu/food-recovery/"
+  },
+  {
+    "id": "1-basic-need-service-3",
+    "buildingId": 1,
+    "floorNumber": null,
+    "locationDetails": "UC Berkeley Food Pantry",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Established to help students in need of emergency food assistance. \u00b7 Basic Needs Center (Equity and Inclusion) \u00b7 http://pantry.berkeley.edu/"
+  },
+  {
+    "id": "14-basic-need-service-1",
+    "buildingId": 14,
+    "floorNumber": null,
+    "locationDetails": "Personal Food Security and Wellness (NST 20)",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Course addressing attitudes, knowledge, skills and barriers in food selection, purchasing and preparation. \u00b7 Nutritional Sciences and Toxicology (College of Natural Resources) \u00b7 http://guide.berkeley.edu/courses/nusctx/"
+  },
+  {
+    "id": "227-basic-need-service-1",
+    "buildingId": 227,
+    "floorNumber": null,
+    "locationDetails": "Emergency Food Assistance: Basic Needs Holistic Fund",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "The Basic Needs Holistic Fund offers emergency food assistance in the form of a direct student award. \u00b7 Basic Needs Center & Financial Aid and Scholarships Office (Equity and Inclusion) \u00b7 https://docs.google.com/document/d/1JD3AOyBM7ZpazTt7fhoKS4iynXPunwChAI_d-UFqaMA/edit"
+  },
+  {
+    "id": "242-basic-need-service-1",
+    "buildingId": 242,
+    "floorNumber": null,
+    "locationDetails": "Nutrition, Cooking, Budgeting Workshops and Demos",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Hands-on, interactive cooking classes highlighting student-friendly food skills, tips, and recipes. \u00b7 University Health Services (Student Affairs) \u00b7 https://uhs.berkeley.edu/counseling/sos/nutrition/events"
+  }
+]

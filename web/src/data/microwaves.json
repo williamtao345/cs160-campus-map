@@ -1,0 +1,145 @@
+[
+  {
+    "id": "26-microwave-1",
+    "buildingId": 26,
+    "floorNumber": null,
+    "locationDetails": "Cory Hall Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "In TeaOne Cafe"
+  },
+  {
+    "id": "43-microwave-1",
+    "buildingId": 43,
+    "floorNumber": null,
+    "locationDetails": "Davis Hall Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "In room 602"
+  },
+  {
+    "id": "3-microwave-1",
+    "buildingId": 3,
+    "floorNumber": null,
+    "locationDetails": "Common Grounds Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Top floor of Dwinelle Hall"
+  },
+  {
+    "id": "42-microwave-1",
+    "buildingId": 42,
+    "floorNumber": null,
+    "locationDetails": "Terrace Cafe Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Inside Terrace Cafe"
+  },
+  {
+    "id": "1-microwave-1",
+    "buildingId": 1,
+    "floorNumber": null,
+    "locationDetails": "Basic Needs Center Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Basement of MLK Jr. Student Union (bNorth), in kitchen. Need Cal1 ID"
+  },
+  {
+    "id": "31-microwave-1",
+    "buildingId": 31,
+    "floorNumber": null,
+    "locationDetails": "Physics South and Physics North Microwaves",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "In lounge/break area next to room 402"
+  },
+  {
+    "id": "204-microwave-1",
+    "buildingId": 204,
+    "floorNumber": null,
+    "locationDetails": "The Pro Shop Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Inside the Pro Shop at Recreational Sports Facility"
+  },
+  {
+    "id": "197-microwave-1",
+    "buildingId": 197,
+    "floorNumber": null,
+    "locationDetails": "Soda Hall Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "In room 311 CSUA, room 562 Cafe Diem, room 678 kitchen, and room 728 kitchen"
+  },
+  {
+    "id": "228-microwave-1",
+    "buildingId": 228,
+    "floorNumber": null,
+    "locationDetails": "Golden Bear Cafe Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Inside Golden Bear Cafe"
+  },
+  {
+    "id": "228-microwave-2",
+    "buildingId": 228,
+    "floorNumber": null,
+    "locationDetails": "Transfer Center Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "Next to Cal 1 Card Office"
+  },
+  {
+    "id": "5-microwave-1",
+    "buildingId": 5,
+    "floorNumber": null,
+    "locationDetails": "Valley Life Sciences Building Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "In Micro Yali's cafe; pay 50 cents to use"
+  },
+  {
+    "id": "84-microwave-1",
+    "buildingId": 84,
+    "floorNumber": null,
+    "locationDetails": "Haas School of Business Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "In room F371"
+  },
+  {
+    "id": "318-microwave-1",
+    "buildingId": 318,
+    "floorNumber": null,
+    "locationDetails": "Foothill Student Housing 6 Microwave",
+    "isAvailable": true,
+    "accessible": null,
+    "operatingHours": null,
+    "rating": null,
+    "notes": "In dining hall TV room"
+  }
+]

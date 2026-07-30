@@ -2,15 +2,21 @@ import { get, ref } from "firebase/database"
 
 import { getFirebaseDatabase } from "@/lib/firebase"
 
-export type AmenityType = "restroom" | "waterRefillStation" | "vendingMachine" | "studySpace"
+export type AmenityType =
+  | "restroom"
+  | "waterRefillStation"
+  | "vendingMachine"
+  | "studySpace"
+  | "lactationRoom"
+  | "microwave"
+  | "zeroWasteStation"
+  | "eatery"
+  | "campusGarden"
+  | "basicNeedService"
+  | "changingTable"
+  | "menstrualProduct"
 
-export type AmenityCounts = {
-  total: number
-  restrooms: number
-  waterRefillStations: number
-  vendingMachines: number
-  studySpaces: number
-}
+export type AmenityCounts = { total: number } & Record<AmenityType, number>
 
 export type Building = {
   id: number
@@ -63,12 +69,33 @@ export type BuildingSearchResult = {
   amenityCounts: AmenityCounts
 }
 
-const amenityTypes: AmenityType[] = ["restroom", "waterRefillStation", "vendingMachine", "studySpace"]
+const amenityTypes: AmenityType[] = [
+  "restroom",
+  "waterRefillStation",
+  "vendingMachine",
+  "studySpace",
+  "lactationRoom",
+  "microwave",
+  "zeroWasteStation",
+  "eatery",
+  "campusGarden",
+  "basicNeedService",
+  "changingTable",
+  "menstrualProduct",
+]
 const amenityBranches: Record<AmenityType, string> = {
   restroom: "restrooms",
   waterRefillStation: "waterRefillStations",
   vendingMachine: "vendingMachines",
   studySpace: "studySpaces",
+  lactationRoom: "lactationRooms",
+  microwave: "microwaves",
+  zeroWasteStation: "zeroWasteStations",
+  eatery: "eateries",
+  campusGarden: "campusGardens",
+  basicNeedService: "basicNeedServices",
+  changingTable: "changingTables",
+  menstrualProduct: "menstrualProducts",
 }
 const restroomCategories: Restroom["category"][] = ["women", "men", "genderInclusive"]
 
@@ -133,11 +160,13 @@ function parseBuilding(value: unknown, documentId: string): Building {
     },
     amenityCounts: {
       total: numberValue(counts.total, `total amenity count for building ${documentId}`),
-      restrooms: numberValue(counts.restrooms, `restroom count for building ${documentId}`),
-      waterRefillStations: numberValue(counts.waterRefillStations, `water refill station count for building ${documentId}`),
-      vendingMachines: numberValue(counts.vendingMachines, `vending machine count for building ${documentId}`),
-      studySpaces: numberValue(counts.studySpaces, `study space count for building ${documentId}`),
-    },
+      ...Object.fromEntries(
+        amenityTypes.map((amenityType) => [
+          amenityType,
+          numberValue(counts[amenityType], `${amenityType} count for building ${documentId}`),
+        ]),
+      ),
+    } as AmenityCounts,
     availableAmenityTypes: availableTypes.map((type) => enumValue(type, amenityTypes, `amenity type for building ${documentId}`)),
   }
 }
@@ -219,6 +248,14 @@ const amenitySearchTerms: Record<AmenityType, string> = {
   waterRefillStation: "water refill station stations bottle filling",
   vendingMachine: "vending machine machines",
   studySpace: "study space spaces",
+  lactationRoom: "lactation room rooms nursing",
+  microwave: "microwave microwaves",
+  zeroWasteStation: "zero waste station stations recycling compost",
+  eatery: "eatery eateries food cafe restaurant dining",
+  campusGarden: "campus garden gardens",
+  basicNeedService: "basic needs service services food pantry",
+  changingTable: "changing table tables diaper",
+  menstrualProduct: "menstrual product products period",
 }
 
 export function searchBuildings(buildings: Building[], queryValue: string) {
