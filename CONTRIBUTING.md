@@ -14,6 +14,9 @@
 
 ## Commits
 
+- Limit each commit to one coherent feature, fix, refactor, data update, or documentation change.
+- Split unrelated UI, behavior, data, and cleanup changes into separate commits, even when they belong to the same pull request.
+- Keep each commit independently understandable and reviewable; do not include opportunistic cleanup in a feature commit.
 - Use Conventional Commits: `type(scope): summary`.
 - Example: `feat(web): add project dashboard`.
 - Common types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
