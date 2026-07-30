@@ -68,7 +68,7 @@ const amenityTypes = [
   "Changing table",
   "Menstrual product dispenser",
 ]
-const collapsedSnapPoint = "5.75rem"
+const collapsedSnapPoint = "16rem"
 const resultLimit = 50
 const nearestBuildingLimit = 3
 const earthRadiusMiles = 3_958.8

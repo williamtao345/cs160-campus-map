@@ -9,6 +9,12 @@ A mobile campus amenity map that helps UC Berkeley students quickly find nearby 
 - View building, floor, and indoor location details
 - Share reviews, photos, and issue reports to keep information accurate
 
+## Design constraints
+
+- Treat the application as mobile-first and use one shared sizing and layout system across viewport sizes.
+- Do not add desktop-specific sizing, breakpoint-based layout variants, or root font-size overrides. Desktop should inherit the mobile design unless the team agrees to a specific exception.
+- Keep the collapsed drawer snap point at `16rem`; it is intentionally shared by mobile and desktop.
+
 ## Run locally
 
 Install the frontend dependencies exactly from the lockfile:
