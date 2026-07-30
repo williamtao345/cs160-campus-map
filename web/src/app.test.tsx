@@ -367,6 +367,39 @@ describe("campus map app", () => {
     expect(screen.getByRole("button", { name: /Cory Hall.*14 amenities/i })).toBeInTheDocument()
   })
 
+  it("collapses the drawer to view a route from restroom details", async () => {
+    const user = userEvent.setup()
+    await renderApp()
+    const drawer = document.querySelector('[data-slot="drawer-popup"]')
+
+    await user.type(screen.getByRole("searchbox"), "Cory Hall")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /Cory Hall.*14 amenities/i }))
+    await user.click(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0])
+
+    const viewRoute = screen.getByRole("button", { name: "View route" })
+    expect(viewRoute.querySelector(".lucide-route")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Back" })).toBeInTheDocument()
+
+    await user.click(viewRoute)
+
+    expect(drawer).not.toHaveAttribute("data-expanded")
+    expect(screen.queryByRole("button", { name: "View route" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument()
+    const expand = screen.getByRole("button", { name: "Expand" })
+    expect(expand.querySelector(".lucide-chevrons-up-down")).toBeInTheDocument()
+
+    await user.click(expand)
+    expect(drawer).toHaveAttribute("data-expanded", "")
+    expect(screen.getByRole("button", { name: "Back" })).toBeInTheDocument()
+
+    await user.click(screen.getByRole("button", { name: "Back" }))
+    await user.click(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0])
+
+    expect(drawer).toHaveAttribute("data-expanded", "")
+    expect(screen.getByRole("button", { name: "View route" })).toBeInTheDocument()
+  })
+
   it("searches short building names and returns each eligible building once", async () => {
     const user = userEvent.setup()
     await renderApp()

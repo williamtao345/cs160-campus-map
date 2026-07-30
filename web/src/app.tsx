@@ -4,6 +4,7 @@ import {
   ArrowLeftIcon,
   BabyIcon,
   BookOpenIcon,
+  ChevronsUpDownIcon,
   DropletIcon,
   DropletsIcon,
   HeartHandshakeIcon,
@@ -13,6 +14,7 @@ import {
   PlusIcon,
   PopcornIcon,
   RecycleIcon,
+  RouteIcon,
   SettingsIcon,
   SproutIcon,
   ToiletIcon,
@@ -505,7 +507,15 @@ function BuildingDetails({
   )
 }
 
-function RestroomDetails({ restroom }: { restroom: Restroom }) {
+function RestroomDetails({
+  isDrawerExpanded,
+  onToggleDrawer,
+  restroom,
+}: {
+  isDrawerExpanded: boolean
+  onToggleDrawer: () => void
+  restroom: Restroom
+}) {
   const details = [
     ...(restroom.floorNumber ? [["Floor", restroom.floorNumber]] : []),
     ...(restroom.roomNumber ? [["Room number", restroom.roomNumber]] : []),
@@ -517,7 +527,15 @@ function RestroomDetails({ restroom }: { restroom: Restroom }) {
   return (
     <article className="space-y-5">
       <header className="space-y-1">
-        <h2 className="font-heading text-xl font-medium">{categoryLabel(restroom.category)} restroom</h2>
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="font-heading text-xl font-medium">{categoryLabel(restroom.category)} restroom</h2>
+          <Button type="button" size="lg" onClick={onToggleDrawer}>
+            {isDrawerExpanded
+              ? <RouteIcon data-icon="inline-start" aria-hidden="true" />
+              : <ChevronsUpDownIcon data-icon="inline-start" aria-hidden="true" />}
+            {isDrawerExpanded ? "View route" : "Expand"}
+          </Button>
+        </div>
         <p className="text-sm text-muted-foreground">{restroom.building.name}</p>
       </header>
       <dl className="space-y-3 text-sm">
@@ -896,7 +914,7 @@ export function App() {
           <DrawerDescription className="sr-only">Search, view, and add campus amenities.</DrawerDescription>
           <div className="drawer-main-content flex-1 overflow-y-auto overscroll-contain p-4">
             <div className="mx-auto max-w-lg">
-              {view !== "search" && (
+              {view !== "search" && snapPoint === 1 && (
                 <Button type="button" variant="outline" className="mb-5" onClick={goBack}>
                   <ArrowLeftIcon aria-hidden="true" />
                   Back
@@ -944,7 +962,13 @@ export function App() {
                   />
                 )
               )}
-              {view === "restroom" && selectedRestroom && <RestroomDetails restroom={selectedRestroom} />}
+              {view === "restroom" && selectedRestroom && (
+                <RestroomDetails
+                  isDrawerExpanded={snapPoint === 1}
+                  onToggleDrawer={() => setSnapPoint(snapPoint === 1 ? collapsedSnapPoint : 1)}
+                  restroom={selectedRestroom}
+                />
+              )}
               {view === "create" && <CreateAmenityForm buildings={buildings} />}
               {view === "settings" && (
                 <SettingsView
