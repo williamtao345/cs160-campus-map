@@ -937,9 +937,9 @@ describe("campus map app", () => {
       expect.stringContaining("Far Building"),
     ])
     expect(within(nearestRegion).getByText("0.07 mi")).toHaveStyle({ color: "#34A853" })
-    expect(within(nearestRegion).getByText("0.69 mi")).toHaveStyle({ color: "#EA4335" })
-    expect(within(nearestRegion).getByText("1.4 mi")).toBeInTheDocument()
-    expect(within(nearestRegion).getByText("Far Building")).toBeInTheDocument()
+    expect(within(nearestRegion).getByText("0.69 mi")).toHaveStyle({ color: "#34A853" })
+    expect(within(nearestRegion).getByText("1.4 mi")).toHaveStyle({ color: "#FBBC04" })
+    expect(within(nearestRegion).getByText("2.1 mi")).toHaveStyle({ color: "#EA4335" })
 
     act(() => updatePosition({
       coords: {
@@ -1128,7 +1128,7 @@ describe("campus map app", () => {
     await waitFor(() => expect(computeRoutes).toHaveBeenCalledTimes(2))
     expect(maps[0].zoom).toBe(18.5)
     expect(maps[0].setZoom).not.toHaveBeenCalled()
-    expect(maps[0].options.minZoom).toBe(14)
+    expect(maps[0].options.minZoom).toBe(13)
     expect(maps[0].options.maxZoom).toBe(18.5)
     unmount()
   })

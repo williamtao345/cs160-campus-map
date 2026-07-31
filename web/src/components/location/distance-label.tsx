@@ -5,9 +5,8 @@ function distanceLabel(distance: number) {
 }
 
 function distanceColor(distance: number) {
-  const feet = distance * 5280
-  if (feet <= 1000) return "#34A853"
-  if (feet <= 2640) return "#FBBC04"
+  if (distance <= 1) return "#34A853"
+  if (distance <= 2) return "#FBBC04"
   return "#EA4335"
 }
 
