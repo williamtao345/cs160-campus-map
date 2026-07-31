@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { App } from "@/app"
 import { loadAmenitiesForBuilding, loadBuildings, searchBuildings } from "@/data/amenities"
+import { createAmenityReview, observeAmenityReviews, type AmenityReview } from "@/data/reviews"
 import {
   authenticationErrorMessage,
   observeAuthState,
@@ -26,12 +27,37 @@ vi.mock("@/lib/auth", () => ({
   signOutCurrentUser: vi.fn(),
 }))
 
+vi.mock("@/data/reviews", () => ({
+  createAmenityReview: vi.fn(),
+  observeAmenityReviews: vi.fn(),
+}))
+
 const signedInUser: AuthUser = {
   uid: "google-user-1",
   displayName: "Test User",
   email: "test.user@example.com",
   photoURL: "https://example.com/avatar.jpg",
 }
+const reviews: AmenityReview[] = [
+  {
+    id: "review-1",
+    userId: "google-user-2",
+    authorName: "Maya Chen",
+    authorPhotoURL: "https://example.com/maya.jpg",
+    rating: 5,
+    comment: "Easy to locate, and the information on this page matched what I found.",
+    createdAt: Date.UTC(2026, 6, 24),
+  },
+  {
+    id: "review-2",
+    userId: "google-user-3",
+    authorName: "Jordan Lee",
+    authorPhotoURL: null,
+    rating: 4,
+    comment: "The location details were helpful. It was a little busy when I visited.",
+    createdAt: Date.UTC(2026, 6, 18),
+  },
+]
 
 function deferred<T>() {
   let resolve!: (value: T) => void
@@ -234,6 +260,11 @@ describe("campus map app", () => {
       onChange(null)
       return vi.fn()
     })
+    vi.mocked(observeAmenityReviews).mockImplementation((_buildingId, _amenityType, _amenityId, onChange) => {
+      onChange(reviews)
+      return vi.fn()
+    })
+    vi.mocked(createAmenityReview).mockResolvedValue()
     vi.mocked(signInWithGoogle).mockResolvedValue(signedInUser)
     vi.mocked(signOutCurrentUser).mockResolvedValue()
   })
@@ -447,7 +478,7 @@ describe("campus map app", () => {
     expect(screen.queryByRole("textbox", { name: "Comment" })).not.toBeInTheDocument()
   })
 
-  it("lets signed-in users draft a rating and comment in a dialog", async () => {
+  it("lets signed-in users submit a rating and comment", async () => {
     const user = userEvent.setup()
     vi.mocked(observeAuthState).mockImplementation((onChange) => {
       onChange(signedInUser)
@@ -470,8 +501,60 @@ describe("campus map app", () => {
 
     expect(fourStars).toHaveAttribute("aria-pressed", "true")
     expect(comment).toHaveValue("Easy to find and well maintained.")
-    expect(within(reviewDialog).getByText("Review submission is not enabled in this prototype.")).toBeInTheDocument()
-    expect(within(reviewDialog).getByRole("button", { name: "Reviews unavailable" })).toBeDisabled()
+    expect(within(reviewDialog).getByText("Your name, profile photo, rating, and comment will be public.")).toBeInTheDocument()
+
+    await user.click(within(reviewDialog).getByRole("button", { name: "Post review" }))
+
+    await waitFor(() => expect(createAmenityReview).toHaveBeenCalledWith(expect.objectContaining({
+      user: signedInUser,
+      rating: 4,
+      comment: "Easy to find and well maintained.",
+    })))
+    expect(screen.queryByRole("dialog", { name: "Write a review" })).not.toBeInTheDocument()
+  })
+
+  it("keeps a review draft open when submission fails", async () => {
+    const user = userEvent.setup()
+    vi.mocked(observeAuthState).mockImplementation((onChange) => {
+      onChange(signedInUser)
+      return vi.fn()
+    })
+    vi.mocked(createAmenityReview).mockRejectedValueOnce(new Error("Permission denied"))
+    await renderApp()
+
+    await user.type(screen.getByRole("searchbox"), "Cory Hall")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /Cory Hall.*14 amenities/i }))
+    await user.click(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0])
+    await user.click(screen.getByRole("button", { name: "Write a review" }))
+
+    const reviewDialog = screen.getByRole("dialog", { name: "Write a review" })
+    await user.click(within(reviewDialog).getByRole("button", { name: "4 stars" }))
+    await user.type(within(reviewDialog).getByRole("textbox", { name: "Comment" }), "Keep this draft.")
+    await user.click(within(reviewDialog).getByRole("button", { name: "Post review" }))
+
+    expect(await within(reviewDialog).findByRole("alert")).toHaveTextContent("Review could not be submitted")
+    expect(within(reviewDialog).getByRole("textbox", { name: "Comment" })).toHaveValue("Keep this draft.")
+  })
+
+  it("retries a failed review subscription", async () => {
+    const user = userEvent.setup()
+    vi.mocked(observeAmenityReviews).mockImplementationOnce((_buildingId, _amenityType, _amenityId, _onChange, onError) => {
+      onError(new Error("Permission denied"))
+      return vi.fn()
+    })
+    await renderApp()
+
+    await user.type(screen.getByRole("searchbox"), "Cory Hall")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /Cory Hall.*14 amenities/i }))
+    await user.click(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0])
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Reviews could not be loaded")
+    await user.click(screen.getByRole("button", { name: "Try again" }))
+
+    expect(await screen.findByText("2 reviews")).toBeInTheDocument()
+    expect(observeAmenityReviews).toHaveBeenCalledTimes(2)
   })
 
   it("searches short building names and returns each eligible building once", async () => {

@@ -69,6 +69,8 @@ export function AmenityDetailsPage({
       </dl>
 
       <AmenityReviews
+        buildingId={amenity.buildingId}
+        amenityType={amenity.amenityType}
         amenityId={amenity.id}
         authUser={authUser}
         isAuthLoading={isAuthLoading}

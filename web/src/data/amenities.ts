@@ -97,6 +97,10 @@ const amenityBranches: Record<AmenityType, string> = {
   changingTable: "changingTables",
   menstrualProduct: "menstrualProducts",
 }
+
+export function amenityBranchForType(amenityType: AmenityType) {
+  return amenityBranches[amenityType]
+}
 const restroomCategories: Restroom["category"][] = ["women", "men", "genderInclusive"]
 
 function recordValue(value: unknown, description: string): Record<string, unknown> {

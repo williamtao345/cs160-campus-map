@@ -36,7 +36,7 @@ Start the Vite development server:
 npm run dev
 ```
 
-The application reads `/buildings` when it starts and reads `/amenitiesByBuilding/{buildingId}` when a building is opened. Building records use non-numeric keys such as `building_200`, while retaining their numeric `id` field. Amenities within a building are grouped under `restrooms`, `waterRefillStations`, `vendingMachines`, and `studySpaces`. If Firebase is not configured, the app displays a setup error instead of making a request.
+The application reads `/buildings` when it starts, reads `/amenitiesByBuilding/{buildingId}` when a building is opened, and subscribes to `/reviewsByAmenity/{buildingId}/{amenityBranch}/{amenityId}` when an amenity is opened. Building records use non-numeric keys such as `building_200`, while retaining their numeric `id` field. Amenities and their reviews are grouped under category branches such as `restrooms`, `waterRefillStations`, `vendingMachines`, and `studySpaces`. If Firebase is not configured, the app displays a setup error instead of making a request.
 
 ## Set up Google sign-in
 
@@ -48,7 +48,7 @@ In Firebase Console, open **Authentication**, select **Sign-in method**, and ena
 
 The browser signs users in directly through Firebase Authentication and Google. Firebase configuration values in `.env` are public project identifiers, not administrator credentials. The app uses Firebase's local authentication persistence, so a session remains available after a reload until the user explicitly signs out.
 
-Authentication currently identifies the user only. Amenity submissions remain disabled, and Realtime Database rules continue to deny all browser writes.
+Authentication identifies review authors and protects review ownership. Signed-in users can submit multiple immutable reviews for an amenity; amenity submissions remain disabled.
 
 ## Set up Realtime Database
 
@@ -73,7 +73,7 @@ Alternatively, an existing Google Cloud CLI login can provide a short-lived toke
 FIREBASE_PROJECT_ID=YOUR_PROJECT_ID FIREBASE_DATABASE_URL=https://YOUR_PROJECT-default-rtdb.firebaseio.com FIREBASE_ACCESS_TOKEN="$(gcloud auth print-access-token)" npm run seed:database
 ```
 
-The seed is idempotent and replaces only the `/buildings` and `/amenitiesByBuilding` nodes. The deployed rules permit public reads of those nodes and deny every client write. The Admin SDK or Google Cloud access token used by the seed script authenticates outside those client rules.
+The seed is idempotent and replaces only the `/buildings` and `/amenitiesByBuilding` nodes, so it does not remove reviews. The deployed rules permit public reads of campus data and reviews. They permit an authenticated user to create a review only when its `userId` matches the user's Firebase Authentication UID; reviews cannot be changed or deleted from the browser. The Admin SDK or Google Cloud access token used by the seed script authenticates outside those client rules.
 
 The development server always uses port `5173`. When developing in WSL, open the displayed Local URL in the Windows browser. If Windows localhost forwarding is disabled, use the displayed Network URL and add that exact origin to the API key's website restrictions. Run `hostname -I` in WSL to find the current address; it can change after WSL restarts.
 
