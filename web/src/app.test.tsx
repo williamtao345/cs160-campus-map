@@ -502,12 +502,19 @@ describe("campus map app", () => {
     }
   })
 
-  it("shows available GSPP restrooms, its water station, and Evans vending machines", async () => {
+  it("opens general amenity details and shows Evans vending machines", async () => {
     const user = userEvent.setup()
     vi.mocked(loadAmenitiesForBuilding).mockImplementation(async (building) => (
       amenities
         .filter((amenity) => amenity.buildingId === building.id)
-        .map((amenity) => amenity.amenityType === "waterRefillStation" ? { ...amenity, accessible: true } : amenity)
+        .map((amenity) => amenity.amenityType === "waterRefillStation" ? {
+          ...amenity,
+          floorNumber: "1",
+          accessible: true,
+          operatingHours: "Mon-Fri: 8am - 5pm",
+          rating: 4,
+          notes: "Near the main entrance",
+        } : amenity)
     ))
     await renderApp()
     const searchbox = screen.getByRole("searchbox")
@@ -520,9 +527,24 @@ describe("campus map app", () => {
     expect(screen.getByRole("heading", { name: "1 Water refill station" })).toBeInTheDocument()
     expect(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0].querySelector(".lucide-toilet")).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "Water refill station", level: 4 }).querySelector(".lucide-droplets")).toBeInTheDocument()
-    expect(screen.getByText("Goldman School of Public Policy")).toBeInTheDocument()
+    expect(screen.getByText(/Goldman School of Public Policy/)).toBeInTheDocument()
     expect(screen.getAllByText("Available")).toHaveLength(4)
     expect(screen.queryByText(/^Accessible$/)).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole("button", { name: /Water refill station.*Floor 1.*Goldman School of Public Policy/i }))
+
+    expect(screen.getByRole("heading", { name: "Water refill station" })).toBeInTheDocument()
+    expect(screen.getByText("Location")).toBeInTheDocument()
+    expect(screen.getByText("Goldman School of Public Policy")).toBeInTheDocument()
+    expect(screen.getByText("Accessibility")).toBeInTheDocument()
+    expect(screen.getByText("Accessible")).toBeInTheDocument()
+    expect(screen.getByText("Operating hours")).toBeInTheDocument()
+    expect(screen.getByText("Mon-Fri: 8am - 5pm")).toBeInTheDocument()
+    expect(screen.getByText("4/5")).toBeInTheDocument()
+    expect(screen.getByText("Near the main entrance")).toBeInTheDocument()
+
+    await user.click(screen.getByRole("button", { name: "Back" }))
+    expect(screen.getByRole("heading", { name: "2607 Hearst Avenue" })).toBeInTheDocument()
 
     await user.click(screen.getByRole("button", { name: "Back" }))
     const returnedSearchbox = screen.getByRole("searchbox")

@@ -2,7 +2,7 @@ import { amenityTypeIcons, amenityTypeLabels, restroomCategoryLabel } from "@/co
 import type { Amenity } from "@/data/amenities"
 import { AvailabilityBadge } from "@/pages/building/availability-badge"
 
-export function AmenityResult({ amenity, onSelect }: { amenity: Amenity; onSelect?: () => void }) {
+export function AmenityResult({ amenity, onSelect }: { amenity: Amenity; onSelect: () => void }) {
   const Icon = amenityTypeIcons[amenity.amenityType]
   const title = amenity.amenityType === "restroom"
     ? `${restroomCategoryLabel(amenity.category)} restroom`
@@ -28,13 +28,9 @@ export function AmenityResult({ amenity, onSelect }: { amenity: Amenity; onSelec
     </>
   )
 
-  if (onSelect) {
-    return (
-      <button type="button" className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-left text-sm text-card-foreground outline-none ring-1 ring-foreground/10 transition-colors hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50" onClick={onSelect}>
-        {content}
-      </button>
-    )
-  }
-
-  return <article className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-sm text-card-foreground ring-1 ring-foreground/10">{content}</article>
+  return (
+    <button type="button" className="flex w-full items-start justify-between gap-4 rounded-xl bg-card p-3 text-left text-sm text-card-foreground outline-none ring-1 ring-foreground/10 transition-colors hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50" onClick={onSelect}>
+      {content}
+    </button>
+  )
 }

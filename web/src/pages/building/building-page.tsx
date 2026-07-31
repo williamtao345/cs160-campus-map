@@ -40,7 +40,7 @@ export function BuildingPage({
   amenities: Amenity[]
   position: Coordinates | null
   preferredCategory: Restroom["category"] | null
-  onSelectAmenity: (restroom: Restroom) => void
+  onSelectAmenity: (amenity: Amenity) => void
 }) {
   const [selectedAmenityType, setSelectedAmenityType] = useState<AmenityType | "all">("all")
   const [selectedLevel, setSelectedLevel] = useState("all")
@@ -146,7 +146,7 @@ export function BuildingPage({
                 <AmenityResult
                   key={amenity.id}
                   amenity={amenity}
-                  onSelect={amenity.amenityType === "restroom" ? () => onSelectAmenity(amenity) : undefined}
+                  onSelect={() => onSelectAmenity(amenity)}
                 />
               ))}
             </div>

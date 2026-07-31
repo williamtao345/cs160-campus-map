@@ -4,7 +4,7 @@ import { AppActions } from "@/components/app-actions"
 import { CampusDrawer, collapsedSnapPoint } from "@/components/campus-drawer"
 import { CampusMap } from "@/components/campus-map"
 import { Button } from "@/components/ui/button"
-import type { Building, Restroom } from "@/data/amenities"
+import type { Amenity, Building, Restroom } from "@/data/amenities"
 import { useAuthSession } from "@/hooks/use-auth-session"
 import { useBuildingAmenities } from "@/hooks/use-building-amenities"
 import { useBuildings } from "@/hooks/use-buildings"
@@ -33,7 +33,7 @@ export function App() {
   } = useBuildings()
   const [view, setView] = useState<DrawerView>("search")
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null)
-  const [selectedAmenity, setSelectedAmenity] = useState<Restroom | null>(null)
+  const [selectedAmenity, setSelectedAmenity] = useState<Amenity | null>(null)
   const {
     amenities: selectedAmenities,
     error: amenityLoadError,
