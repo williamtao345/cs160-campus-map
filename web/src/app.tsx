@@ -163,6 +163,10 @@ export function App() {
             isDrawerExpanded={snapPoint === 1}
             onToggleDrawer={() => setSnapPoint(snapPoint === 1 ? collapsedSnapPoint : 1)}
             amenity={selectedAmenity}
+            authUser={authUser}
+            isAuthLoading={isAuthLoading}
+            isAuthPending={isAuthPending}
+            onSignIn={() => void signInUser()}
           />
         )}
         {view === "create" && <CreateAmenityPage buildings={buildings} />}

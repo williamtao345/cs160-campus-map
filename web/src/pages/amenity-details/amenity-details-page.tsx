@@ -3,15 +3,25 @@ import { ChevronsUpDownIcon, RouteIcon } from "lucide-react"
 import { amenityTypeIcons, amenityTypeLabels, restroomCategoryLabel } from "@/components/amenities/amenity-metadata"
 import { Button } from "@/components/ui/button"
 import type { Amenity } from "@/data/amenities"
+import type { AuthUser } from "@/lib/auth"
+import { AmenityReviews } from "@/pages/amenity-details/amenity-reviews"
 
 export function AmenityDetailsPage({
   isDrawerExpanded,
   onToggleDrawer,
   amenity,
+  authUser,
+  isAuthLoading,
+  isAuthPending,
+  onSignIn,
 }: {
   isDrawerExpanded: boolean
   onToggleDrawer: () => void
   amenity: Amenity
+  authUser: AuthUser | null
+  isAuthLoading: boolean
+  isAuthPending: boolean
+  onSignIn: () => void
 }) {
   const Icon = amenityTypeIcons[amenity.amenityType]
   const title = amenity.amenityType === "restroom"
@@ -57,6 +67,14 @@ export function AmenityDetailsPage({
           </div>
         ))}
       </dl>
+
+      <AmenityReviews
+        amenityId={amenity.id}
+        authUser={authUser}
+        isAuthLoading={isAuthLoading}
+        isAuthPending={isAuthPending}
+        onSignIn={onSignIn}
+      />
     </article>
   )
 }

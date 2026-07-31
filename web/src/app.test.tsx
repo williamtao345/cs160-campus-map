@@ -428,6 +428,52 @@ describe("campus map app", () => {
     expect(screen.getByRole("button", { name: "View route" })).toBeInTheDocument()
   })
 
+  it("asks signed-out users to sign in before leaving a review", async () => {
+    const user = userEvent.setup()
+    await renderApp()
+
+    await user.type(screen.getByRole("searchbox"), "Cory Hall")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /Cory Hall.*14 amenities/i }))
+    await user.click(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0])
+
+    expect(screen.getByRole("heading", { name: "Reviews" })).toBeInTheDocument()
+    expect(screen.getByText("2 reviews")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Maya Chen" })).toBeInTheDocument()
+    expect(screen.getByText("Easy to locate, and the information on this page matched what I found.")).toBeInTheDocument()
+    expect(screen.getByLabelText("5 out of 5 stars")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Sign in to review" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Write a review" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("textbox", { name: "Comment" })).not.toBeInTheDocument()
+  })
+
+  it("lets signed-in users draft a rating and comment in a dialog", async () => {
+    const user = userEvent.setup()
+    vi.mocked(observeAuthState).mockImplementation((onChange) => {
+      onChange(signedInUser)
+      return vi.fn()
+    })
+    await renderApp()
+
+    await user.type(screen.getByRole("searchbox"), "Cory Hall")
+    await user.click(screen.getByRole("button", { name: "Search" }))
+    await user.click(screen.getByRole("button", { name: /Cory Hall.*14 amenities/i }))
+    await user.click(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0])
+    await user.click(screen.getByRole("button", { name: "Write a review" }))
+
+    const reviewDialog = screen.getByRole("dialog", { name: "Write a review" })
+    expect(document.querySelector('[data-slot="dialog-overlay"]')).toBeInTheDocument()
+    const fourStars = within(reviewDialog).getByRole("button", { name: "4 stars" })
+    const comment = within(reviewDialog).getByRole("textbox", { name: "Comment" })
+    await user.click(fourStars)
+    await user.type(comment, "Easy to find and well maintained.")
+
+    expect(fourStars).toHaveAttribute("aria-pressed", "true")
+    expect(comment).toHaveValue("Easy to find and well maintained.")
+    expect(within(reviewDialog).getByText("Review submission is not enabled in this prototype.")).toBeInTheDocument()
+    expect(within(reviewDialog).getByRole("button", { name: "Reviews unavailable" })).toBeDisabled()
+  })
+
   it("searches short building names and returns each eligible building once", async () => {
     const user = userEvent.setup()
     await renderApp()
