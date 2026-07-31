@@ -62,8 +62,14 @@ for (const building of buildingRecords) {
   const availableAmenityTypes = amenitySources
     .map(([, amenityType]) => amenityType)
     .filter((amenityType) => buildingAmenities.some((amenity) => amenity.amenityType === amenityType))
+  const restrooms = buildingAmenities.filter((amenity) => amenity.amenityType === "restroom")
+  const restroomCategoryCounts = {
+    women: restrooms.filter((restroom) => restroom.category === "women").length,
+    men: restrooms.filter((restroom) => restroom.category === "men").length,
+    genderInclusive: restrooms.filter((restroom) => restroom.category === "genderInclusive").length,
+  }
 
-  buildings[`building_${building.id}`] = { ...building, amenityCounts, availableAmenityTypes }
+  buildings[`building_${building.id}`] = { ...building, amenityCounts, restroomCategoryCounts, availableAmenityTypes }
 }
 
 if (process.env.FIREBASE_ACCESS_TOKEN) {

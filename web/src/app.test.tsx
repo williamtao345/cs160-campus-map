@@ -6,6 +6,7 @@ import { App } from "@/app"
 import { createAmenitySubmission } from "@/data/amenity-submissions"
 import { loadAmenitiesForBuilding, loadBuildings, searchBuildings } from "@/data/amenities"
 import { createAmenityReview, observeAmenityReviews, type AmenityReview } from "@/data/reviews"
+import { loadUserPreferences, saveUserPreferences } from "@/data/user-preferences"
 import {
   authenticationErrorMessage,
   observeAuthState,
@@ -14,6 +15,7 @@ import {
   type AuthUser,
 } from "@/lib/auth"
 import { amenities, buildings, restrooms } from "@/test/amenity-fixtures"
+import { rankSearchResults } from "@/pages/search/search-page"
 
 vi.mock("@/data/amenities", async (importOriginal) => ({
   ...await importOriginal<typeof import("@/data/amenities")>(),
@@ -35,6 +37,12 @@ vi.mock("@/data/reviews", () => ({
 
 vi.mock("@/data/amenity-submissions", () => ({
   createAmenitySubmission: vi.fn(),
+}))
+
+vi.mock("@/data/user-preferences", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@/data/user-preferences")>(),
+  loadUserPreferences: vi.fn(),
+  saveUserPreferences: vi.fn(),
 }))
 
 const signedInUser: AuthUser = {
@@ -271,6 +279,8 @@ describe("campus map app", () => {
     })
     vi.mocked(createAmenityReview).mockResolvedValue()
     vi.mocked(createAmenitySubmission).mockResolvedValue()
+    vi.mocked(loadUserPreferences).mockResolvedValue(null)
+    vi.mocked(saveUserPreferences).mockResolvedValue()
     vi.mocked(signInWithGoogle).mockResolvedValue(signedInUser)
     vi.mocked(signOutCurrentUser).mockResolvedValue()
   })
@@ -923,6 +933,119 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: /Cory Hall.*14 amenities/i }))
 
     expect(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0]).toHaveAccessibleName(/^Gender-inclusive restroom/)
+  })
+
+  it("loads and saves preferences for the authenticated account", async () => {
+    const user = userEvent.setup()
+    vi.mocked(observeAuthState).mockImplementation((onChange) => {
+      onChange(signedInUser)
+      return vi.fn()
+    })
+    vi.mocked(loadUserPreferences).mockResolvedValue({ gender: "Non-binary" })
+    await renderApp()
+
+    await user.click(screen.getByRole("button", { name: "Settings" }))
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Gender" })).toHaveTextContent("Non-binary"))
+    await user.click(screen.getByRole("combobox", { name: "Gender" }))
+    await user.click(await screen.findByRole("option", { name: "Man" }))
+    await user.click(screen.getByRole("button", { name: "Save preferences" }))
+
+    await waitFor(() => expect(saveUserPreferences).toHaveBeenCalledWith("google-user-1", { gender: "Man" }))
+    expect(screen.getByRole("status")).toHaveTextContent("Preferences saved to your account.")
+  })
+
+  it("retains the account preference as a guest setting after sign-out", async () => {
+    const user = userEvent.setup()
+    vi.mocked(observeAuthState).mockImplementation((onChange) => {
+      onChange(signedInUser)
+      return vi.fn()
+    })
+    vi.mocked(loadUserPreferences).mockResolvedValue({ gender: "Woman" })
+    await renderApp()
+
+    await user.click(screen.getByRole("button", { name: "Settings" }))
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Gender" })).toHaveTextContent("Woman"))
+    await user.click(screen.getByRole("button", { name: "Sign out" }))
+
+    expect(screen.getByRole("combobox", { name: "Gender" })).toHaveTextContent("Woman")
+  })
+
+  it("ranks searched buildings by preference and then distance", () => {
+    const origin = { latitude: 37, longitude: -122.25 }
+    const preferredFar = {
+      ...buildings[0],
+      name: "Preferred Far Building",
+      coordinates: { latitude: 37.03, longitude: -122.25 },
+      restroomCategoryCounts: { women: 1, men: 0, genderInclusive: 0 },
+    }
+    const nonPreferredNear = {
+      ...buildings[1],
+      name: "Non-preferred Near Building",
+      coordinates: { latitude: 37.005, longitude: -122.25 },
+      restroomCategoryCounts: { women: 0, men: 1, genderInclusive: 0 },
+    }
+    const preferredNear = {
+      ...buildings[2],
+      name: "Preferred Near Building",
+      coordinates: { latitude: 37.01, longitude: -122.25 },
+      restroomCategoryCounts: { women: 1, men: 0, genderInclusive: 0 },
+    }
+    const nonPreferredFar = {
+      ...buildings[3],
+      name: "Non-preferred Far Building",
+      coordinates: { latitude: 37.02, longitude: -122.25 },
+      restroomCategoryCounts: { women: 0, men: 1, genderInclusive: 0 },
+    }
+    const results = searchBuildings([
+      preferredFar,
+      nonPreferredNear,
+      preferredNear,
+      nonPreferredFar,
+    ], "Building")
+
+    expect(rankSearchResults(results, "women", origin)
+      .map(({ building }) => building.name))
+      .toEqual([
+        "Preferred Near Building",
+        "Preferred Far Building",
+        "Non-preferred Near Building",
+        "Non-preferred Far Building",
+      ])
+    expect(rankSearchResults(results, null, origin)
+      .map(({ building }) => building.name))
+      .toEqual([
+        "Non-preferred Near Building",
+        "Preferred Near Building",
+        "Non-preferred Far Building",
+        "Preferred Far Building",
+      ])
+  })
+
+  it("uses name and id as the search ranking fallback without location", () => {
+    const alphaWithoutPreference = {
+      ...buildings[0],
+      name: "Alpha Building",
+      restroomCategoryCounts: { women: 0, men: 1, genderInclusive: 0 },
+    }
+    const zetaWithPreference = {
+      ...buildings[1],
+      name: "Zeta Building",
+      restroomCategoryCounts: { women: 1, men: 0, genderInclusive: 0 },
+    }
+    const betaWithPreference = {
+      ...buildings[2],
+      name: "Beta Building",
+      restroomCategoryCounts: { women: 1, men: 0, genderInclusive: 0 },
+    }
+    const results = searchBuildings([
+      zetaWithPreference,
+      alphaWithoutPreference,
+      betaWithPreference,
+    ], "Building")
+
+    expect(rankSearchResults(results, "women", null)
+      .map(({ building }) => building.name))
+      .toEqual(["Beta Building", "Zeta Building", "Alpha Building"])
   })
 
   it("shows live distances for nearest, searched, and selected buildings", async () => {

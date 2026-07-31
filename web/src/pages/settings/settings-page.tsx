@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { FormEvent } from "react"
 import { LogInIcon, LogOutIcon } from "lucide-react"
 
@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { FormSelect } from "@/components/forms/form-select"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { genderPreferences, type GenderPreference } from "@/data/user-preferences"
 import type { AuthUser } from "@/lib/auth"
 
 function userInitials(user: AuthUser) {
@@ -19,6 +20,8 @@ export function SettingsPage({
   gender,
   isAuthLoading,
   isAuthPending,
+  isPreferenceLoading,
+  preferenceError,
   onSave,
   onSignIn,
   onSignOut,
@@ -28,22 +31,39 @@ export function SettingsPage({
   gender: string
   isAuthLoading: boolean
   isAuthPending: boolean
-  onSave: (gender: string) => void
+  isPreferenceLoading: boolean
+  preferenceError: string
+  onSave: (gender: GenderPreference) => Promise<void>
   onSignIn: () => void
   onSignOut: () => void
 }) {
   const [draftGender, setDraftGender] = useState(gender)
   const [success, setSuccess] = useState(false)
+  const [saveError, setSaveError] = useState("")
+  const [isSaving, setIsSaving] = useState(false)
   const statusRef = useRef<HTMLParagraphElement>(null)
   const hasChanges = draftGender !== gender
 
-  function saveSettings(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    if (!hasChanges) return
+  useEffect(() => {
+    setDraftGender(gender)
+  }, [gender])
 
-    onSave(draftGender)
-    setSuccess(true)
-    requestAnimationFrame(() => statusRef.current?.focus())
+  async function saveSettings(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!hasChanges || !genderPreferences.includes(draftGender as GenderPreference)) return
+
+    setIsSaving(true)
+    setSaveError("")
+    setSuccess(false)
+    try {
+      await onSave(draftGender as GenderPreference)
+      setSuccess(true)
+      requestAnimationFrame(() => statusRef.current?.focus())
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Preferences could not be saved.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -87,18 +107,25 @@ export function SettingsPage({
           id="settings-gender"
           label="Gender"
           placeholder="Select gender"
-          options={["Woman", "Man", "Non-binary", "Prefer not to say"]}
+          options={[...genderPreferences]}
           value={draftGender}
           onValueChange={(value) => {
             setDraftGender(value)
             setSuccess(false)
+            setSaveError("")
           }}
         />
-        <Button type="submit" disabled={!hasChanges}>Save preferences</Button>
+        <Button type="submit" disabled={!hasChanges || isPreferenceLoading || isSaving}>
+          {isSaving ? "Saving..." : "Save preferences"}
+        </Button>
       </form>
+      {isPreferenceLoading && <p role="status" className="mt-4 text-sm text-muted-foreground">Loading preferences...</p>}
+      {(preferenceError || saveError) && (
+        <p role="alert" className="mt-4 text-sm text-destructive">{saveError || preferenceError}</p>
+      )}
       {success && (
         <p ref={statusRef} role="status" tabIndex={-1} className="mt-4 rounded-lg bg-secondary p-3 text-sm font-medium">
-          Settings saved for this session.
+          {authUser ? "Preferences saved to your account." : "Preferences saved for this session."}
         </p>
       )}
     </section>

@@ -11,7 +11,15 @@ import studySpaceData from "@/data/study-spaces.json"
 import vendingMachineData from "@/data/vending-machines.json"
 import waterRefillStationData from "@/data/water-refill-stations.json"
 import zeroWasteStationData from "@/data/zero-waste-stations.json"
-import type { Amenity, AmenityCounts, AmenityType, Building, GeneralAmenity, Restroom } from "@/data/amenities"
+import type {
+  Amenity,
+  AmenityCounts,
+  AmenityType,
+  Building,
+  GeneralAmenity,
+  Restroom,
+  RestroomCategoryCounts,
+} from "@/data/amenities"
 
 function taggedRecords<T extends AmenityType>(data: unknown, amenityType: T) {
   return (data as Array<Record<string, unknown> & { buildingId: number }>).map((amenity) => ({ ...amenity, amenityType }))
@@ -57,10 +65,24 @@ function countsForBuilding(buildingId: number): AmenityCounts {
   } as AmenityCounts
 }
 
+function restroomCountsForBuilding(buildingId: number): RestroomCategoryCounts {
+  const records = restroomData.filter((restroom) => restroom.buildingId === buildingId)
+  return {
+    women: records.filter((restroom) => restroom.category === "women").length,
+    men: records.filter((restroom) => restroom.category === "men").length,
+    genderInclusive: records.filter((restroom) => restroom.category === "genderInclusive").length,
+  }
+}
+
 export const buildings: Building[] = buildingData.map((building) => {
   const amenityCounts = countsForBuilding(building.id)
   const availableAmenityTypes = amenityTypes.filter((amenityType) => amenityCounts[amenityType] > 0)
-  return { ...building, amenityCounts, availableAmenityTypes }
+  return {
+    ...building,
+    amenityCounts,
+    restroomCategoryCounts: restroomCountsForBuilding(building.id),
+    availableAmenityTypes,
+  }
 })
 
 const buildingsById = new Map(buildings.map((building) => [building.id, building]))

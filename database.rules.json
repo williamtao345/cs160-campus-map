@@ -78,6 +78,19 @@
         }
       }
     },
+    "userPreferences": {
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "auth != null && auth.uid === $userId && newData.exists()",
+        ".validate": "newData.hasChildren(['gender'])",
+        "gender": {
+          ".validate": "newData.isString() && newData.val().matches(/^(Woman|Man|Non-binary|Prefer not to say)$/)"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
     "$other": {
       ".read": false,
       ".write": false

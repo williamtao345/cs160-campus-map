@@ -17,6 +17,8 @@ export type AmenityType =
   | "menstrualProduct"
 
 export type AmenityCounts = { total: number } & Record<AmenityType, number>
+export type RestroomCategory = "women" | "men" | "genderInclusive"
+export type RestroomCategoryCounts = Record<RestroomCategory, number>
 
 export type Building = {
   id: number
@@ -29,6 +31,7 @@ export type Building = {
     longitude: number
   }
   amenityCounts: AmenityCounts
+  restroomCategoryCounts: RestroomCategoryCounts
   availableAmenityTypes: AmenityType[]
 }
 
@@ -44,7 +47,7 @@ export type Restroom = AmenityBase & {
   floorNumber: string | null
   roomNumber: string | null
   isAvailable: boolean | null
-  category: "women" | "men" | "genderInclusive"
+  category: RestroomCategory
   accessible: boolean
   stallType: "single" | "multi" | null
   restrictedAccess: boolean
@@ -147,6 +150,9 @@ function parseBuilding(value: unknown, documentId: string): Building {
   const data = recordValue(value, `building ${documentId}`)
   const coordinates = recordValue(data.coordinates, `coordinates for building ${documentId}`)
   const counts = recordValue(data.amenityCounts, `amenity counts for building ${documentId}`)
+  const restroomCategoryCounts = data.restroomCategoryCounts === undefined
+    ? { women: 0, men: 0, genderInclusive: 0 }
+    : recordValue(data.restroomCategoryCounts, `restroom category counts for building ${documentId}`)
   const availableTypes = data.availableAmenityTypes ?? []
   if (!Array.isArray(availableTypes)) throw new Error(`Invalid amenity types for building ${documentId}`)
   const id = numberValue(data.id, `id for building ${documentId}`)
@@ -171,6 +177,11 @@ function parseBuilding(value: unknown, documentId: string): Building {
         ]),
       ),
     } as AmenityCounts,
+    restroomCategoryCounts: {
+      women: numberValue(restroomCategoryCounts.women, `women restroom count for building ${documentId}`),
+      men: numberValue(restroomCategoryCounts.men, `men restroom count for building ${documentId}`),
+      genderInclusive: numberValue(restroomCategoryCounts.genderInclusive, `gender-inclusive restroom count for building ${documentId}`),
+    },
     availableAmenityTypes: availableTypes.map((type) => enumValue(type, amenityTypes, `amenity type for building ${documentId}`)),
   }
 }
