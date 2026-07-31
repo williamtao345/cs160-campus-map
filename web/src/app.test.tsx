@@ -33,6 +33,16 @@ const signedInUser: AuthUser = {
   photoURL: "https://example.com/avatar.jpg",
 }
 
+function deferred<T>() {
+  let resolve!: (value: T) => void
+  let reject!: (error: unknown) => void
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise
+    reject = rejectPromise
+  })
+  return { promise, reject, resolve }
+}
+
 async function renderApp() {
   const result = render(<App />)
   await screen.findByRole("searchbox")
@@ -674,6 +684,23 @@ describe("campus map app", () => {
 
     expect(authenticationErrorMessage).toHaveBeenCalledOnce()
     expect(await screen.findByRole("alert")).toHaveTextContent("Google sign-in could not be completed")
+  })
+
+  it("returns to settings when sign-in fails after navigating away", async () => {
+    const user = userEvent.setup()
+    const signInRequest = deferred<AuthUser>()
+    vi.mocked(signInWithGoogle).mockReturnValueOnce(signInRequest.promise)
+    await renderApp()
+
+    await user.click(screen.getByRole("button", { name: "Settings" }))
+    await user.click(screen.getByRole("button", { name: "Sign in with Google" }))
+    await user.click(screen.getByRole("button", { name: "Add Amenity" }))
+    expect(screen.getByRole("heading", { name: "Add an amenity" })).toBeInTheDocument()
+
+    await act(async () => signInRequest.reject(new Error("popup blocked")))
+
+    expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument()
+    expect(screen.getByRole("alert")).toHaveTextContent("Google sign-in could not be completed")
   })
 
   it("silently handles a cancelled Google popup", async () => {

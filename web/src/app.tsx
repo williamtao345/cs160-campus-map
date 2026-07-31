@@ -1,23 +1,13 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { AppActions } from "@/components/app-actions"
 import { CampusDrawer, collapsedSnapPoint } from "@/components/campus-drawer"
 import { CampusMap } from "@/components/campus-map"
 import { Button } from "@/components/ui/button"
-import {
-  loadAmenitiesForBuilding,
-  loadBuildings,
-  type Amenity,
-  type Building,
-  type Restroom,
-} from "@/data/amenities"
-import {
-  authenticationErrorMessage,
-  observeAuthState,
-  signInWithGoogle,
-  signOutCurrentUser,
-  type AuthUser,
-} from "@/lib/auth"
+import type { Building, Restroom } from "@/data/amenities"
+import { useAuthSession } from "@/hooks/use-auth-session"
+import { useBuildingAmenities } from "@/hooks/use-building-amenities"
+import { useBuildings } from "@/hooks/use-buildings"
 import type { Coordinates } from "@/lib/geo"
 import { AmenityDetailsPage } from "@/pages/amenity-details/amenity-details-page"
 import { BuildingPage } from "@/pages/building/building-page"
@@ -35,61 +25,36 @@ function preferredRestroomCategory(gender: string): Restroom["category"] | null 
 }
 
 export function App() {
-  const [buildings, setBuildings] = useState<Building[]>([])
-  const [buildingLoadError, setBuildingLoadError] = useState("")
-  const [isLoadingBuildings, setIsLoadingBuildings] = useState(true)
-  const [loadAttempt, setLoadAttempt] = useState(0)
+  const {
+    buildings,
+    error: buildingLoadError,
+    retry: retryBuildings,
+    status: buildingsStatus,
+  } = useBuildings()
   const [view, setView] = useState<DrawerView>("search")
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null)
   const [selectedAmenity, setSelectedAmenity] = useState<Restroom | null>(null)
-  const [selectedAmenities, setSelectedAmenities] = useState<Amenity[]>([])
-  const [amenityLoadError, setAmenityLoadError] = useState("")
-  const [isLoadingAmenities, setIsLoadingAmenities] = useState(false)
+  const {
+    amenities: selectedAmenities,
+    error: amenityLoadError,
+    retry: retryAmenities,
+    status: amenitiesStatus,
+  } = useBuildingAmenities(selectedBuilding)
   const [snapPoint, setSnapPoint] = useState<string | number>(collapsedSnapPoint)
-  const [authUser, setAuthUser] = useState<AuthUser | null>(null)
-  const [authError, setAuthError] = useState("")
-  const [isAuthLoading, setIsAuthLoading] = useState(true)
-  const [isAuthPending, setIsAuthPending] = useState(false)
+  const {
+    error: authError,
+    isInitializing: isAuthLoading,
+    isPending: isAuthPending,
+    signIn,
+    signOut: signOutUser,
+    user: authUser,
+  } = useAuthSession()
   const [gender, setGender] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [submittedQuery, setSubmittedQuery] = useState<string | null>(null)
   const [userPosition, setUserPosition] = useState<Coordinates | null>(null)
   const [routeOrigin, setRouteOrigin] = useState<Coordinates | null>(null)
-  const amenityCache = useRef(new Map<number, Amenity[]>())
-  const amenityRequest = useRef(0)
   const preferredCategory = preferredRestroomCategory(gender)
-
-  useEffect(() => {
-    let cancelled = false
-    setIsLoadingBuildings(true)
-    setBuildingLoadError("")
-
-    loadBuildings()
-      .then((loadedBuildings) => {
-        if (!cancelled) setBuildings(loadedBuildings)
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) setBuildingLoadError(error instanceof Error ? error.message : "Unable to load campus data.")
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoadingBuildings(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [loadAttempt])
-
-  useEffect(() => observeAuthState(
-    (user) => {
-      setAuthUser(user)
-      setIsAuthLoading(false)
-    },
-    () => {
-      setAuthError("Authentication could not be initialized. Check the Firebase configuration and try again.")
-      setIsAuthLoading(false)
-    },
-  ), [])
 
   useEffect(() => {
     if ((view === "building" || view === "amenityDetails") && selectedBuilding && !routeOrigin && userPosition) {
@@ -103,33 +68,9 @@ export function App() {
     setSnapPoint(nextView === "search" && !hasSavedResults ? collapsedSnapPoint : 1)
   }
 
-  async function signIn() {
-    setAuthError("")
-    setIsAuthPending(true)
-    try {
-      setAuthUser(await signInWithGoogle())
-    } catch (error) {
-      const message = authenticationErrorMessage(error)
-      if (message) {
-        setAuthError(message)
-        showView("settings")
-      }
-    } finally {
-      setIsAuthPending(false)
-    }
-  }
-
-  async function signOutUser() {
-    setAuthError("")
-    setIsAuthPending(true)
-    try {
-      await signOutCurrentUser()
-      setAuthUser(null)
-    } catch {
-      setAuthError("Sign out could not be completed. Please try again.")
-    } finally {
-      setIsAuthPending(false)
-    }
+  async function signInUser() {
+    const error = await signIn()
+    if (error) showView("settings")
   }
 
   function submitSearch() {
@@ -141,35 +82,11 @@ export function App() {
     setSnapPoint(1)
   }
 
-  async function openBuilding(building: Building) {
-    const request = ++amenityRequest.current
+  function openBuilding(building: Building) {
     setSelectedBuilding(building)
     setSelectedAmenity(null)
     setRouteOrigin(userPosition)
-    setAmenityLoadError("")
     showView("building")
-
-    const cachedAmenities = amenityCache.current.get(building.id)
-    if (cachedAmenities) {
-      setSelectedAmenities(cachedAmenities)
-      setIsLoadingAmenities(false)
-      return
-    }
-
-    setSelectedAmenities([])
-    setIsLoadingAmenities(true)
-
-    try {
-      const loadedAmenities = await loadAmenitiesForBuilding(building)
-      amenityCache.current.set(building.id, loadedAmenities)
-      if (request === amenityRequest.current) setSelectedAmenities(loadedAmenities)
-    } catch (error) {
-      if (request === amenityRequest.current) {
-        setAmenityLoadError(error instanceof Error ? error.message : "Unable to load amenities.")
-      }
-    } finally {
-      if (request === amenityRequest.current) setIsLoadingAmenities(false)
-    }
   }
 
   function goBack() {
@@ -201,12 +118,12 @@ export function App() {
         onBack={goBack}
       >
         {view === "search" && (
-          isLoadingBuildings ? (
+          buildingsStatus === "loading" ? (
             <p role="status" className="text-sm text-muted-foreground">Loading campus data...</p>
           ) : buildingLoadError ? (
             <div role="alert" className="space-y-3 rounded-xl bg-destructive/10 p-4 text-sm text-destructive">
               <p>Campus data could not be loaded. {buildingLoadError}</p>
-              <Button type="button" variant="outline" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>Try again</Button>
+              <Button type="button" variant="outline" onClick={retryBuildings}>Try again</Button>
             </div>
           ) : (
             <SearchPage
@@ -221,12 +138,12 @@ export function App() {
           )
         )}
         {view === "building" && selectedBuilding && (
-          isLoadingAmenities ? (
+          amenitiesStatus === "loading" ? (
             <p role="status" className="text-sm text-muted-foreground">Loading amenities for {selectedBuilding.name}...</p>
           ) : amenityLoadError ? (
             <div role="alert" className="space-y-3 rounded-xl bg-destructive/10 p-4 text-sm text-destructive">
               <p>Amenities could not be loaded. {amenityLoadError}</p>
-              <Button type="button" variant="outline" onClick={() => void openBuilding(selectedBuilding)}>Try again</Button>
+              <Button type="button" variant="outline" onClick={retryAmenities}>Try again</Button>
             </div>
           ) : (
             <BuildingPage
@@ -257,7 +174,7 @@ export function App() {
             isAuthLoading={isAuthLoading}
             isAuthPending={isAuthPending}
             onSave={setGender}
-            onSignIn={() => void signIn()}
+            onSignIn={() => void signInUser()}
             onSignOut={() => void signOutUser()}
           />
         )}
