@@ -1,6 +1,6 @@
 import { amenityTypeIcons, amenityTypeLabels, restroomCategoryLabel } from "@/components/amenities/amenity-metadata"
+import { AvailabilityBadge } from "@/components/amenities/availability-badge"
 import type { Amenity } from "@/data/amenities"
-import { AvailabilityBadge } from "@/pages/building/availability-badge"
 
 export function AmenityResult({ amenity, onSelect }: { amenity: Amenity; onSelect: () => void }) {
   const Icon = amenityTypeIcons[amenity.amenityType]

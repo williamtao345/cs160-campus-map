@@ -1,51 +1,12 @@
+import { BuildingResult } from "@/components/buildings/building-result"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import {
-  searchBuildings,
-  type Building,
-  type BuildingSearchResult,
-  type RestroomCategory,
-} from "@/data/amenities"
-import { distanceInMiles, type Coordinates } from "@/lib/geo"
-import { BuildingResult } from "@/pages/search/building-result"
+import type { Building, RestroomCategory } from "@/data/amenities"
+import { nearestBuildings, rankSearchResults, searchBuildings } from "@/data/building-search"
+import type { Coordinates } from "@/lib/geo"
 
 const resultLimit = 50
-const nearestBuildingLimit = 10
-
-function nearestBuildings(buildings: Building[], position: Coordinates): BuildingSearchResult[] {
-  return buildings
-    .map((building) => ({ building, distance: distanceInMiles(position, building.coordinates) }))
-    .sort((first, second) => (
-      first.distance - second.distance
-      || first.building.name.localeCompare(second.building.name)
-      || first.building.id - second.building.id
-    ))
-    .slice(0, nearestBuildingLimit)
-    .map(({ building }) => ({ building, amenityCounts: building.amenityCounts }))
-}
-
-export function rankSearchResults(
-  results: BuildingSearchResult[],
-  preferredCategory: RestroomCategory | null,
-  position: Coordinates | null,
-) {
-  return [...results].sort((first, second) => {
-    const preferenceOrder = preferredCategory === null ? 0 : (
-      Number(second.building.restroomCategoryCounts[preferredCategory] > 0)
-      - Number(first.building.restroomCategoryCounts[preferredCategory] > 0)
-    )
-    if (preferenceOrder !== 0) return preferenceOrder
-
-    const distanceOrder = position === null ? 0 : (
-      distanceInMiles(position, first.building.coordinates)
-      - distanceInMiles(position, second.building.coordinates)
-    )
-    return distanceOrder
-      || first.building.name.localeCompare(second.building.name)
-      || first.building.id - second.building.id
-  })
-}
 
 export function SearchPage({
   buildings,

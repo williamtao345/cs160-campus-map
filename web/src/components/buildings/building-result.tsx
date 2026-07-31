@@ -1,7 +1,7 @@
 import { buildingAmenityIcons } from "@/components/amenities/amenity-metadata"
 import { DistanceLabel } from "@/components/location/distance-label"
 import { Badge } from "@/components/ui/badge"
-import type { BuildingSearchResult } from "@/data/amenities"
+import type { BuildingSearchResult } from "@/data/building-search"
 import type { Coordinates } from "@/lib/geo"
 
 export function BuildingResult({

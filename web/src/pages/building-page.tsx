@@ -6,13 +6,13 @@ import {
   amenityTypeOrder,
   buildingAmenityIcons,
 } from "@/components/amenities/amenity-metadata"
+import { AmenityResult } from "@/components/amenities/amenity-result"
 import { DistanceLabel } from "@/components/location/distance-label"
 import { ButtonGroup } from "@/components/ui/button-group"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type { Amenity, AmenityType, Building, Restroom } from "@/data/amenities"
 import type { Coordinates } from "@/lib/geo"
-import { AmenityResult } from "@/pages/building/amenity-result"
 
 function compareLevels(first: string, second: string) {
   const sortValue = (level: string) => {

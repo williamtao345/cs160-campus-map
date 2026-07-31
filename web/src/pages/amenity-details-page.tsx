@@ -1,10 +1,10 @@
 import { ChevronsUpDownIcon, RouteIcon } from "lucide-react"
 
 import { amenityTypeIcons, amenityTypeLabels, restroomCategoryLabel } from "@/components/amenities/amenity-metadata"
+import { AmenityReviews } from "@/components/amenities/amenity-reviews"
 import { Button } from "@/components/ui/button"
 import type { Amenity } from "@/data/amenities"
 import type { AuthUser } from "@/lib/auth"
-import { AmenityReviews } from "@/pages/amenity-details/amenity-reviews"
 
 export function AmenityDetailsPage({
   isDrawerExpanded,

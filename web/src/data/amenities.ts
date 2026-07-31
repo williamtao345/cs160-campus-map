@@ -67,11 +67,6 @@ export type GeneralAmenity = AmenityBase & {
 
 export type Amenity = Restroom | GeneralAmenity
 
-export type BuildingSearchResult = {
-  building: Building
-  amenityCounts: AmenityCounts
-}
-
 const amenityTypes: AmenityType[] = [
   "restroom",
   "waterRefillStation",
@@ -255,34 +250,5 @@ export async function loadAmenitiesForBuilding(building: Building) {
         }
         return parsedAmenity
       })
-  })
-}
-
-const amenitySearchTerms: Record<AmenityType, string> = {
-  restroom: "restroom restrooms bathroom bathrooms",
-  waterRefillStation: "water refill station stations bottle filling",
-  vendingMachine: "vending machine machines",
-  studySpace: "study space spaces",
-  lactationRoom: "lactation room rooms nursing",
-  microwave: "microwave microwaves",
-  zeroWasteStation: "zero waste station stations recycling compost",
-  eatery: "eatery eateries food cafe restaurant dining",
-  campusGarden: "campus garden gardens",
-  basicNeedService: "basic needs service services food pantry",
-  changingTable: "changing table tables diaper",
-  menstrualProduct: "menstrual product products period",
-}
-
-export function searchBuildings(buildings: Building[], queryValue: string) {
-  const terms = queryValue.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean)
-
-  return buildings.flatMap((building): BuildingSearchResult[] => {
-    const searchableText = [
-      building.name,
-      building.shortName,
-      ...building.availableAmenityTypes.map((type) => amenitySearchTerms[type]),
-    ].filter(Boolean).join(" ").toLocaleLowerCase()
-    const matches = terms.length === 0 || terms.every((term) => searchableText.includes(term))
-    return matches ? [{ building, amenityCounts: building.amenityCounts }] : []
   })
 }
