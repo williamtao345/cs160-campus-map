@@ -1198,7 +1198,7 @@ describe("campus map app", () => {
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
     await renderApp()
 
-    expect(window.gm_authFailure).toBeTypeOf("function")
+    await waitFor(() => expect(window.gm_authFailure).toBeTypeOf("function"))
     act(() => window.gm_authFailure?.())
 
     expect(screen.getByText("Google Maps could not be authorized.")).toBeInTheDocument()
