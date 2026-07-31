@@ -169,7 +169,15 @@ export function App() {
             onSignIn={() => void signInUser()}
           />
         )}
-        {view === "create" && <CreateAmenityPage buildings={buildings} />}
+        {view === "create" && (
+          <CreateAmenityPage
+            buildings={buildings}
+            authUser={authUser}
+            isAuthLoading={isAuthLoading}
+            isAuthPending={isAuthPending}
+            onSignIn={() => void signInUser()}
+          />
+        )}
         {view === "settings" && (
           <SettingsPage
             authError={authError}

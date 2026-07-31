@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { App } from "@/app"
+import { createAmenitySubmission } from "@/data/amenity-submissions"
 import { loadAmenitiesForBuilding, loadBuildings, searchBuildings } from "@/data/amenities"
 import { createAmenityReview, observeAmenityReviews, type AmenityReview } from "@/data/reviews"
 import {
@@ -30,6 +31,10 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("@/data/reviews", () => ({
   createAmenityReview: vi.fn(),
   observeAmenityReviews: vi.fn(),
+}))
+
+vi.mock("@/data/amenity-submissions", () => ({
+  createAmenitySubmission: vi.fn(),
 }))
 
 const signedInUser: AuthUser = {
@@ -265,6 +270,7 @@ describe("campus map app", () => {
       return vi.fn()
     })
     vi.mocked(createAmenityReview).mockResolvedValue()
+    vi.mocked(createAmenitySubmission).mockResolvedValue()
     vi.mocked(signInWithGoogle).mockResolvedValue(signedInUser)
     vi.mocked(signOutCurrentUser).mockResolvedValue()
   })
@@ -761,8 +767,8 @@ describe("campus map app", () => {
     await user.click(screen.getByRole("button", { name: "Add Amenity" }))
     expect(drawer).toHaveAttribute("data-expanded", "")
     expect(screen.getByRole("heading", { name: "Add an amenity" })).toBeInTheDocument()
-    expect(screen.getByText("Amenity submissions are not enabled yet.")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Submissions unavailable" })).toBeDisabled()
+    expect(screen.getByText("All submissions will be manually reviewed.")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Sign in to submit" })).toBeInTheDocument()
 
     await user.click(screen.getByRole("button", { name: "Settings" }))
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument()
@@ -772,6 +778,37 @@ describe("campus map app", () => {
 
     await user.keyboard("{Escape}")
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument()
+  })
+
+  it("submits an amenity for review when signed in", async () => {
+    const user = userEvent.setup()
+    vi.mocked(observeAuthState).mockImplementation((onChange) => {
+      onChange(signedInUser)
+      return vi.fn()
+    })
+    await renderApp()
+
+    await user.click(screen.getByRole("button", { name: "Add Amenity" }))
+    await user.click(screen.getByRole("combobox", { name: "Amenity type" }))
+    await user.click(await screen.findByRole("option", { name: "Water refill station" }))
+    await user.click(screen.getByRole("combobox", { name: "Building" }))
+    await user.click(await screen.findByRole("option", { name: buildings[0].name }))
+    expect(screen.getByRole("combobox", { name: "Building" })).toHaveTextContent(buildings[0].name)
+    await user.type(screen.getByRole("spinbutton", { name: "Floor" }), "2")
+    await user.type(screen.getByRole("textbox", { name: "Location details" }), " Near the elevator ")
+    await user.click(screen.getByRole("combobox", { name: "Availability" }))
+    await user.click(await screen.findByRole("option", { name: "Available" }))
+    await user.click(screen.getByRole("button", { name: "Submit amenity" }))
+
+    await waitFor(() => expect(createAmenitySubmission).toHaveBeenCalledWith(expect.objectContaining({
+      user: signedInUser,
+      buildingId: buildings[0].id,
+      amenityType: "waterRefillStation",
+      floorNumber: 2,
+      availability: "available",
+      locationDetails: " Near the elevator ",
+    })))
+    expect(screen.getByRole("status")).toHaveTextContent("Amenity submitted for review.")
   })
 
   it("signs in with Google and shows the authenticated identity", async () => {
