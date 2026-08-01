@@ -124,24 +124,27 @@ function installGoogleMapsMock() {
   }> = []
   const polygonFeatures = [{ id: "campus-buildings" }]
   const routeViewport = { id: "route-viewport" } as unknown as google.maps.LatLngBounds
-  const computeRoutes = vi.fn(async (_request: google.maps.routes.ComputeRoutesRequest) => ({
-    fallbackInfo: null,
-    geocodingResults: null,
-    routes: [{
-      createPolylines: (options?: google.maps.routes.RoutePolylineOptions) => {
-        const polyline = {
-          map: null as google.maps.Map | null,
-          options,
-          setMap: vi.fn((map: google.maps.Map | null) => {
-            polyline.map = map
-          }),
-        }
-        polylines.push(polyline)
-        return [polyline]
-      },
-      viewport: routeViewport,
-    }],
-  }))
+  const computeRoutes = vi.fn(async (request: google.maps.routes.ComputeRoutesRequest) => {
+    void request
+    return {
+      fallbackInfo: null,
+      geocodingResults: null,
+      routes: [{
+        createPolylines: (options?: google.maps.routes.RoutePolylineOptions) => {
+          const polyline = {
+            map: null as google.maps.Map | null,
+            options,
+            setMap: vi.fn((map: google.maps.Map | null) => {
+              polyline.map = map
+            }),
+          }
+          polylines.push(polyline)
+          return [polyline]
+        },
+        viewport: routeViewport,
+      }],
+    }
+  })
 
   class MockMap {
     options: google.maps.MapOptions

@@ -1,7 +1,6 @@
 import { useState } from "react"
 
 import {
-  amenityTypeIcons,
   amenityTypeLabels,
   amenityTypeOrder,
   buildingAmenityIcons,

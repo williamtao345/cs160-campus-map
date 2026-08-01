@@ -59,6 +59,7 @@ describe("loadBuildings", () => {
 
   it("loads existing building records before restroom category counts are reseeded", async () => {
     const { restroomCategoryCounts: _restroomCategoryCounts, ...existingBuilding } = building
+    void _restroomCategoryCounts
     getMock.mockResolvedValue({ val: () => ({ building_200: existingBuilding }) })
 
     await expect(loadBuildings()).resolves.toEqual([building])

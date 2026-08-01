@@ -82,7 +82,7 @@ export function CampusMap({
     const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID
     let cancelled = false
     let markers: google.maps.marker.AdvancedMarkerElement[] = []
-    let listenerCleanups: (() => void)[] = []
+    const listenerCleanups: (() => void)[] = []
     let polygonFeatures: google.maps.Data.Feature[] = []
     let polygonLayer: google.maps.Data | undefined
     let locationMarker: google.maps.marker.AdvancedMarkerElement | undefined
