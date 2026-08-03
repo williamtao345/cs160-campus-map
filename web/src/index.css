@@ -196,12 +196,41 @@ body {
 }
 
 .current-location-dot {
+  position: relative;
   width: 1.125rem;
   height: 1.125rem;
   border: 3px solid #fff;
   border-radius: 50%;
   background: #4285f4;
   box-shadow: 0 1px 4px rgb(0 0 0 / 45%);
+}
+
+.current-location-dot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 50%;
+  background: #4285f4;
+  animation: current-location-pulse 2s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+
+@keyframes current-location-pulse {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .current-location-dot::before {
+    animation: none;
+    display: none;
+  }
 }
 
 .top-actions {

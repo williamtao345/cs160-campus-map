@@ -4,7 +4,7 @@ import { ArrowLeftIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer"
 
-export const collapsedSnapPoint = "16rem"
+export const collapsedSnapPoint = "6rem"
 
 export function CampusDrawer({
   children,

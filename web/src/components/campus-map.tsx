@@ -16,6 +16,53 @@ const routeViewportPadding = {
 } satisfies google.maps.Padding
 const routeViewportVerticalOffset = (routeViewportPadding.bottom - routeViewportPadding.top) / 2
 
+type BuildingPolygonFeature = {
+  properties: { GISID?: number }
+  geometry: { type: string; coordinates: number[][][] | number[][][][] }
+}
+
+function ringCentroid(ring: number[][]) {
+  let area = 0
+  let centroidLng = 0
+  let centroidLat = 0
+
+  for (let index = 0; index < ring.length - 1; index++) {
+    const [lng0, lat0] = ring[index]
+    const [lng1, lat1] = ring[index + 1]
+    const cross = lng0 * lat1 - lng1 * lat0
+    area += cross
+    centroidLng += (lng0 + lng1) * cross
+    centroidLat += (lat0 + lat1) * cross
+  }
+
+  if (area === 0) return null
+
+  area /= 2
+  return { lat: centroidLat / (6 * area), lng: centroidLng / (6 * area), area: Math.abs(area) }
+}
+
+function buildingPolygonCenter(gisId: number): google.maps.LatLngLiteral | null {
+  const feature = (campusBuildingPolygons.features as BuildingPolygonFeature[]).find(
+    (candidate) => candidate.properties?.GISID === gisId,
+  )
+  if (!feature) return null
+
+  const { coordinates, type } = feature.geometry
+  const outerRings = type === "Polygon"
+    ? [(coordinates as number[][][])[0]]
+    : type === "MultiPolygon"
+      ? (coordinates as number[][][][]).map((polygon) => polygon[0])
+      : []
+
+  const centroids = outerRings
+    .map(ringCentroid)
+    .filter((centroid): centroid is NonNullable<typeof centroid> => centroid !== null)
+  if (centroids.length === 0) return null
+
+  const largest = centroids.reduce((best, candidate) => (candidate.area > best.area ? candidate : best))
+  return { lat: largest.lat, lng: largest.lng }
+}
+
 function panToPaddedPosition(map: google.maps.Map, position: google.maps.LatLngLiteral) {
   map.panTo(position)
   map.panBy(0, routeViewportVerticalOffset)
@@ -237,6 +284,8 @@ export function CampusMap({
   useEffect(() => {
     let cancelled = false
     let routePolylines: google.maps.Polyline[] = []
+    let destinationCenterLine: google.maps.Polyline | undefined
+    let destinationCenterCircle: google.maps.Circle | undefined
 
     if (!mapInstance || !routeDestination || !routeOrigin) {
       if (mapInstance && hadActiveRouteRef.current) {
@@ -283,12 +332,40 @@ export function CampusMap({
         })
         routePolylines.forEach((polyline) => polyline.setMap(mapInstance))
         if (route.viewport) mapInstance.fitBounds(route.viewport, routeViewportPadding)
+
+        const buildingCenter = routeDestination.gisId != null
+          ? buildingPolygonCenter(routeDestination.gisId)
+          : null
+
+        if (buildingCenter) {
+          destinationCenterLine = new google.maps.Polyline({
+            clickable: false,
+            path: [destination, buildingCenter],
+            strokeColor: "#003262",
+            strokeOpacity: 0.9,
+            strokeWeight: 4,
+            map: mapInstance,
+          })
+          destinationCenterCircle = new google.maps.Circle({
+            center: buildingCenter,
+            clickable: false,
+            fillColor: "#003262",
+            fillOpacity: 1,
+            map: mapInstance,
+            radius: 6,
+            strokeColor: "#fff",
+            strokeWeight: 2,
+            zIndex: 2,
+          })
+        }
       })
       .catch(() => {})
 
     return () => {
       cancelled = true
       routePolylines.forEach((polyline) => polyline.setMap(null))
+      destinationCenterLine?.setMap(null)
+      destinationCenterCircle?.setMap(null)
     }
   }, [mapInstance, routeDestination, routeOrigin])
 

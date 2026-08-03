@@ -1070,6 +1070,7 @@ describe("campus map app", () => {
     })
     installGoogleMapsMock()
     const { unmount } = await renderApp()
+    await user.click(screen.getByRole("button", { name: "Expand results" }))
 
     const emptyNearestRegion = screen.getByRole("region", { name: "Buildings Near You" })
     expect(within(emptyNearestRegion).queryAllByRole("button")).toHaveLength(0)
@@ -1416,6 +1417,7 @@ describe("campus map app", () => {
   })
 
   it("keeps the map usable when location access is denied", async () => {
+    const user = userEvent.setup()
     vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
     const geolocation = {
       clearWatch: vi.fn(),
@@ -1427,6 +1429,7 @@ describe("campus map app", () => {
     vi.stubGlobal("navigator", { geolocation })
     const { circles, markers } = installGoogleMapsMock()
     const { unmount } = await renderApp()
+    await user.click(screen.getByRole("button", { name: "Expand results" }))
 
     await waitFor(() => expect(markers).toHaveLength(buildings.length))
     expect(circles).toHaveLength(0)

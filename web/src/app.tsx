@@ -169,11 +169,13 @@ export function App() {
           ) : (
             <SearchPage
               buildings={buildings}
+              isDrawerExpanded={snapPoint === 1}
               query={searchQuery}
               submittedQuery={submittedQuery}
               onQueryChange={setSearchQuery}
               onSearch={submitSearch}
               onSelectBuilding={openBuilding}
+              onToggleDrawer={() => setSnapPoint(snapPoint === 1 ? collapsedSnapPoint : 1)}
               position={userPosition}
               preferredCategory={preferredCategory}
             />

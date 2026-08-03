@@ -1,3 +1,5 @@
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -49,18 +51,22 @@ export function rankSearchResults(
 
 export function SearchPage({
   buildings,
+  isDrawerExpanded,
   onQueryChange,
   onSearch,
   onSelectBuilding,
+  onToggleDrawer,
   position,
   preferredCategory,
   query,
   submittedQuery,
 }: {
   buildings: Building[]
+  isDrawerExpanded: boolean
   onQueryChange: (query: string) => void
   onSearch: () => void
   onSelectBuilding: (building: Building) => void
+  onToggleDrawer: () => void
   position: Coordinates | null
   preferredCategory: RestroomCategory | null
   query: string
@@ -76,54 +82,69 @@ export function SearchPage({
   return (
     <section className="space-y-4" aria-labelledby="search-heading">
       <h2 id="search-heading" className="sr-only">Search campus buildings and amenities</h2>
-      <form
-        role="search"
-        className="flex gap-2"
-        onSubmit={(event) => {
-          event.preventDefault()
-          if (isSearchDisabled) return
-          onSearch()
-        }}
-      >
-        <Input
-          name="query"
-          type="search"
-          aria-label="Search buildings and amenities"
-          placeholder="Search buildings or amenities"
-          className="h-9"
-          value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
-        />
-        <Button type="submit" disabled={isSearchDisabled}>Search</Button>
-      </form>
+      <div className="flex items-start gap-2">
+        <form
+          role="search"
+          className="flex flex-1 gap-2"
+          onSubmit={(event) => {
+            event.preventDefault()
+            if (isSearchDisabled) return
+            onSearch()
+          }}
+        >
+          <Input
+            name="query"
+            type="search"
+            aria-label="Search buildings and amenities"
+            placeholder="Search buildings or amenities"
+            className="h-9"
+            value={query}
+            onChange={(event) => onQueryChange(event.target.value)}
+          />
+          <Button type="submit" disabled={isSearchDisabled}>Search</Button>
+        </form>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          onClick={onToggleDrawer}
+          aria-label={isDrawerExpanded ? "Collapse to search bar" : "Expand results"}
+        >
+          {isDrawerExpanded ? <ChevronDownIcon aria-hidden="true" /> : <ChevronUpIcon aria-hidden="true" />}
+        </Button>
+      </div>
 
-      <Separator />
+      {isDrawerExpanded && (
+        <>
+          <Separator />
 
-      <section className="space-y-3" aria-labelledby="buildings-heading" aria-live="polite">
-        <div className="flex items-center justify-between gap-3">
-          <h2 id="buildings-heading" className="text-sm font-medium">
-            {hasSearched ? "Campus Buildings" : "Buildings Near You"}
-          </h2>
-          {hasSearched && results.length > 0 && (
-            <p className="text-xs text-muted-foreground">
-              Showing {visibleResults.length.toLocaleString()} of {results.length.toLocaleString()} results.
-            </p>
-          )}
-        </div>
-        {hasSearched && results.length === 0 && <p className="text-sm text-muted-foreground">No matching buildings found.</p>}
-        {visibleResults.length > 0 && (
-          <div className="flex flex-col gap-3">
-            {visibleResults.map((result) => (
-              <BuildingResult
-                key={result.building.id}
-                position={position}
-                result={result}
-                onSelect={() => onSelectBuilding(result.building)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+          <section className="space-y-3" aria-labelledby="buildings-heading" aria-live="polite">
+            <div className="flex items-center justify-between gap-3">
+              <h2 id="buildings-heading" className="text-sm font-medium">
+                {hasSearched ? "Campus Buildings" : "Buildings Near You"}
+              </h2>
+              {hasSearched && results.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Showing {visibleResults.length.toLocaleString()} of {results.length.toLocaleString()} results.
+                </p>
+              )}
+            </div>
+            {hasSearched && results.length === 0 && <p className="text-sm text-muted-foreground">No matching buildings found.</p>}
+            {visibleResults.length > 0 && (
+              <div className="flex flex-col gap-3">
+                {visibleResults.map((result) => (
+                  <BuildingResult
+                    key={result.building.id}
+                    position={position}
+                    result={result}
+                    onSelect={() => onSelectBuilding(result.building)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        </>
+      )}
     </section>
   )
 }
