@@ -438,14 +438,21 @@ describe("campus map app", () => {
     await user.click(viewRoute)
 
     expect(drawer).not.toHaveAttribute("data-expanded")
+    expect(screen.getByRole("heading", { name: "Women's restroom" })).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "View route" })).not.toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument()
+    expect(screen.getByText("Cory Hall")).not.toBeVisible()
+    expect(screen.getByText("Accessibility")).not.toBeVisible()
+    expect(screen.queryByRole("heading", { name: "Reviews" })).not.toBeInTheDocument()
     const expand = screen.getByRole("button", { name: "Expand" })
     expect(expand.querySelector(".lucide-chevrons-up-down")).toBeInTheDocument()
 
     await user.click(expand)
     expect(drawer).toHaveAttribute("data-expanded", "")
     expect(screen.getByRole("button", { name: "Back" })).toBeInTheDocument()
+    expect(screen.getByText("Cory Hall")).toBeInTheDocument()
+    expect(screen.getByText("Accessibility")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Reviews" })).toBeInTheDocument()
 
     await user.click(screen.getByRole("button", { name: "Back" }))
     await user.click(screen.getAllByRole("button", { name: /^(?:Women's|Men's|Gender-inclusive) restroom/i })[0])

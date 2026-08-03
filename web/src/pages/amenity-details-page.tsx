@@ -43,8 +43,8 @@ export function AmenityDetailsPage({
   ]
 
   return (
-    <article className="space-y-5">
-      <header className="space-y-1">
+    <article className="flex flex-col gap-5">
+      <header className="flex flex-col gap-1">
         <div className="flex items-start justify-between gap-3">
           <h2 className="flex items-center gap-2 font-heading text-xl font-medium">
             <Icon className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
@@ -57,26 +57,31 @@ export function AmenityDetailsPage({
             {isDrawerExpanded ? "View route" : "Expand"}
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground">{amenity.building.name}</p>
+        <p hidden={!isDrawerExpanded} className="text-sm text-muted-foreground">
+          {amenity.building.name}
+        </p>
       </header>
-      <dl className="space-y-3 text-sm">
-        {details.map(([term, description]) => (
-          <div key={term} className="flex items-start justify-between gap-6 border-b pb-3 last:border-0">
-            <dt className="text-muted-foreground">{term}</dt>
-            <dd className="whitespace-pre-line text-right font-medium">{description}</dd>
-          </div>
-        ))}
-      </dl>
 
-      <AmenityReviews
-        buildingId={amenity.buildingId}
-        amenityType={amenity.amenityType}
-        amenityId={amenity.id}
-        authUser={authUser}
-        isAuthLoading={isAuthLoading}
-        isAuthPending={isAuthPending}
-        onSignIn={onSignIn}
-      />
+      <div hidden={!isDrawerExpanded} className={isDrawerExpanded ? "flex flex-col gap-5" : undefined}>
+        <dl className="space-y-3 text-sm">
+          {details.map(([term, description]) => (
+            <div key={term} className="flex items-start justify-between gap-6 border-b pb-3 last:border-0">
+              <dt className="text-muted-foreground">{term}</dt>
+              <dd className="whitespace-pre-line text-right font-medium">{description}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <AmenityReviews
+          buildingId={amenity.buildingId}
+          amenityType={amenity.amenityType}
+          amenityId={amenity.id}
+          authUser={authUser}
+          isAuthLoading={isAuthLoading}
+          isAuthPending={isAuthPending}
+          onSignIn={onSignIn}
+        />
+      </div>
     </article>
   )
 }

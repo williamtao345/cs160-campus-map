@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react"
 
 import { AppActions } from "@/components/app-actions"
-import { CampusDrawer, collapsedSnapPoint } from "@/components/campus-drawer"
+import {
+  amenityCollapsedSnapPoint,
+  CampusDrawer,
+  defaultCollapsedSnapPoint,
+} from "@/components/campus-drawer"
 import { CampusMap } from "@/components/campus-map"
 import { Button } from "@/components/ui/button"
 import type { Amenity, Building, Restroom } from "@/data/amenities"
@@ -45,7 +49,7 @@ export function App() {
     retry: retryAmenities,
     status: amenitiesStatus,
   } = useBuildingAmenities(selectedBuilding)
-  const [snapPoint, setSnapPoint] = useState<string | number>(collapsedSnapPoint)
+  const [snapPoint, setSnapPoint] = useState<string | number>(defaultCollapsedSnapPoint)
   const {
     error: authError,
     isInitializing: isAuthLoading,
@@ -100,7 +104,7 @@ export function App() {
   function showView(nextView: DrawerView) {
     setView(nextView)
     const hasSavedResults = submittedQuery !== null
-    setSnapPoint(nextView === "search" && !hasSavedResults ? collapsedSnapPoint : 1)
+    setSnapPoint(nextView === "search" && !hasSavedResults ? defaultCollapsedSnapPoint : 1)
   }
 
   async function signInUser() {
@@ -153,6 +157,7 @@ export function App() {
       <AppActions onCreate={() => showView("create")} onOpenSettings={() => showView("settings")} />
 
       <CampusDrawer
+        collapsedSnapPoint={view === "amenityDetails" ? amenityCollapsedSnapPoint : defaultCollapsedSnapPoint}
         snapPoint={snapPoint}
         onSnapPointChange={setSnapPoint}
         showBack={view !== "search" && snapPoint === 1}
@@ -203,7 +208,7 @@ export function App() {
         {view === "amenityDetails" && selectedAmenity && (
           <AmenityDetailsPage
             isDrawerExpanded={snapPoint === 1}
-            onToggleDrawer={() => setSnapPoint(snapPoint === 1 ? collapsedSnapPoint : 1)}
+            onToggleDrawer={() => setSnapPoint(snapPoint === 1 ? amenityCollapsedSnapPoint : 1)}
             amenity={selectedAmenity}
             authUser={authUser}
             isAuthLoading={isAuthLoading}

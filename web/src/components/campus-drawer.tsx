@@ -4,16 +4,19 @@ import { ArrowLeftIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer"
 
-export const collapsedSnapPoint = "16rem"
+export const defaultCollapsedSnapPoint = "16rem"
+export const amenityCollapsedSnapPoint = "6rem"
 
 export function CampusDrawer({
   children,
+  collapsedSnapPoint = defaultCollapsedSnapPoint,
   onBack,
   onSnapPointChange,
   showBack,
   snapPoint,
 }: {
   children: ReactNode
+  collapsedSnapPoint?: string | number
   onBack: () => void
   onSnapPointChange: (snapPoint: string | number) => void
   showBack: boolean
