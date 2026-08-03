@@ -10,7 +10,9 @@
 ## Pull Requests
 
 - Keep pull requests focused, describe what changed, and include screenshots for visible UI changes.
-- Get at least one teammate review before merging, then delete the branch.
+- Do not push directly to `main`; open a pull request and get approval from `@williamtao345` before merging.
+- `@williamtao345` is the only exception and may push directly to `main` or merge without another approval.
+- Delete the branch after merging.
 
 ## Commits
 
