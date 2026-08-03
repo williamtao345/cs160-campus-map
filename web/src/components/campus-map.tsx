@@ -285,7 +285,7 @@ export function CampusMap({
     let cancelled = false
     let routePolylines: google.maps.Polyline[] = []
     let destinationCenterLine: google.maps.Polyline | undefined
-    let destinationCenterCircle: google.maps.Circle | undefined
+    let destinationCenterMarker: google.maps.marker.AdvancedMarkerElement | undefined
 
     if (!mapInstance || !routeDestination || !routeOrigin) {
       if (mapInstance && hadActiveRouteRef.current) {
@@ -316,7 +316,7 @@ export function CampusMap({
           travelMode: "WALKING",
         })
       })
-      .then(({ routes }) => {
+      .then(async ({ routes }) => {
         if (cancelled) return
 
         const route = routes?.[0]
@@ -338,23 +338,31 @@ export function CampusMap({
           : null
 
         if (buildingCenter) {
+          const routeEnd = route.path?.at(-1)
+          const connectionPoint = routeEnd
+            ? { lat: routeEnd.lat, lng: routeEnd.lng }
+            : destination
+
           destinationCenterLine = new google.maps.Polyline({
             clickable: false,
-            path: [destination, buildingCenter],
+            path: [connectionPoint, buildingCenter],
             strokeColor: "#003262",
             strokeOpacity: 0.9,
             strokeWeight: 4,
             map: mapInstance,
           })
-          destinationCenterCircle = new google.maps.Circle({
-            center: buildingCenter,
-            clickable: false,
-            fillColor: "#003262",
-            fillOpacity: 1,
+
+          const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary
+          if (cancelled) return
+
+          const centerDot = document.createElement("div")
+          centerDot.className = "building-center-dot"
+          destinationCenterMarker = new AdvancedMarkerElement({
+            anchorLeft: "-50%",
+            anchorTop: "-50%",
+            content: centerDot,
             map: mapInstance,
-            radius: 6,
-            strokeColor: "#fff",
-            strokeWeight: 2,
+            position: buildingCenter,
             zIndex: 2,
           })
         }
@@ -365,7 +373,7 @@ export function CampusMap({
       cancelled = true
       routePolylines.forEach((polyline) => polyline.setMap(null))
       destinationCenterLine?.setMap(null)
-      destinationCenterCircle?.setMap(null)
+      if (destinationCenterMarker) destinationCenterMarker.map = null
     }
   }, [mapInstance, routeDestination, routeOrigin])
 

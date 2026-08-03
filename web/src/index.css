@@ -226,6 +226,15 @@ body {
   }
 }
 
+.building-center-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #003262;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 45%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .current-location-dot::before {
     animation: none;
