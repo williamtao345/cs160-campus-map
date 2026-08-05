@@ -98,6 +98,47 @@ describe("loadAmenitiesForBuilding", () => {
     ])
   })
 
+  it("loads the room number of a general amenity", async () => {
+    const microwave = {
+      id: "microwave_1",
+      buildingId: 200,
+      amenityType: "microwave",
+      floorNumber: "B",
+      roomNumber: "602",
+      locationDetails: "Davis Hall Microwave",
+      isAvailable: true,
+      accessible: null,
+      operatingHours: null,
+      rating: null,
+      notes: "In room 602",
+    }
+    getMock.mockResolvedValue({ val: () => ({ microwaves: { microwave_1: microwave } }) })
+
+    await expect(loadAmenitiesForBuilding(building as Building)).resolves.toEqual([
+      { ...microwave, building },
+    ])
+  })
+
+  it("defaults a general amenity to no room number when the field is absent", async () => {
+    const eatery = {
+      id: "eatery_1",
+      buildingId: 200,
+      amenityType: "eatery",
+      floorNumber: null,
+      locationDetails: null,
+      isAvailable: true,
+      accessible: null,
+      operatingHours: null,
+      rating: null,
+      notes: null,
+    }
+    getMock.mockResolvedValue({ val: () => ({ eateries: { eatery_1: eatery } }) })
+
+    await expect(loadAmenitiesForBuilding(building as Building)).resolves.toEqual([
+      { ...eatery, roomNumber: null, building },
+    ])
+  })
+
   it("rejects a key that does not match the amenity id", async () => {
     getMock.mockResolvedValue({
       val: () => ({

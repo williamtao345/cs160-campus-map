@@ -57,6 +57,7 @@ export type Restroom = AmenityBase & {
 export type GeneralAmenity = AmenityBase & {
   amenityType: Exclude<AmenityType, "restroom">
   floorNumber: string | null
+  roomNumber: string | null
   locationDetails: string | null
   isAvailable: boolean | null
   accessible: boolean | null
@@ -213,6 +214,7 @@ function parseAmenity(value: unknown, documentId: string, building: Building): A
     ...base,
     amenityType,
     floorNumber: nullableString(data.floorNumber, `floor for amenity ${documentId}`),
+    roomNumber: nullableString(data.roomNumber, `room for amenity ${documentId}`),
     locationDetails: nullableString(data.locationDetails, `location details for amenity ${documentId}`),
     isAvailable: nullableBoolean(data.isAvailable, `availability for amenity ${documentId}`),
     accessible: nullableBoolean(data.accessible, `accessibility for amenity ${documentId}`),

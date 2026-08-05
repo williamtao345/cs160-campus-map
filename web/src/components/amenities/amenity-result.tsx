@@ -9,9 +9,8 @@ export function AmenityResult({ amenity, onSelect }: { amenity: Amenity; onSelec
     : amenityTypeLabels[amenity.amenityType].singular
   const locationLabel = [
     amenity.floorNumber ? `Floor ${amenity.floorNumber}` : null,
-    amenity.amenityType === "restroom"
-      ? (amenity.roomNumber ? `Room ${amenity.roomNumber}` : null)
-      : amenity.locationDetails,
+    amenity.roomNumber ? `Room ${amenity.roomNumber}` : null,
+    amenity.amenityType === "restroom" ? null : amenity.locationDetails,
   ].filter(Boolean).join(" · ")
   const content = (
     <>

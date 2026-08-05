@@ -35,6 +35,7 @@ export function AmenityDetailsPage({
     ["Access", amenity.restrictedAccess ? "Restricted" : "General campus access"],
   ] : [
     ...(amenity.floorNumber ? [["Floor", amenity.floorNumber]] : []),
+    ...(amenity.roomNumber ? [["Room number", amenity.roomNumber]] : []),
     ...(amenity.locationDetails ? [["Location", amenity.locationDetails]] : []),
     ...(amenity.accessible !== null ? [["Accessibility", amenity.accessible ? "Accessible" : "Not accessible"]] : []),
     ...(amenity.operatingHours ? [["Operating hours", amenity.operatingHours]] : []),
