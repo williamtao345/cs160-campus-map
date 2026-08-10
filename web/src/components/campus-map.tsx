@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 
 import type { Building } from "@/data/amenities"
 import campusBuildingPolygons from "@/data/campus-building-polygons.json"
+import { simulatedUserLocation, type SimulatedLocation } from "@/data/simulated-location"
 
 let googleMapsPromise: Promise<void> | undefined
 
@@ -131,54 +132,59 @@ export function CampusMap({
         })
         listenerCleanups.push(() => dragListener.remove())
 
-        if (navigator.geolocation) {
+        const applyLocation = (coords: SimulatedLocation) => {
+          if (cancelled) return
+
+          const position = { lat: coords.latitude, lng: coords.longitude }
+          onLocationChangeRef.current({ latitude: coords.latitude, longitude: coords.longitude })
+
+          if (!hasCenteredOnLocation) {
+            hasCenteredOnLocation = true
+            if (!hasUserPanned) panToPaddedPosition(map, position)
+          }
+
+          if (locationMarker) {
+            locationMarker.position = position
+          } else {
+            const locationDot = document.createElement("div")
+            locationDot.className = "current-location-dot"
+            locationMarker = new AdvancedMarkerElement({
+              anchorLeft: "-50%",
+              anchorTop: "-50%",
+              collisionBehavior: CollisionBehavior.REQUIRED,
+              content: locationDot,
+              map,
+              position,
+              title: "Your location",
+              zIndex: 2_147_483_647,
+            })
+          }
+
+          if (accuracyCircle) {
+            accuracyCircle.setCenter(position)
+            accuracyCircle.setRadius(coords.accuracy)
+          } else {
+            accuracyCircle = new google.maps.Circle({
+              center: position,
+              clickable: false,
+              fillColor: "#4285f4",
+              fillOpacity: 0.15,
+              map,
+              radius: coords.accuracy,
+              strokeColor: "#4285f4",
+              strokeOpacity: 0.3,
+              strokeWeight: 1,
+              zIndex: 1,
+            })
+          }
+        }
+
+        const simulatedLocation = simulatedUserLocation()
+        if (simulatedLocation) {
+          applyLocation(simulatedLocation)
+        } else if (navigator.geolocation) {
           locationWatchId = navigator.geolocation.watchPosition(
-            ({ coords }) => {
-              if (cancelled) return
-
-              const position = { lat: coords.latitude, lng: coords.longitude }
-              onLocationChangeRef.current({ latitude: coords.latitude, longitude: coords.longitude })
-
-              if (!hasCenteredOnLocation) {
-                hasCenteredOnLocation = true
-                if (!hasUserPanned) panToPaddedPosition(map, position)
-              }
-
-              if (locationMarker) {
-                locationMarker.position = position
-              } else {
-                const locationDot = document.createElement("div")
-                locationDot.className = "current-location-dot"
-                locationMarker = new AdvancedMarkerElement({
-                  anchorLeft: "-50%",
-                  anchorTop: "-50%",
-                  collisionBehavior: CollisionBehavior.REQUIRED,
-                  content: locationDot,
-                  map,
-                  position,
-                  title: "Your location",
-                  zIndex: 2_147_483_647,
-                })
-              }
-
-              if (accuracyCircle) {
-                accuracyCircle.setCenter(position)
-                accuracyCircle.setRadius(coords.accuracy)
-              } else {
-                accuracyCircle = new google.maps.Circle({
-                  center: position,
-                  clickable: false,
-                  fillColor: "#4285f4",
-                  fillOpacity: 0.15,
-                  map,
-                  radius: coords.accuracy,
-                  strokeColor: "#4285f4",
-                  strokeOpacity: 0.3,
-                  strokeWeight: 1,
-                  zIndex: 1,
-                })
-              }
-            },
+            ({ coords }) => applyLocation(coords),
             () => {},
             { enableHighAccuracy: true, maximumAge: 10_000, timeout: 20_000 },
           )

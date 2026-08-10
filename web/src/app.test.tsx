@@ -6,6 +6,7 @@ import { App } from "@/app"
 import { createAmenitySubmission } from "@/data/amenity-submissions"
 import { loadAmenitiesForBuilding, loadBuildings } from "@/data/amenities"
 import { createAmenityReview, observeAmenityReviews, type AmenityReview } from "@/data/reviews"
+import { simulatedUserLocation } from "@/data/simulated-location"
 import { loadUserPreferences, saveUserPreferences } from "@/data/user-preferences"
 import {
   authenticationErrorMessage,
@@ -36,6 +37,10 @@ vi.mock("@/data/reviews", () => ({
 
 vi.mock("@/data/amenity-submissions", () => ({
   createAmenitySubmission: vi.fn(),
+}))
+
+vi.mock("@/data/simulated-location", () => ({
+  simulatedUserLocation: vi.fn(),
 }))
 
 vi.mock("@/data/user-preferences", async (importOriginal) => ({
@@ -285,6 +290,7 @@ describe("campus map app", () => {
     vi.mocked(saveUserPreferences).mockResolvedValue()
     vi.mocked(signInWithGoogle).mockResolvedValue(signedInUser)
     vi.mocked(signOutCurrentUser).mockResolvedValue()
+    vi.mocked(simulatedUserLocation).mockReturnValue(null)
   })
 
   afterEach(() => {
@@ -1284,6 +1290,32 @@ describe("campus map app", () => {
     expect(geolocation.clearWatch).toHaveBeenCalledWith(42)
     expect(locationMarker?.map).toBeNull()
     expect(circles[0].setMap).toHaveBeenCalledWith(null)
+  })
+
+  it("uses the simulated location instead of the device when one is configured", async () => {
+    vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-key")
+    const geolocation = { clearWatch: vi.fn(), watchPosition: vi.fn() }
+    vi.stubGlobal("navigator", { geolocation })
+    vi.mocked(simulatedUserLocation).mockReturnValue({
+      accuracy: 10,
+      latitude: 37.87564567934229,
+      longitude: -122.25872258719399,
+    })
+    const { circles, markers } = installGoogleMapsMock()
+    const { unmount } = await renderApp()
+
+    await waitFor(() => expect(markers.some((marker) => marker.options.title === "Your location")).toBe(true))
+    expect(geolocation.watchPosition).not.toHaveBeenCalled()
+
+    const locationMarker = markers.find((marker) => marker.options.title === "Your location")
+    expect(locationMarker?.options.position).toEqual({ lat: 37.87564567934229, lng: -122.25872258719399 })
+    expect(circles[0].options).toMatchObject({
+      center: { lat: 37.87564567934229, lng: -122.25872258719399 },
+      radius: 10,
+    })
+
+    unmount()
+    expect(geolocation.clearWatch).not.toHaveBeenCalled()
   })
 
   it("does not override a manual pan while waiting for the user's location", async () => {
