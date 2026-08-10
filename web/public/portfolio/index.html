@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CalShi — the design process behind a campus amenity map</title>
+<meta name="description" content="How a UC Berkeley CS160 team built a campus amenity finder: needfinding, paper prototypes, a hi-fi critique, implementation, and a six-person evaluation.">
+<meta name="theme-color" content="#001f3d">
+<link rel="canonical" href="https://williamtao345.github.io/cs160-campus-map/portfolio/">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CalShi">
+<meta property="og:title" content="CalShi — the design process behind a campus amenity map">
+<meta property="og:description" content="Needfinding, paper prototypes, a hi-fi critique, a shipped app, and a six-person evaluation. The whole CS160 design journey, in order.">
+<meta property="og:url" content="https://williamtao345.github.io/cs160-campus-map/portfolio/">
+<meta property="og:image" content="https://williamtao345.github.io/cs160-campus-map/portfolio/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<!-- Set before first paint: the entrance animation only hides content when we
+     know JavaScript can bring it back. -->
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar" id="topbar">
+  <div class="wrap topbar-inner">
+    <a class="lockup" href="#top">
+      <img class="lockup-mark" src="logo-badge.webp" width="320" height="320" alt="" decoding="async">
+      <span class="lockup-name">CalShi</span>
+    </a>
+
+    <a class="btn btn-sm btn-gold topbar-cta" href="../">Open the app</a>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ─────────────────────────────  HERO  ───────────────────────────── -->
+<section class="hero" id="top">
+  <div class="wrap hero-inner">
+    <p class="label label-gold reveal">CS160 · UC Berkeley · Team project</p>
+
+    <div class="hero-lockup reveal" style="--d:1">
+      <img class="hero-mark" src="logo-badge.webp" width="320" height="320" fetchpriority="high" decoding="async"
+           alt="The CalShi logo: a circular campus map with a gold location pin over the Campanile, ringed by icons for a water fountain, a book, a bench, and a coffee cup.">
+      <div>
+        <p class="hero-name">CalShi</p>
+        <p class="hero-slogan">Find the campus amenities you need, fast.</p>
+      </div>
+    </div>
+
+    <h1 class="hero-head reveal" style="--d:2">Campus maps<br>stop at the door.</h1>
+
+    <p class="hero-lede reveal" style="--d:3">
+      Getting to a building and finding what is inside it are two different problems. CalShi solves the
+      second one: which floor, which room, whether it is accessible, and whether it is working right now.
+      This is the whole design process that got us there — eight interviews to a deployed app, in order.
+    </p>
+
+    <p class="hero-actions reveal" style="--d:4">
+      <a class="btn btn-gold" href="../">Open the app</a>
+      <a class="btn btn-ghost" href="#product">Watch the demo</a>
+    </p>
+
+    <dl class="stats reveal" style="--d:5">
+      <div><dt>Evaluation sessions</dt><dd>6</dd></div>
+      <div><dt>Buildings mapped</dt><dd>242</dd></div>
+      <div><dt>Amenity records</dt><dd>1,296</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  PROBLEM  ───────────────────────────── -->
+<section class="band" id="problem" aria-labelledby="problem-h">
+  <div class="wrap layout">
+    <div class="marker">
+      <p class="num" aria-hidden="true">00</p>
+      <p class="marker-sub">The problem</p>
+    </div>
+    <div class="content">
+      <h2 id="problem-h">The last hundred feet</h2>
+      <p class="lede">
+        Standard mapping tools guide you across campus and stop at the entrance. They do not show
+        the location or the condition of anything inside.
+      </p>
+      <p>
+        That gap is most frustrating in exactly the situations where you can least afford it — when you
+        need a restroom, a water refill station, a vending machine, or somewhere to sit and work, in a
+        building you have never been in before. Locked doors, broken fixtures, and unmarked rooms make
+        the guesswork worse.
+      </p>
+      <p>
+        So we started where we should have: by asking people how they actually cope today.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  01 NEEDFINDING  ───────────────────────────── -->
+<section class="band alt" id="needfinding" aria-labelledby="needfinding-h">
+  <div class="wrap layout">
+    <div class="marker">
+      <p class="num" aria-hidden="true">01</p>
+      <p class="marker-sub">Needfinding</p>
+    </div>
+
+    <div class="content">
+      <h2 id="needfinding-h">Eight interviews, and one thing nobody could answer</h2>
+
+      <p class="lede">
+        We interviewed eight campus users about how they find amenities and where that goes wrong.
+      </p>
+
+      <p>
+        To keep the picture wide, we recruited students at different stages of their degree — some we
+        knew, some at random — plus a UC&nbsp;Berkeley professor and a staff member from the Tang Center.
+        Between them they covered frequent and infrequent campus users, people who knew particular
+        buildings well and people who did not, and people who regularly need restrooms, water, food, and
+        study space. No participant had taken CS&nbsp;160, which kept the feedback honest.
+      </p>
+
+      <p>
+        We asked for background on which amenities they use and how often, then pushed hard on the
+        friction: what is frustrating, what they work around, and what they did the last time it went
+        badly. We also asked each participant to find a nearby restroom, water fountain, vending machine,
+        or study spot from where we were sitting, and to narrate it.
+      </p>
+
+      <details class="disclosure">
+        <summary>The interview protocol — all 16 questions</summary>
+        <ol class="qlist">
+          <li>How many times a week are you on the UC Berkeley campus?</li>
+          <li>What areas or buildings on campus do you usually spend time in?</li>
+          <li>What campus amenities do you find yourself using, or looking for the most (bathroom / water fountain / vending machine / study spot)?</li>
+          <li>What does your experience of using these usually look like for you?</li>
+          <li>Are there any challenges, frustrations, or workarounds you commonly experience?</li>
+          <li>From where we are now, show us how you would find a nearby bathroom / water fountain / vending machine / study spot.</li>
+          <li>Why did you do it that way?</li>
+          <li>How did you feel during the task?</li>
+          <li>Was anything confusing, frustrating, or difficult?</li>
+          <li>Was there any moment where you felt unsure?</li>
+          <li>Was this your usual method, or did you take a new approach for this instance?</li>
+          <li>Can you tell me about a time when finding what you were just looking for was especially frustrating?</li>
+          <li>Do you think an application that shows you the locations of the amenities would help solve this problem?</li>
+          <li>Are there any other challenges regarding campus amenities you want to mention?</li>
+          <li>What solutions would resolve these challenges?</li>
+          <li>Is there anything else you would like to add?</li>
+        </ol>
+      </details>
+
+      <h3>What we heard</h3>
+      <div class="cards">
+        <article class="card">
+          <h4>Memory is the map</h4>
+          <p>People navigate to amenities they have already used. It works — right up until they are somewhere unfamiliar.</p>
+        </article>
+        <article class="card">
+          <h4>Otherwise, wander</h4>
+          <p>Outside familiar territory the fallbacks are wandering, following signs, or asking whoever is nearby.</p>
+        </article>
+        <article class="card">
+          <h4>Some amenities are invisible</h4>
+          <p>Water refill stations and vending machines were hardest of all to discover, with no indoor map or indicator to point at them.</p>
+        </article>
+        <article class="card">
+          <h4>Condition decides</h4>
+          <p>Crowding and cleanliness — restrooms especially — made people unwilling to use a facility even when they knew where it was.</p>
+        </article>
+      </div>
+
+      <h3>The five questions we designed against</h3>
+      <ol class="rows">
+        <li>How might we help campus users find nearby amenities in unfamiliar areas without requiring prior knowledge of the campus?</li>
+        <li>How might we help users navigate to amenities located inside complex or unfamiliar campus buildings?</li>
+        <li>How might we communicate whether an amenity is currently open, accessible, crowded, or out of service?</li>
+        <li>How might we help users quickly find an alternative when their usual amenity is unavailable?</li>
+        <li>How might we make less-visible campus resources, such as water refill stations, vending machines, and study spaces, easier to discover?</li>
+      </ol>
+
+      <div class="bridge">
+        <p class="bridge-label"><span aria-hidden="true">→</span> What this changed</p>
+        <p>
+          Question three became the spine of the product. Everything that followed had to answer
+          <em>is this thing open, reachable, and working</em> before it answered <em>where is it</em>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  02 LO-FI  ───────────────────────────── -->
+<section class="band" id="lofi" aria-labelledby="lofi-h">
+  <div class="wrap layout">
+    <div class="marker">
+      <p class="num" aria-hidden="true">02</p>
+      <p class="marker-sub">Lo-fi prototyping</p>
+    </div>
+
+    <div class="content">
+      <h2 id="lofi-h">Three ways to solve it, then two ways to build it</h2>
+
+      <p class="lede">
+        We deliberately generated concepts that were different in kind, not in detail — a phone, a
+        building, and a wrist.
+      </p>
+
+      <ol class="rows rows-alpha">
+        <li>
+          <div>
+            <h3>A campus amenity map on your phone</h3>
+            <p>
+              A map of campus with amenities marked and searchable. Pull out your phone, let GPS place you,
+              and route to the nearest one you need.
+            </p>
+            <div class="figrow">
+              <figure class="fig">
+                <img src="media/lofi-concept-a-phone-app-1.webp" width="1400" height="1051" loading="lazy" decoding="async"
+                     alt="Two hand-drawn phone screens labelled 1A Initial App Interface and 1B Selected Amenity, showing a campus map with amenity category icons across the top and pins on nearby buildings.">
+                <figcaption>Concept sketches: the amenity category row, the campus map, and a selected amenity.</figcaption>
+              </figure>
+              <figure class="fig">
+                <img src="media/lofi-concept-a-phone-app-2.webp" width="1400" height="1051" loading="lazy" decoding="async"
+                     alt="Two hand-drawn phone screens labelled 1C Selected Location and 1D Write A Review, showing a list of reviews for a location and a form for adding a name, review, and photo.">
+                <figcaption>Reviews and contribution, gated on having recently visited the amenity.</figcaption>
+              </figure>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Smart signs at every building entrance</h3>
+            <p>
+              A display at the door listing what the building has, whether it is available, and how to get to
+              it — with a QR code for anyone who wants the detail on their phone.
+            </p>
+            <div class="figrow">
+              <figure class="fig">
+                <img src="media/lofi-concept-b-signs-1.webp" width="1400" height="1067" loading="lazy" decoding="async"
+                     alt="Sketch: a student approaches Engineering Hall and notices a digital sign listing restroom, water, vending machine, and printer with green, red, and amber status dots.">
+                <figcaption>1. A student notices the sign at the entrance.</figcaption>
+              </figure>
+              <figure class="fig">
+                <img src="media/lofi-concept-b-signs-2.webp" width="1400" height="1067" loading="lazy" decoding="async"
+                     alt="Sketch: close-up of the sign showing restroom, water fountain, and vending machine rows with pictograms, directional arrows, floor numbers, and a QR code.">
+                <figcaption>2. Pictograms, directions, and floor numbers.</figcaption>
+              </figure>
+              <figure class="fig">
+                <img src="media/lofi-concept-b-signs-3.webp" width="1400" height="1067" loading="lazy" decoding="async"
+                     alt="Sketch: the phone view after scanning the sign's QR code, listing the same amenities with status dots and more detailed personalised information.">
+                <figcaption>3. Scanning the QR code hands off to the phone.</figcaption>
+              </figure>
+              <figure class="fig">
+                <img src="media/lofi-concept-b-signs-4.webp" width="1400" height="1067" loading="lazy" decoding="async"
+                     alt="Sketch: a corridor with colour-labelled restroom and water signs guiding the student to the amenity.">
+                <figcaption>4. Colour-coded corridor signs finish the trip.</figcaption>
+              </figure>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>A smartwatch that notices before you do</h3>
+            <p>
+              Biometrics detect that you are dehydrated or need a break, and the watch surfaces the three
+              nearest options with directions — before you think to search.
+            </p>
+            <figure class="fig fig-wide">
+              <img src="media/lofi-concept-c-smartwatch.webp" width="1400" height="1083" loading="lazy" decoding="async"
+                   alt="Four-panel storyboard: a student arrives at Sather Gate wearing a watch, the watch monitors vitals, it notifies them they appear dehydrated and lists three nearby options, then guides them turn by turn to a water fountain.">
+              <figcaption>Storyboard for the biometrics-powered amenity locator.</figcaption>
+            </figure>
+          </div>
+        </li>
+      </ol>
+
+      
+      <h3>Why we chose the phone</h3>
+      <p>
+        The signs would reach people without a smartphone, and the watch would catch a need before it
+        became urgent — both genuinely better on one axis. But the map app was the only one that was
+        immediately familiar to anyone who has used Google or Apple Maps, needed no new campus
+        infrastructure, and raised no biometric-privacy questions. We took Concept A forward.
+      </p>
+
+      <h3>Two paper prototypes, argued in opposite directions</h3>
+      <p>
+        Rather than refine one idea, we built two architectures and let users break them.
+      </p>
+
+      <div class="ab">
+        <article class="ab-col">
+          <p class="label">Prototype A</p>
+          <h4>Map-first</h4>
+          <p>
+            Start from your current location, pick or search an amenity type, then compare individual
+            amenity markers geographically. Reviews live inside the location-selection flow, so proximity
+            and community knowledge drive the choice.
+          </p>
+          <div class="figrow">
+            <figure class="fig">
+              <img src="media/lofi-proto-a-1.webp" width="1400" height="1057" loading="lazy" decoding="async"
+                   alt="Paper prototype A, screens A1 to A3a: a Welcome to CalShi home screen with location entry, an amenity checklist of toilet, water, gender neutral bathroom, and search, and the same list with map pins shown.">
+              <figcaption>A1–A3a: location, amenity type, then pins on the map.</figcaption>
+            </figure>
+            <figure class="fig">
+              <img src="media/lofi-proto-a-2.webp" width="1400" height="1100" loading="lazy" decoding="async"
+                   alt="Paper prototype A, screens A3b to A5: a free-text amenity search, a list of location reviews with star ratings and a photo, and a leave-a-review form.">
+              <figcaption>A3b–A5: search, reviews, and leaving your own.</figcaption>
+            </figure>
+          </div>
+        </article>
+
+        <article class="ab-col">
+          <p class="label">Prototype B</p>
+          <h4>Building-first</h4>
+          <p>
+            Start from a list of nearby buildings, pick a building, pick a floor, then browse what is on
+            it. More explicit indoor structure and a dedicated “Add Amenity” form — but no individual
+            amenities on the campus map to begin with.
+          </p>
+          <div class="figrow narrow">
+            <figure class="fig">
+              <img src="media/lofi-proto-b-1-home.webp" width="914" height="1200" loading="lazy" decoding="async"
+                   alt="Paper prototype B home page: a campus map with coloured amenity dots on each building above a Nearest Buildings list showing Doe Memorial Library at 0.3 miles.">
+              <figcaption>Home: nearest buildings, by distance.</figcaption>
+            </figure>
+            <figure class="fig">
+              <img src="media/lofi-proto-b-2-search.webp" width="914" height="1200" loading="lazy" decoding="async"
+                   alt="Paper prototype B search page: a text field containing the query Soda above a list of building results with distances.">
+              <figcaption>Search: building names only — the flaw testing found.</figcaption>
+            </figure>
+            <figure class="fig">
+              <img src="media/lofi-proto-b-3-building.webp" width="914" height="1200" loading="lazy" decoding="async"
+                   alt="Paper prototype B building detail page for Soda Hall: a level selector with Level 1 to 4 and a list of restrooms, a vending machine, and a water fountain with green, red, and amber status dots.">
+              <figcaption>Building: levels, then amenities with status.</figcaption>
+            </figure>
+            <figure class="fig">
+              <img src="media/lofi-proto-b-4-amenity.webp" width="914" height="1200" loading="lazy" decoding="async"
+                   alt="Paper prototype B amenity detail page: a restroom marked Available with a description placing it near Room 101, a star rating, a write-a-review button, and two user reviews.">
+              <figcaption>Amenity: availability, description, reviews.</figcaption>
+            </figure>
+            <figure class="fig">
+              <img src="media/lofi-proto-b-5-add-amenity.webp" width="914" height="1200" loading="lazy" decoding="async"
+                   alt="Paper prototype B add-amenity page: amenity type icons followed by fields for building name, floor number, and description.">
+              <figcaption>Add amenity: the contribution path.</figcaption>
+            </figure>
+          </div>
+        </article>
+      </div>
+
+      <h3>What we asked people to do</h3>
+      <ol class="rows">
+        <li>Find a nearby amenity</li>
+        <li>Evaluate and locate the best amenity</li>
+        <li>Contribute amenity information</li>
+      </ol>
+      <p>
+        These three tasks stayed fixed for the rest of the project, which is why the numbers in
+        Milestone&nbsp;05 are directly comparable to this round.
+      </p>
+
+      <h3>What worked</h3>
+      <ol class="rows">
+        <li>Users understood each prototype’s primary browsing structure.</li>
+        <li>Prototype B’s building-first structure was understandable on its own terms.</li>
+        <li>Reviews genuinely helped users evaluate amenities.</li>
+        <li>Users saw value in community-maintained information — but wanted safeguards.</li>
+      </ol>
+
+      <h3>What broke</h3>
+      <div class="tablewrap">
+        <table class="table">
+          <caption>Usability issues from paper-prototype testing, rated by severity.</caption>
+          <thead>
+            <tr><th scope="col">Sev.</th><th scope="col">Issue</th><th scope="col">Evidence</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="sev">3–4</span></td>
+              <th scope="row">Search scope was inconsistent and ambiguous</th>
+              <td>P5 searched “bathroom”, but Prototype B only searched building names. One field has to clearly cover both amenity and building queries.</td>
+            </tr>
+            <tr>
+              <td><span class="sev">3</span></td>
+              <th scope="row">Crowdsourced additions needed abuse prevention</th>
+              <td>P6 worried the add-amenity button could be used to spam fake amenities onto the map.</td>
+            </tr>
+            <tr>
+              <td><span class="sev">2–3</span></td>
+              <th scope="row">Reporting and contribution actions were unclear</th>
+              <td>P1–P3 wanted to report false reviews, P4 could not find “add amenity”, P5 did not notice reviews, and P6 expected to report a dirty bathroom through a review.</td>
+            </tr>
+            <tr>
+              <td><span class="sev">2–3</span></td>
+              <th scope="row">Information presentation needed stronger hierarchy</th>
+              <td>P4 found the screens crowded and text-heavy; P5 wanted photographs on amenity pages.</td>
+            </tr>
+            <tr>
+              <td><span class="sev">2–3</span></td>
+              <th scope="row">Results needed quality, access, and availability context</th>
+              <td>P1–P3 wanted customer-only or purchase-required labels; P6 wanted cleanliness, reviews, and opening hours before choosing.</td>
+            </tr>
+            <tr>
+              <td><span class="sev">2</span></td>
+              <th scope="row">Review integrity and verification were unclear</th>
+              <td>P1–P3 questioned who is eligible to review, and suggested only allowing it when the user’s location matches an amenity they recently viewed.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bridge">
+        <p class="bridge-label"><span aria-hidden="true">→</span> What this changed</p>
+        <p>
+          Neither prototype won outright, so we merged them: keep A’s amenity-based map search, adopt B’s
+          building-and-floor organisation for indoor detail, and make one search field cover both. The
+          interface also had to say plainly what is searchable, whether an amenity is worth the walk, who
+          is allowed in, and how community submissions get verified.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  03 HI-FI  ───────────────────────────── -->
+<section class="band alt" id="hifi" aria-labelledby="hifi-h">
+  <div class="wrap layout">
+    <div class="marker">
+      <p class="num" aria-hidden="true">03</p>
+      <p class="marker-sub">Hi-fi prototyping</p>
+    </div>
+
+    <div class="content">
+      <h2 id="hifi-h">Three visual answers to the same screen</h2>
+
+      <p class="lede">
+        Before designing the whole app, three of us independently designed one screen — amenity search
+        results — and then argued about them against Nielsen-style heuristics.
+      </p>
+
+      <div class="figrow narrow">
+        <figure class="fig">
+          <img src="media/hifi-style-a-listing.webp" width="460" height="1000" loading="lazy" decoding="async"
+               alt="Visual style A: a campus map above a search field reading Soda and six result cards, each naming an amenity, its building and level, and a green Available or red Out of Service status.">
+          <figcaption><b>A — listing-led.</b> Puts the amenity list, and its availability, above everything else.</figcaption>
+        </figure>
+        <figure class="fig">
+          <img src="media/hifi-style-b-map.webp" width="446" height="972" loading="lazy" decoding="async"
+               alt="Visual style B: a search field reading bathroom with category filter chips, a map with numbered WC markers over buildings, and a Bathrooms near you sheet sorted by distance with walk times.">
+          <figcaption><b>B — map-led.</b> Emphasises where amenities sit relative to you, with category filters.</figcaption>
+        </figure>
+        <figure class="fig">
+          <img src="media/hifi-style-c-icons.webp" width="410" height="830" loading="lazy" decoding="async"
+               alt="Visual style C: a blue Berkeley Map header, a campus map showing the user's location, a search field, and a row of large circular category icons for Rest, Food, Study, Rest Rooms, and Water.">
+          <figcaption><b>C — icon-led.</b> Large category icons for fast, low-reading selection.</figcaption>
+        </figure>
+      </div>
+
+      
+      <h3>We synthesised instead of picking a winner</h3>
+      <p>
+        Style A became the foundation, because it encoded the availability signal that needfinding and
+        paper testing had both flagged as the thing that decides whether a trip is worth making. Then we
+        explicitly grafted on Style B’s category filters and map markers, which covered A’s biggest gap:
+        spatial context and fast filtering.
+      </p>
+
+      <h3>Then we tested the whole app on strangers</h3>
+      <p>
+        We built a fully interactive high-fidelity prototype covering search, map, building and amenity
+        detail, and the contribution flows, and ran it past two participants from outside the team and
+        outside CS&nbsp;160. Three themes came back.
+      </p>
+
+      <ol class="rows">
+        <li>
+          <div>
+              <h4>The visual design read as clear and familiar</h4>
+              <blockquote><p>“Straightforward, easy familiarity.”</p><cite>P2</cite></blockquote>
+          </div>
+        </li>
+        <li>
+          <div>
+              <h4>The primary task was understandable</h4>
+              <blockquote><p>“I think it’s clear and intuitive to use.”</p><cite>P1</cite></blockquote>
+          </div>
+        </li>
+        <li>
+          <div>
+              <h4>Information needed better prioritisation</h4>
+              <blockquote><p>“Highlight the available ones… or show at the end.”</p><cite>P2</cite></blockquote>
+              <p class="note">Both flagged redundant or badly ordered information, including duplicated accessibility text.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3>Naming it, and planning the build</h3>
+      <p>
+        We named the application <b>CalShi</b> and wrote the tagline it still carries:
+        <i>find the campus amenities you need, fast.</i> Alongside the shipped 2D direction we ran an
+        exploratory second prototype — a 3D rendered campus model with amenity data attached, covering
+        253 buildings and 313 amenities — which was never meant to ship but told us what scale of data
+        the real product would have to carry.
+      </p>
+      <p>
+        For the implementation sprint we split a conservative task set (the five required pages,
+        authentication, persistent data) from stretch goals (map-based routing, submission moderation,
+        preference-based ordering), assigned work by skill set, and deliberately gave the shared
+        infrastructure — the data model and Firebase setup — to a single person so integrations would not
+        collide.
+      </p>
+
+      <div class="bridge">
+        <p class="bridge-label"><span aria-hidden="true">→</span> What this changed</p>
+        <p>
+          Two decisions carried into implementation: keep the colour system and interaction conventions
+          exactly as tested, and treat availability-first ordering as a requirement rather than a nicety.
+          We kept the first promise. Milestone&nbsp;04 is where we admit what happened to the second.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  04 IMPLEMENTATION  ───────────────────────────── -->
+<section class="band" id="build" aria-labelledby="build-h">
+  <div class="wrap layout">
+    <div class="marker">
+      <p class="num" aria-hidden="true">04</p>
+      <p class="marker-sub">Implementation</p>
+    </div>
+
+    <div class="content">
+      <h2 id="build-h">From hard-coded screens to real campus data</h2>
+
+      <p class="lede">
+        CalShi shipped as a deployed web application backed by Firebase for authentication and persistent
+        storage — replacing every hard-coded value in the hi-fi prototype with real, admin-curated and
+        user-generated content.
+      </p>
+
+      <h3>What we built</h3>
+      <div class="cards">
+        <article class="card">
+          <h4>Accounts</h4>
+          <p>Google sign-in, with preferences, reviews, and submissions linked to the account and following the user across devices.</p>
+        </article>
+        <article class="card">
+          <h4>Search and filtering</h4>
+          <p>Across buildings and amenity types, ordered by distance, and re-prioritised by a saved restroom-category preference when one is set.</p>
+        </article>
+        <article class="card">
+          <h4>Live campus map</h4>
+          <p>The user’s current location, building markers, and a walking route generated automatically to whichever building they choose.</p>
+        </article>
+        <article class="card">
+          <h4>Indoor detail</h4>
+          <p>Floor, room or location description, accessibility, hours, and an availability badge: available, out of service, or unknown.</p>
+        </article>
+        <article class="card">
+          <h4>Contribution loop</h4>
+          <p>A validated “Add amenity” form saved privately pending manual review, plus public 1–5 star reviews with comments.</p>
+        </article>
+        <article class="card">
+          <h4>Five distinct states</h4>
+          <p>Home and search, campus map, building detail, amenity detail, and account settings.</p>
+        </article>
+      </div>
+
+      <h3>Getting the data was the hard part</h3>
+      <p>
+        There is no single source for what is inside UC&nbsp;Berkeley’s buildings. We merged three
+        independently maintained ones — a campus navigation app’s internal dataset, a university
+        facilities GIS layer, and the sustainability office’s public asset map — none of which shared an
+        identifier scheme. The result links <b>242 buildings</b> to <b>1,296 amenity records</b> across
+        <b>9 categories</b>.
+      </p>
+
+      <h4>Restrooms, the seed dataset</h4>
+      <p>
+        The public campus restroom map turned out to be a thin client over a facilities ArcGIS
+        FeatureServer: it did no computation, and simply rendered two feature layers — “Restrooms by
+        Building” and “Building not yet surveyed”. So instead of scraping rendered output we queried the
+        same REST endpoint directly and got structured attributes: room numbers, per-category counts, and
+        free-text notes about changing tables and menstrual-product dispensers.
+      </p>
+      <p>
+        Two obstacles showed up immediately. The API’s default response size truncated large field lists
+        mid-record, and asking for building polygon geometry alongside attributes pushed responses past
+        the size ceiling. Requesting attributes and geometry in separate passes, and generalising the
+        polygon coordinates, brought each full layer back inside a single response. That produced
+        <b>242 buildings, 177 of which carry 1,013 restrooms</b>; the other 65 have not been surveyed.
+        Every later amenity was matched onto this building list.
+      </p>
+
+      <h4>Everything else, and a truncation that nearly slipped through</h4>
+      <p>
+        A public Leaflet map publishing six GeoJSON layers was the only source with real coverage of water
+        refill stations, lactation rooms, microwaves, zero-waste stations, eateries, campus gardens, and
+        basic needs services. Because it renders client-side, the data files are not in the page source at
+        all — we found the endpoints by inspecting the scripts the live page loads.
+      </p>
+      <p>
+        Four layers fetched cleanly. The self-service layer — water refill, lactation, microwave, and
+        zero-waste — exceeded the fetch tool’s response ceiling and came back <b>silently truncated at 130
+        of 242 features</b>, with one entire subtype missing. We only caught it by cross-checking the
+        retrieved count against <code>selfservice.features.length</code> in the browser’s own JavaScript,
+        which is authoritative because the browser had already downloaded and parsed the whole file to draw
+        the map. The missing 112 features were recovered by querying that in-page object in batches.
+      </p>
+
+      <h4>Matching amenities to buildings</h4>
+      <p>
+        Each amenity was attached in two stages: nearest building within 45&nbsp;m, and failing that,
+        nearest building within 150&nbsp;m that also matched on normalised name. Records satisfying
+        neither were left out rather than guessed at — <b>281 attached, 37 held out</b>. We validated by
+        programmatic JSON well-formedness checks, by spot-checking buildings with independently verifiable
+        ground truth (confirming a library’s lactation room, cafe, and water refill station all landed on
+        the right record and not a visually adjacent one), and by manually reviewing the collision and
+        held-out lists to confirm each was an expected case — adjacent sub-structures, off-campus sites,
+        non-building waypoints — rather than a systematic failure.
+      </p>
+
+      <figure class="fig fig-wide">
+        <img src="media/data-amenity-counts.webp" width="1200" height="742" loading="lazy" decoding="async"
+             alt="Bar chart of amenity records by category: restrooms 1013, water refill 127, zero waste 60, eateries 42, lactation rooms 22, microwaves 13, campus gardens 10, basic needs 8, vending machines 1.">
+        <figcaption>
+          The shape of the dataset: restrooms 1,013 · water refill 127 · zero waste 60 · eateries 42 ·
+          lactation rooms 22 · microwaves 13 · campus gardens 10 · basic needs 8 · vending machines 1.
+        </figcaption>
+      </figure>
+
+      <h3>Testing, and one thing we did not finish</h3>
+      <div class="tablewrap">
+        <table class="table">
+          <caption>Test results at submission.</caption>
+          <thead>
+            <tr><th scope="col">Category</th><th scope="col">Total</th><th scope="col">Passed</th><th scope="col">Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Feature tests</th><td>15</td><td>13</td>
+              <td>Availability- and rating-based ordering not implemented.</td>
+            </tr>
+            <tr>
+              <th scope="row">Stress / edge-case tests</th><td>5</td><td>4 fully, 1 partial</td>
+              <td>Long review text could overflow and freeze the review dialog.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        One failure we did fix: cross-device persistence, which broke because saved data was not yet tied
+        to authenticated accounts. Associating preferences with Firebase user IDs fixed it, verified by
+        retesting on a second device. Stress testing also caught a mobile problem — the map’s minimum zoom
+        stopped small-screen users from zooming out far enough to orient themselves — so we lowered it. On
+        very small screens we hide the map entirely and keep search fully usable, protecting the primary
+        workflow rather than degrading it.
+      </p>
+
+      <p>
+        We also wrote a full user manual covering account creation, every major workflow, expected
+        results, and troubleshooting. Partly for grading, but mostly because writing it forces you to
+        notice features that exist and cannot be found. Milestone&nbsp;05 showed that concern was
+        well-placed.
+      </p>
+
+      <div class="bridge">
+        <p class="bridge-label"><span aria-hidden="true">→</span> What this changed</p>
+        <p>
+          Thirteen of fifteen feature tests passed. Both failures were the availability- and rating-based
+          ordering we had committed to after the hi-fi critique — so we walked into user evaluation already
+          knowing there was a gap between what we designed and what we shipped.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  PRODUCT  ───────────────────────────── -->
+<section class="band product" id="product" aria-labelledby="product-h">
+  <div class="wrap">
+    <p class="label label-gold">Interlude</p>
+    <h2 id="product-h">See it running</h2>
+    <p class="lede product-lede">
+      A three-minute walkthrough of the shipped app, and the five screens it is made of.
+    </p>
+
+    <!-- Click to play: the poster is served from here, and the YouTube player is
+         only created on demand. Without JavaScript, or from a file:// preview
+         where YouTube refuses to embed, the link opens the video on YouTube. -->
+    <div class="video">
+      <a class="video-link" href="https://youtu.be/Wi2v2XgjTx4" target="_blank" rel="noopener">
+        <img src="media/demo-poster.webp" width="1280" height="720" loading="lazy" decoding="async" alt="">
+        <span class="video-btn" aria-hidden="true"></span>
+        <span class="vh">Play the three-minute CalShi demo video</span>
+      </a>
+    </div>
+
+    <div class="figrow narrow shots">
+      <figure class="fig">
+        <img src="media/app-home-search.webp" width="541" height="1170" loading="lazy" decoding="async"
+             alt="CalShi home screen: a campus map with the user's location marked at Soda Hall, above a search field and a Buildings Near You list showing Soda Hall at 0.00 miles with 21 amenities.">
+        <figcaption>Home — the map, and buildings near you.</figcaption>
+      </figure>
+      <figure class="fig">
+        <img src="media/app-search-results.webp" width="541" height="1170" loading="lazy" decoding="async"
+             alt="CalShi search results for the query Doe: two campus buildings, Bancroft Library at 0.23 miles with 14 amenities and Doe Library at 0.24 miles with 11 amenities, each with amenity type icons.">
+        <figcaption>Search — buildings and amenities in one field.</figcaption>
+      </figure>
+      <figure class="fig">
+        <img src="media/app-building-detail.webp" width="541" height="1170" loading="lazy" decoding="async"
+             alt="CalShi building detail for Doe Memorial Library: category filters, a level filter, and a list of eight restrooms each labelled with floor and room number.">
+        <figcaption>Building — filter by type and level.</figcaption>
+      </figure>
+      <figure class="fig">
+        <img src="media/app-amenity-detail.webp" width="541" height="1170" loading="lazy" decoding="async"
+             alt="CalShi amenity detail for a men's restroom in Doe Memorial Library: a View route button, floor 1, room number 175, accessible, general campus access, and one five-star review.">
+        <figcaption>Amenity — floor, room, access, reviews, route.</figcaption>
+      </figure>
+      <figure class="fig">
+        <img src="media/app-add-amenity.webp" width="541" height="1170" loading="lazy" decoding="async"
+             alt="CalShi add-an-amenity form: amenity type, building, floor, location details, availability, and notes, with a note that all submissions will be manually reviewed.">
+        <figcaption>Add amenity — validated, and manually reviewed.</figcaption>
+      </figure>
+      <figure class="fig">
+        <img src="media/app-settings.webp" width="541" height="1170" loading="lazy" decoding="async"
+             alt="CalShi settings screen showing the signed-in account, a sign-out button, and a gender preference selector with a save preferences button.">
+        <figcaption>Settings — the account, and search preferences.</figcaption>
+      </figure>
+    </div>
+
+    <p class="product-actions">
+      <a class="btn btn-gold" href="../">Open the live app</a>
+      <a class="btn btn-ghost" href="https://github.com/williamtao345/cs160-campus-map">View the source</a>
+    </p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  05 EVALUATION  ───────────────────────────── -->
+<section class="band alt" id="evaluation" aria-labelledby="evaluation-h">
+  <div class="wrap layout">
+    <div class="marker">
+      <p class="num" aria-hidden="true">05</p>
+      <p class="marker-sub">User evaluation</p>
+    </div>
+
+    <div class="content">
+      <h2 id="evaluation-h">Six people, three tasks, and one very slow one</h2>
+
+      <p class="lede">
+        Participants finished 17 of 18 tasks. Finding an amenity was quick and clear. Contributing one
+        was neither.
+      </p>
+
+      <p>
+        All six were UC&nbsp;Berkeley students and campus community members who regularly hunt for
+        restrooms, water, and study space — the same population as our original needfinding — and none
+        were enrolled in CS&nbsp;160. We screen-recorded every session and measured completion, time,
+        taps, and missteps against the same three tasks we have used since paper.
+      </p>
+
+      <div class="figrow">
+        <figure class="fig">
+          <img src="media/eval-mean-task-time.webp" width="600" height="371" loading="lazy" decoding="async"
+               alt="Bar chart of mean task time in seconds: Find a Nearby Amenity 30.2, Evaluate and Locate 37, Contribute Info 90.3.">
+          <figcaption>Mean time roughly triples from Task 1 to Task 3.</figcaption>
+        </figure>
+        <figure class="fig">
+          <img src="media/eval-missteps-by-task.webp" width="600" height="371" loading="lazy" decoding="async"
+               alt="Bar chart of total missteps by task: Find a Nearby Amenity 5, Evaluate and Locate 5, Contribute Info 14.">
+          <figcaption>Missteps nearly triple on the same task.</figcaption>
+        </figure>
+      </div>
+
+      <p>
+        Mean completion time climbed from <b>30.2&nbsp;s</b> on Task&nbsp;1 to <b>90.3&nbsp;s</b> on
+        Task&nbsp;3. Missteps followed exactly the same shape: 5, 5, then <b>14</b> — making contribution
+        both the slowest and the most error-prone task, driven by sign-in and list navigation. Tap counts
+        agree, though Task&nbsp;3’s mean of 52.7 is skewed by a single session dominated by two-factor
+        verification; its <b>median of 19.5</b> is the honest figure.
+      </p>
+
+      <p>
+        Only one task failed outright. Participant&nbsp;2 could not complete Task&nbsp;1 — not because the
+        answer was missing, but because it was in the wrong place. Their category search for “restroom”
+        returned buildings about six miles away, while the genuinely nearest option, a gender-inclusive
+        restroom 1.0&nbsp;mile away at the Rogers Rowing Center, sat unclicked on the map with a
+        low-contrast label at the edge of the frame. It was correctly listed under “Buildings Near You”
+        the whole time.
+      </p>
+
+      <figure class="fig fig-wide">
+        <img src="media/eval-likert-survey.webp" width="628" height="388" loading="lazy" decoding="async"
+             alt="Stacked bar chart of Likert survey responses for seven questions, showing strong agreement for Q1 to Q3 and Q6, and disagreement appearing on Q4, Q5, and Q7.">
+        <figcaption>Post-session survey: agreement on finding, disagreement on contributing.</figcaption>
+      </figure>
+
+      <details class="disclosure">
+        <summary>The seven survey prompts</summary>
+        <ol class="qlist">
+          <li>Searching for and filtering nearby campus amenities (e.g. bathrooms, water fountains) was quick and intuitive.</li>
+          <li>The interface made it easy to view and select nearby options.</li>
+          <li>The detailed information (building, floor, written directions, photos) made it clear where to find the amenity within the building.</li>
+          <li>Comparing different amenities to find the option that best fits my needs was straightforward.</li>
+          <li>The process of submitting a review, photo, or issue report was clear and easy to complete.</li>
+          <li>The overall design and layout of the app felt clean, clear, and visually appealing.</li>
+          <li>If adopted by my campus community, I would regularly use this app to find and check amenities.</li>
+        </ol>
+      </details>
+
+      <p>
+        Most participants agreed that search was quick and intuitive, that the interface made options easy
+        to compare, and that the detail we show is enough to actually find the amenity indoors. They
+        disagreed about whether contributing was straightforward, and about whether they would use the app
+        regularly.
+      </p>
+
+      <h3>Three themes from thinking aloud</h3>
+
+      <ol class="rows">
+        <li>
+          <div>
+            <h4>Unfiltered, alphabetical lists force manual scanning</h4>
+            <p>
+              The problem is not confined to one screen. Any list long enough to need scanning becomes a
+              bottleneck, and category search compounded it by ranking results that proximity ordering already
+              had right — the failure behind our only incomplete task.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h4>Map entry points do not look interactive</h4>
+            <blockquote>
+              <p>“I did not know that you could click on the names itself [of the buildings]… a little tutorial [would help].”</p>
+              <cite>Participant 3</cite>
+            </blockquote>
+            <p>
+              When search underperforms, nothing points users at the map as a fallback, so correct nearby
+              answers go undiscovered. Meanwhile users elsewhere place unverified trust in our ordering:
+            </p>
+            <blockquote>
+              <p>“I just want the nearest building, and I am assuming the buildings are ordered by how close they are to me, so I just pick the top building.”</p>
+              <cite>Participant 1</cite>
+            </blockquote>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h4>The contribution loop is broken at both ends</h4>
+            <p>
+              Sign-in creates friction and distrust at the moment someone wants to help, and the app misses the
+              moment when it most needs data.
+            </p>
+            <blockquote>
+              <p>“Why does this require me to log in? Fine, I’ll use my fake account…” — later: “It was functional, I just question the reason to collect my data information.”</p>
+              <cite>Participant 4</cite>
+            </blockquote>
+            <p>
+              That matters because reviews are the feature people said they wanted most: <i>“what would matter
+              to me the most is if people left reviews and that could help me determine a bit more about like
+              what bathrooms are better.”</i> On the other end, Participant&nbsp;5 opened Hearst Field Annex A —
+              a building with zero recorded amenities — and hit nothing at all, then proposed the fix
+              themselves.
+            </p>
+            <blockquote>
+              <p>“Clicking on a building that had no recorded amenities felt like a dead end… adding a quick way to report or add missing amenities directly on empty building pages would be a great addition.”</p>
+              <cite>Participant 5</cite>
+            </blockquote>
+          </div>
+        </li>
+      </ol>
+
+      <div class="bridge">
+        <p class="bridge-label"><span aria-hidden="true">→</span> What this changed</p>
+        <p>
+          Every theme mapped onto a concrete change, and each of the five next steps below is tagged with
+          the theme it answers.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  NEXT  ───────────────────────────── -->
+<section class="band" id="next" aria-labelledby="next-h">
+  <div class="wrap layout">
+    <div class="marker">
+      <p class="num" aria-hidden="true">06</p>
+      <p class="marker-sub">Next steps</p>
+    </div>
+    <div class="content">
+      <h2 id="next-h">Five things we would do next</h2>
+      <ol class="rows">
+        <li>
+          <div>
+            <p class="label">Theme 1</p>
+            <h3>Live filtering and an A–Z index</h3>
+            <p>On the building and amenity-type lists, so long lists stop demanding a manual scan.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <p class="label">Theme 2</p>
+            <h3>Fix category-search ranking</h3>
+            <p>Make it use the proximity data “Buildings Near You” already gets right — the study’s only task failure.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <p class="label">Theme 2</p>
+            <h3>Make the map look tappable</h3>
+            <p>Auto-centre on nearby results, raise pin-label contrast, and add a one-time interactive hint.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <p class="label">Theme 3</p>
+            <h3>Reduce contribution friction</h3>
+            <p>Allow anonymous or guest submissions — or at minimum, explain why sign-in is required at the moment it is asked for.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <p class="label">Theme 3</p>
+            <h3>Turn empty buildings into prompts</h3>
+            <p>Replace the dead-end empty state with a contribution invitation, at exactly the moment the app most needs user input.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  REFLECTION  ───────────────────────────── -->
+<section class="reflection" aria-labelledby="reflection-h">
+  <div class="wrap reflection-inner">
+    <p class="label label-gold">Closing</p>
+    <h2 id="reflection-h">The same problem, five times, getting sharper</h2>
+    <p>
+      Across five milestones the throughline was that one problem kept resurfacing at every fidelity
+      level, each time in a more specific form. Needfinding found that people cannot tell whether an
+      amenity is currently usable. Paper testing found users questioning how reviews could be trusted and
+      failing to find the contribution controls. The hi-fi critique asked us to put available amenities
+      ahead of unavailable ones. And the final evaluation found that our shipped contribution flow was
+      still the slowest, most error-prone, and least trusted part of the app — while the two
+      availability features we promised after that critique had not been finished.
+    </p>
+    <p>
+      We do not read that as five failures. We read it as evidence that the earliest insight was the right
+      one and it held: <b>people need to trust an amenity’s status before they will commit to walking
+      there.</b> Closing that loop, in the data and in the interface, is the highest-leverage work left.
+      The five next steps are scoped to exactly that unfinished thread.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <img class="footer-lockup" src="logo-lockup.webp" width="720" height="811" loading="lazy" decoding="async"
+           alt="CalShi wordmark beneath the circular campus-map logo, with a bear tucked into the letter A.">
+      <p class="footer-slogan">Find the campus amenities you need, fast.</p>
+    </div>
+
+    <nav class="footer-links" aria-label="Project links">
+      <h2>Project</h2>
+      <ul>
+        <li><a href="../">Live application</a></li>
+        <li><a href="https://github.com/williamtao345/cs160-campus-map">Source on GitHub</a></li>
+        <li><a href="https://youtu.be/Wi2v2XgjTx4">Demo video</a></li>
+      </ul>
+    </nav>
+
+    <nav class="footer-links" aria-label="Process sections">
+      <h2>Process</h2>
+      <ul>
+        <li><a href="#problem">00 The problem</a></li>
+        <li><a href="#needfinding">01 Needfinding</a></li>
+        <li><a href="#lofi">02 Lo-fi prototyping</a></li>
+        <li><a href="#hifi">03 Hi-fi prototyping</a></li>
+        <li><a href="#build">04 Implementation</a></li>
+        <li><a href="#evaluation">05 User evaluation</a></li>
+        <li><a href="#next">06 Next steps</a></li>
+      </ul>
+    </nav>
+
+    <p class="footer-meta">
+      CS&nbsp;160: User Interface Design and Development · University of California, Berkeley.
+      Built for the course team project.
+    </p>
+  </div>
+</footer>
+
+<dialog class="lightbox" id="lightbox" aria-label="Enlarged figure">
+  <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
+  <img id="lightbox-img" alt="">
+  <p id="lightbox-cap"></p>
+</dialog>
+
+<script src="main.js"></script>
+</body>
+</html>

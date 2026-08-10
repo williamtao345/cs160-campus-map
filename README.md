@@ -9,6 +9,14 @@ A mobile campus amenity map that helps UC Berkeley students quickly find nearby 
 - View building, floor, and indoor location details
 - Share reviews, photos, and issue reports to keep information accurate
 
+## Design process portfolio
+
+The design journey behind CalShi — needfinding, lo-fi and hi-fi prototyping, implementation, and the final user evaluation — is documented at [williamtao345.github.io/cs160-campus-map/portfolio/](https://williamtao345.github.io/cs160-campus-map/portfolio/).
+
+The site is a static page in `web/public/portfolio/`, so the existing Pages workflow publishes it alongside the application with no extra configuration. Its figures live in `web/public/portfolio/media/` as optimized WebP.
+
+The full CHI article is deliberately not published here, in either PDF or web form, because it contains personal information. Do not add it back to `web/public/`, which is served verbatim.
+
 ## Design constraints
 
 - Treat the application as mobile-first and use one shared sizing and layout system across viewport sizes.

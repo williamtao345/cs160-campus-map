@@ -1,0 +1,630 @@
+/* ==========================================================================
+   CalShi — design process portfolio
+
+   Palette and typeface come from the shipped app (web/src/index.css), so the
+   site and the product read as one thing.
+
+   The visual system is deliberately thin: one page ground, hairline rules and
+   whitespace instead of boxes, and exactly one filled block — the "what this
+   changed" sign that closes every milestone. If something needs emphasis, it
+   gets space or a rule, not another container.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Geist";
+  src: url("fonts/geist-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* brand */
+  --blue-900: #001f3d;
+  --blue-700: #003262;
+  --gold: #fdb515;
+  --gold-ink: #7a5300;          /* gold-family text that passes contrast on white */
+
+  /* surfaces and text */
+  --surface: #ffffff;
+  --paper: #f4f6f9;
+  --ink: #101720;
+  --muted: #55606d;
+  --line: #e0e6ee;
+  --line-strong: #c8d2de;
+
+  --ok: #15803d;
+
+  --radius: 8px;
+  --topbar-h: 4rem;
+  --measure: 40rem;
+
+  font-family: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--topbar-h) + 1rem);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: clamp(1.02rem, 0.35vw + 0.95rem, 1.12rem);
+  line-height: 1.65;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; height: auto; }
+
+a { color: var(--blue-700); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { color: var(--gold-ink); }
+
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 3px; }
+
+.skip {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.7rem 1.1rem;
+  background: var(--blue-900);
+  color: #fff;
+  border-radius: 0 0 var(--radius) var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+  transition: top 0.15s ease;
+}
+.skip:focus { top: 0; color: #fff; }
+
+/* announced by screen readers, invisible on screen */
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.wrap { width: min(100% - 2.5rem, 64rem); margin-inline: auto; }
+
+/* ---------------------------------------------------------------- type ---- */
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 650;
+  letter-spacing: -0.028em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -0.035em; }
+h3 { font-size: clamp(1.15rem, 1.3vw, 1.3rem); margin-top: 3rem; }
+h4 { font-size: 1.03rem; letter-spacing: -0.012em; }
+
+p { margin: 0 0 1.1rem; }
+.content > p, .content > details, .content > ol, .content > ul { max-width: var(--measure); }
+.content > .rows-alpha { max-width: none; }
+
+.lede {
+  font-size: clamp(1.15rem, 1vw + 0.95rem, 1.35rem);
+  line-height: 1.5;
+  letter-spacing: -0.017em;
+  color: var(--blue-900);
+  margin-bottom: 1.6rem;
+}
+
+/* one small-caps label style, used everywhere a label is needed */
+.label, .table thead th, .footer-links h2, blockquote cite {
+  font-size: 0.7rem;
+  font-weight: 640;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.label { margin: 0 0 0.5rem; }
+.label-gold { color: var(--gold); }
+.rows .label { color: var(--gold-ink); }
+
+b, strong { font-weight: 640; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+  color: var(--blue-700);
+}
+
+/* --------------------------------------------------------------- topbar ---- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgb(255 255 255 / 0.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-inner { display: flex; align-items: center; gap: 1rem; min-height: var(--topbar-h); }
+
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+  color: var(--blue-900);
+  margin-right: auto;
+}
+.lockup:hover { color: var(--blue-900); }
+.lockup-mark { width: 2rem; height: 2rem; }
+.lockup-name { font-weight: 680; font-size: 1.15rem; letter-spacing: -0.03em; }
+
+
+/* --------------------------------------------------------------- buttons --- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 1.15rem;
+  border-radius: 999px;
+  font-weight: 620;
+  font-size: 0.97rem;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.btn-sm { padding: 0.4rem 0.85rem; font-size: 0.9rem; }
+
+.btn-gold { background: var(--gold); color: var(--blue-900); }
+.btn-gold:hover { background: #ffc542; color: var(--blue-900); }
+
+.btn-ghost { border-color: rgb(255 255 255 / 0.4); color: #fff; }
+.btn-ghost:hover { border-color: #fff; color: #fff; }
+
+.band .btn-ghost, .product .btn-ghost { border-color: var(--line-strong); color: var(--blue-700); }
+.band .btn-ghost:hover, .product .btn-ghost:hover { border-color: var(--blue-700); color: var(--blue-700); }
+
+/* ------------------------------------------------------------------ hero --- */
+
+.hero {
+  background:
+    radial-gradient(58rem 28rem at 80% -14%, rgb(253 181 21 / 0.17), transparent 62%),
+    var(--blue-900);
+  color: #fff;
+  padding: clamp(3rem, 6vw, 5.5rem) 0 clamp(3.5rem, 7vw, 6rem);
+}
+
+.hero-lockup { display: flex; align-items: center; gap: 1.1rem; margin-bottom: 2rem; }
+.hero-mark { width: clamp(4.25rem, 10vw, 6.25rem); height: auto; }
+.hero-name {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+.hero-slogan { margin: 0.2rem 0 0; color: var(--gold); font-size: clamp(0.95rem, 1.2vw, 1.08rem); }
+
+.hero-head {
+  font-size: clamp(2.6rem, 7.4vw, 5.2rem);
+  font-weight: 700;
+  letter-spacing: -0.048em;
+  line-height: 0.98;
+  margin-bottom: 1.6rem;
+}
+
+.hero-lede {
+  max-width: 40rem;
+  color: #ccd9e7;
+  font-size: clamp(1.05rem, 0.6vw + 0.95rem, 1.22rem);
+  line-height: 1.55;
+}
+
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 2.25rem 0 0; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: 1.75rem 2rem;
+  margin: 3.5rem 0 0;
+}
+/* labels sit at the top, numbers at the bottom, so a label that wraps to two
+   lines does not drop its number below the rest of the row */
+.stats > div { display: flex; flex-direction: column; }
+.stats dt {
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #93aac2;
+  font-weight: 620;
+}
+.stats dd {
+  margin: auto 0 0;          /* auto top margin pins the number to the bottom */
+  padding-top: 0.25rem;
+  font-size: clamp(1.7rem, 2.4vw, 2.1rem);
+  font-weight: 690;
+  letter-spacing: -0.045em;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* ------------------------------------------------------------------ band --- */
+
+.band { padding: clamp(3.25rem, 6vw, 5.5rem) 0; border-top: 1px solid var(--line); }
+
+/* minmax(0, …): grid items default to min-width:auto, which lets a wide child
+   (the scrolling tables) push the whole page sideways on mobile. */
+.layout { display: grid; gap: 1.75rem; grid-template-columns: minmax(0, 1fr); }
+.layout > * { min-width: 0; }
+
+@media (min-width: 60rem) {
+  .layout { grid-template-columns: 8.5rem minmax(0, 1fr); gap: 3.5rem; }
+  .marker { position: sticky; top: calc(var(--topbar-h) + 2.5rem); align-self: start; }
+}
+
+.marker .num {
+  margin: 0 0 0.5rem;
+  font-size: clamp(2.75rem, 5vw, 4.25rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--gold);
+}
+.marker-sub {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 620;
+  letter-spacing: 0.01em;
+  color: var(--blue-700);
+}
+
+.content > h2 { margin-bottom: 1.1rem; }
+.content > h3 { margin-bottom: 0.85rem; }
+.content > h3:first-of-type { margin-top: 2.5rem; }
+.content > h4 { margin: 2.25rem 0 0.6rem; color: var(--blue-900); }
+
+/* ------------------------------------------------------------------ rows --- */
+/* The one list on the page. A number (or letter) in the gutter, content in the
+   column beside it, a hairline between. Used for the how-might-we questions,
+   the tasks, the findings, the concepts, the themes and the next steps. */
+
+.rows {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  counter-reset: r;
+  border-top: 1px solid var(--line);
+}
+.rows > li {
+  counter-increment: r;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.rows > li::before {
+  content: counter(r, decimal-leading-zero);
+  font-variant-numeric: tabular-nums;
+  font-weight: 680;
+  color: var(--gold-ink);
+}
+.rows-alpha > li::before { content: counter(r, upper-alpha); }
+.rows-alpha > li { padding: 1.9rem 0; }
+
+.rows h3, .rows h4 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+.rows > li > div > :last-child { margin-bottom: 0; }
+.rows .note { margin: 0.75rem 0 0; font-size: 0.93rem; color: var(--muted); }
+.rows .figrow, .rows .fig-wide { margin-bottom: 0; }
+
+/* ------------------------------------------------------- headed passages --- */
+/* Cards and themes are the same thing: a rule, a heading, a paragraph. */
+
+.cards {
+  display: grid;
+  gap: 1.75rem 2.5rem;
+  margin: 1.5rem 0 0;
+}
+/* min(…, 100%) so the track can shrink below its ideal width on narrow phones */
+.cards { grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr)); }
+.card {
+  border-top: 1px solid var(--line-strong);
+  padding-top: 0.9rem;
+}
+.card h4 { margin-bottom: 0.45rem; color: var(--blue-900); }
+.card p { margin: 0; font-size: 0.97rem; color: var(--muted); line-height: 1.55; }
+
+
+
+.disclosure { margin: 1.75rem 0; max-width: var(--measure); border-block: 1px solid var(--line); }
+.disclosure summary {
+  cursor: pointer;
+  padding: 0.85rem 0;
+  font-weight: 600;
+  font-size: 0.97rem;
+  color: var(--blue-700);
+}
+.disclosure summary:hover { color: var(--gold-ink); }
+.qlist {
+  margin: 0;
+  padding: 0 0 1.1rem 1.4rem;
+  display: grid;
+  gap: 0.45rem;
+  color: var(--muted);
+  font-size: 0.96rem;
+}
+
+/* -------------------------------------------------------------- concepts --- */
+
+
+.ab { display: grid; gap: 2.5rem; margin: 1.75rem 0 0; }
+@media (min-width: 48rem) { .ab { grid-template-columns: 1fr 1fr; gap: 3rem; } }
+.ab-col h4 { margin: 0 0 0.5rem; font-size: 1.2rem; letter-spacing: -0.025em; }
+.ab-col > p { font-size: 0.98rem; color: var(--muted); }
+
+/* --------------------------------------------------------------- figures --- */
+
+/* Flex rather than grid: with a variable number of figures per row, auto-fit
+   leaves collapsed tracks behind and the trailing gap shows. */
+.figrow { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 1.5rem 0 0; }
+.figrow > .fig { flex: 1 1 11rem; min-width: 0; }
+/* portrait phone captures hold a phone-ish width instead of stretching */
+.figrow.narrow > .fig { flex: 0 1 13rem; }
+/* inside the half-width A/B comparison there is room for one, or a pair */
+.ab-col .figrow > .fig { flex: 1 1 100%; }
+.ab-col .figrow.narrow > .fig { flex: 0 1 calc(50% - 0.625rem); }
+
+.fig { margin: 0; }
+.fig img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: zoom-in;
+}
+.fig figcaption { margin-top: 0.6rem; font-size: 0.85rem; line-height: 1.45; color: var(--muted); }
+.fig figcaption b { color: var(--ink); font-weight: 620; }
+
+.fig-wide { margin: 1.75rem 0; max-width: 42rem; }
+
+/* Phone screenshots are tall; hold them to a phone-ish width so a row of them
+   does not swamp the page. */
+.shots { max-width: 42rem; margin-inline: auto; }
+
+/* ---------------------------------------------------------------- tables --- */
+
+.tablewrap { overflow-x: auto; margin: 1.5rem 0 0; -webkit-overflow-scrolling: touch; }
+.table { width: 100%; min-width: 32rem; border-collapse: collapse; font-size: 0.95rem; }
+.table caption {
+  caption-side: bottom;
+  padding-top: 0.85rem;
+  font-size: 0.84rem;
+  color: var(--muted);
+  text-align: left;
+}
+.table th, .table td {
+  padding: 0.8rem 1.25rem 0.8rem 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.table thead th { border-bottom: 1px solid var(--line-strong); padding-bottom: 0.55rem; }
+.table tbody th { font-weight: 620; color: var(--blue-900); }
+.table td { color: var(--muted); }
+.table td:last-child, .table th:last-child { padding-right: 0; }
+
+/* severity reads off the number itself — no need for a coloured chip */
+.sev {
+  font-variant-numeric: tabular-nums;
+  font-weight: 680;
+  color: var(--gold-ink);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ quote -- */
+
+blockquote { margin: 1.1rem 0; padding: 0 0 0 1.1rem; border-left: 2px solid var(--gold); }
+blockquote p {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--blue-900);
+  letter-spacing: -0.012em;
+}
+blockquote cite { display: block; margin-top: 0.45rem; font-style: normal; }
+
+/* ---------------------------------------------------------------- bridge --- */
+/* The one filled block on the page: a sign at the end of every milestone,
+   naming the decision the next milestone starts from. */
+
+.bridge {
+  margin: 3rem 0 0;
+  padding: 1.4rem 1.6rem;
+  background: var(--blue-900);
+  color: #dfe8f2;
+  border-radius: var(--radius);
+}
+.bridge-label {
+  margin: 0 0 0.55rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+  font-weight: 680;
+  color: var(--gold);
+}
+.bridge-label span { margin-right: 0.45rem; font-size: 1.05rem; line-height: 1; }
+.bridge p:last-child { margin: 0; max-width: 44rem; }
+.bridge em { color: #fff; font-style: italic; }
+
+/* --------------------------------------------------------------- product --- */
+
+.product { background: var(--paper); text-align: center; }
+.product h2 { margin-bottom: 0.9rem; }
+.product-lede { max-width: 32rem; margin-inline: auto; }
+.product .figrow { justify-content: center; text-align: left; }
+.product-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; justify-content: center; margin-top: 2.5rem; }
+
+.video {
+  position: relative;
+  max-width: 52rem;
+  margin: 2rem auto;
+  aspect-ratio: 16 / 9;
+  background: var(--blue-900);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+.video-link { position: absolute; inset: 0; display: grid; place-items: center; }
+.video-link img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.video-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 4px 22px rgb(0 12 26 / 0.4);
+  transition: transform 0.15s ease;
+}
+.video-btn::before {
+  content: "";
+  margin-left: 0.3rem;
+  border-left: 1.1rem solid var(--blue-900);
+  border-top: 0.68rem solid transparent;
+  border-bottom: 0.68rem solid transparent;
+}
+.video-link:hover .video-btn { transform: scale(1.07); }
+
+/* ------------------------------------------------------------ reflection --- */
+
+.reflection {
+  background: var(--blue-700);
+  color: #dfe8f2;
+  padding: clamp(3.5rem, 7vw, 6rem) 0;
+}
+.reflection-inner { max-width: 44rem; }
+.reflection h2 { color: #fff; margin-bottom: 1.35rem; }
+.reflection p { font-size: clamp(1.02rem, 0.5vw + 0.92rem, 1.14rem); }
+.reflection b { color: var(--gold); }
+
+/* ---------------------------------------------------------------- footer --- */
+
+.footer { background: var(--blue-900); color: #b3c4d6; padding: 3.5rem 0 2.5rem; }
+.footer-inner { display: grid; gap: 2.5rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+.footer-brand { grid-column: 1 / -1; }
+@media (min-width: 52rem) { .footer-brand { grid-column: auto; } }
+
+/* the full lockup is drawn for light backgrounds, so it gets its own plate */
+.footer-lockup {
+  display: block;
+  width: 9rem;
+  height: auto;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  border-radius: var(--radius);
+}
+.footer-slogan { margin: 0.9rem 0 0; color: var(--gold); font-size: 0.94rem; max-width: 15rem; }
+
+.footer-links h2 { color: #7f93a8; margin-bottom: 0.85rem; }
+.footer-links ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.footer-links a { color: #dce6f0; text-decoration: none; font-size: 0.95rem; }
+.footer-links a:hover { color: var(--gold); }
+
+.footer-meta {
+  grid-column: 1 / -1;
+  margin: 1.25rem 0 0;
+  padding-top: 1.75rem;
+  border-top: 1px solid rgb(255 255 255 / 0.13);
+  font-size: 0.87rem;
+  color: #8ba0b6;
+}
+
+/* -------------------------------------------------------------- lightbox --- */
+
+.lightbox {
+  border: 0;
+  padding: 0;
+  max-width: min(94vw, 58rem);
+  max-height: 92vh;
+  background: transparent;
+  overflow: visible;
+}
+.lightbox::backdrop { background: rgb(0 12 26 / 0.88); }
+.lightbox img {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+  width: auto;
+  margin-inline: auto;
+  border-radius: 3px;
+  background: #fff;
+}
+.lightbox p { margin: 0.8rem 0 0; color: #d5e0ec; font-size: 0.89rem; text-align: center; }
+.lightbox-close {
+  position: absolute;
+  top: -2.6rem;
+  right: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lightbox-close:hover { background: rgb(255 255 255 / 0.26); }
+
+/* ---------------------------------------------------------------- mobile --- */
+
+@media (max-width: 40rem) {
+  .figrow > .fig { flex: 1 1 8rem; }
+  .figrow.narrow > .fig { flex: 0 1 calc(50% - 0.625rem); }
+}
+
+@media (max-width: 30rem) {
+  .hero-lockup { gap: 0.85rem; }
+  .tasks li { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------- motion --- */
+/* Content is visible by default; only the .js branch hides it, so a failed or
+   blocked script can never leave the hero blank. */
+
+.js .reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--d, 0) * 80ms);
+}
+
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .js .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+@media print {
+  .topbar, .video, .lightbox, .skip { display: none; }
+  .hero, .reflection, .footer, .bridge { background: #fff !important; color: #000; }
+  .bridge-label, .hero-slogan, .reflection b, .stats dd { color: #7a5300; }
+}
