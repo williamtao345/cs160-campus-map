@@ -4,7 +4,7 @@ export type SimulatedLocation = {
   longitude: number
 }
 
-// Pins the user to Soda Hall so the app can be demoed away from campus. Return null to track the real device position with navigator.geolocation.
+// Returns null so the app tracks the real device position with navigator.geolocation. Return a fixed position instead to demo the app away from campus; Soda Hall is { accuracy: 10, latitude: 37.87564567934229, longitude: -122.25872258719399 }.
 export function simulatedUserLocation(): SimulatedLocation | null {
-  return { accuracy: 10, latitude: 37.87564567934229, longitude: -122.25872258719399 }
+  return null
 }
